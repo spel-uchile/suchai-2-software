@@ -68,3 +68,5 @@ docs/html/
 *__pycache__
 *.pyc
 
+# SUCHAI
+suchai-flight-software/src/system/include/config.h
