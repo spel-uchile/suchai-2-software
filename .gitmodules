@@ -1,3 +1,5 @@
 [submodule "suchai-flight-software"]
 	path = suchai-flight-software
 	url = ../suchai-flight-software.git
+	update = merge
+ 
