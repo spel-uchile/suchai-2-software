@@ -294,6 +294,10 @@ typedef struct __attribute__((__packed__)) stt_exp_time_data{
     int n_stars;
 }stt_exp_time_data_t;
 
+typedef struct __attribute__((__packed__)) stt_gyro_data{
+    float gx, gy, gz;
+} stt_gyro_data_t;
+
 static char status_var_string[] = "sat_index timestamp obc_last_reset obc_hrs_alive obc_hrs_wo_reset obc_reset_counter "
                                   "obc_sw_wdt obc_temp_1 obc_temp_2 obc_temp_3 obc_executed_cmds obc_failed_cmds "
                                   "dep_deployed dep_ant_deployed dep_date_time com_count_tm com_count_tc com_last_tc "

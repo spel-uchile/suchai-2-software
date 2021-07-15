@@ -54,6 +54,7 @@ set(SOURCE_FILES
         src/system/cmdAPP.c
         src/system/cmdAX100.c
         src/system/cmdEPS.c
+        src/system/hookCommunications.c
 )
 
 add_executable(ground-app ${GS_SOURCE_FILES} ${SOURCE_FILES})
