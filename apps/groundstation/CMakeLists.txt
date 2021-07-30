@@ -54,6 +54,7 @@ set(SOURCE_FILES
         src/system/cmdAPP.c
         src/system/cmdAX100.c
         src/system/cmdEPS.c
+        src/system/cmdMAG.c
         src/system/hookCommunications.c
 )
 

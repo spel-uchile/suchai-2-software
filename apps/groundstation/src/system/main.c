@@ -24,6 +24,7 @@
 #include "app/system/cmdAPP.h"
 #include "app/system/cmdAX100.h"
 #include "app/system/cmdEPS.h"
+#include "app/system/cmdMAG.h"
 
 static char *tag = "app_main";
 
@@ -48,6 +49,7 @@ void initAppHook(void *params)
     cmd_app_init();
     cmd_ax100_init();
     cmd_eps_init();
+    cmd_mag_init();
 
     /** Init CSP **/
     struct usart_conf conf;
