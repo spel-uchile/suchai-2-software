@@ -19,8 +19,10 @@ void taskCommunicationsHook(csp_conn_t *conn, csp_packet_t *packet)
     {
         case SCH_TRX_PORT_STT:
             parse_stt_data(packet);
+            break;
         case SCH_TRX_PORT_MAG:
             parse_mag_data(packet);
+            break;
         default:
             break;
     }

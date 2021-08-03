@@ -52,17 +52,24 @@ void initAppHook(void *params)
     cmd_mag_init();
 
     /** Init CSP **/
+    /* KISS INTERFACE */
     struct usart_conf conf;
     conf.device = SCH_KISS_DEVICE;
     conf.baudrate = SCH_KISS_UART_BAUDRATE;
     usart_init(&conf);
-
     csp_kiss_init(&csp_if_kiss, &csp_kiss_driver, usart_putc, usart_insert, "KISS");
-
-    /* Setup callback from USART RX to KISS RS */
-    usart_set_callback(my_usart_rx);
+    usart_set_callback(my_usart_rx); // Setup callback from USART RX to KISS RS
     csp_route_set(SCH_TNC_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
     csp_rtable_set(0, 2, &csp_if_kiss, SCH_TNC_ADDRESS); // Traffic to GND (0-7) via KISS node TNC
+
+    /* ZMQ INTERFACE */
+    /* Set ZMQ interface as a default route*/
+    uint8_t addr = (uint8_t)SCH_COMM_NODE;
+    uint8_t *rxfilter = &addr;
+    unsigned  int rxfilter_count = 1;
+    csp_zmqhub_init_w_name_endpoints_rxfilter(CSP_ZMQHUB_IF_NAME, rxfilter, rxfilter_count,
+                                              SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN, &csp_if_zmqhub);
+    csp_route_set(CSP_DEFAULT_ROUTE, csp_if_zmqhub, CSP_NODE_MAC);
 
     /** Init app tasks */
 }
