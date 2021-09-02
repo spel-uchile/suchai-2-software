@@ -6,6 +6,9 @@ set(SCH_TX_PWR 0 CACHE STRING "Nanocom TX power")
 set(SCH_TX_BAUD 4800 CACHE STRING "Nanocom TX Baudrate")
 set(SCH_TX_BCN_PERIOD 600 CACHE STRING "Number of seconds between trx beacon packets")
 set(SCH_OBC_BCN_OFFSET 600 CACHE STRING "Number of seconds between obc beacon packets")
+set(SCH_HK_ENABLED 1 CACHE BOOL "Enable task housekeeping")
+set(SCH_SEN_ENABLED 1 CACHE BOOL "Enable task sensors")
+set(SCH_ADCS_ENABLED 0 CACHE BOOL "Enable task adcs")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/app/system/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/app/system/config.h)
 
@@ -19,9 +22,10 @@ set(SOURCE_FILES
         src/system/cmdRW.c
         src/system/cmdSensors.c
         src/system/hookCommunications.c
-        src/system/taskADCS.c
         src/system/taskHousekeeping.c
         src/system/taskSensors.c
+        src/system/taskADCS.c
+        src/drivers/rwdrv10987.c
 )
 
 set(GS_INCLUDE_PATH
