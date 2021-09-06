@@ -21,7 +21,7 @@
 #include "app/system/cmdEPS.h"
 
 #ifndef SCH_EPS_ADDRESS
-#define SCH_EPS_ADDRESS 2
+#define SCH_EPS_ADDRESS 4
 #endif
 
 static const char *tag = "cmdEPS";
