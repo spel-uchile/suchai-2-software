@@ -314,12 +314,12 @@ static char status_var_types[] = "%u %u %u %u %u %u %u %f %f %f %u %u %u %u %u %
                                  "%f %f %f %f %f %f %u %u %u %u %u %u %u %i %u";
 
 static data_map_t data_map[] = {
-{"temp_data",      (uint16_t) (sizeof(temp_data_t)),         dat_drp_idx_temp,     dat_drp_ack_temp,         "%u %u %f %f %f",                   "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
-{ "ads_data",      (uint16_t) (sizeof(ads_data_t)),          dat_drp_idx_ads,      dat_drp_ack_ads,          "%u %u %f %f %f %f %f %f",          "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
-{ "eps_data",      (uint16_t) (sizeof(eps_data_t)),          dat_drp_idx_eps,      dat_drp_ack_eps,          "%u %u %u %u %u %d %d %d %d %d %d", "sat_index timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
-{"sta_data",       (uint16_t) (sizeof(sta_data_t)),          dat_drp_idx_sta,      dat_drp_ack_sta,          status_var_types,                   status_var_string},
-{"stt_data",       (uint16_t) (sizeof(stt_data_t)),          dat_drp_idx_stt,      dat_drp_ack_stt,          "%u %u %f %f %f %d %f",             "sat_index timestamp ra dec roll time exec_time"},
-{"stt_exp_time",   (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_idx_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"}
+{"dat_temp_data",      (uint16_t) (sizeof(temp_data_t)),         dat_drp_idx_temp,     dat_drp_ack_temp,         "%u %u %f %f %f",                   "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
+{"dat_ads_data",       (uint16_t) (sizeof(ads_data_t)),          dat_drp_idx_ads,      dat_drp_ack_ads,          "%u %u %f %f %f %f %f %f",          "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+{"dat_eps_data",       (uint16_t) (sizeof(eps_data_t)),          dat_drp_idx_eps,      dat_drp_ack_eps,          "%u %u %u %u %u %d %d %d %d %d %d", "sat_index timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
+{"dat_sta_data",       (uint16_t) (sizeof(sta_data_t)),          dat_drp_idx_sta,      dat_drp_ack_sta,          status_var_types,                   status_var_string},
+{"dat_stt_data",       (uint16_t) (sizeof(stt_data_t)),          dat_drp_idx_stt,      dat_drp_ack_stt,          "%u %u %f %f %f %d %f",             "sat_index timestamp ra dec roll time exec_time"},
+{"sdat_tt_exp_time",   (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_idx_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"}
 };
 
 /** The repository's name */

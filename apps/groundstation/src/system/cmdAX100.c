@@ -37,6 +37,8 @@ void cmd_ax100_init(void)
     cmd_add("com_set_config", com_set_config, "%d %s %s", 3);
     cmd_add("com_update_status", com_update_status_vars, "", 0);
     cmd_add("com_set_beacon", com_set_beacon, "%d %d", 2);
+    cmd_add("com_set_uplink", com_set_uplink, "%d", 1);
+    cmd_add("com_set_downlink", com_set_downlink, "%d", 1);
 }
 
 int com_set_node(char *fmt, char *params, int nparams)
@@ -385,4 +387,86 @@ int com_set_beacon(char *fmt, char *params, int nparams)
     }
     else
         return CMD_ERROR;
+}
+
+int com_set_downlink(char *fmt, char *params, int nparams)
+{
+    int baud;
+    char trx_node_tmp = trx_node;
+    char config[32];
+
+    if(params == NULL || sscanf(params, fmt, &baud) != nparams)
+        baud = 4800;
+
+    if(!(baud == 4800 || baud == 9600 || baud == 19200))
+    {
+        LOGE(tag, "Invalid baud rate %d selected! Please use 4800, 9600 or 19200.", baud);
+        return CMD_SYNTAX_ERROR;
+    }
+
+    //CONFIGURE NODE TNC (29)
+    trx_node = 29;
+    memset(config, 0, 32);
+    snprintf(config, 32, "1 baud %d", baud);  // TABLE 1 -> RX
+    int tnc_baud = com_set_config("%d %s %s", config, 3);
+    LOGI(tag, "Setting TNC with: %s (%d)", config, tnc_baud);
+    if(tnc_baud != CMD_OK) {
+        trx_node = trx_node_tmp;
+        return CMD_ERROR;
+    }
+
+    //CONFIGURE NODE TRX (5)
+    trx_node = 5;
+    memset(config, 0, 32);
+    snprintf(config, 32, "5 baud %d", baud); // TABLE 5 -> TX
+    int trx_baud = com_set_config("%d %s %s", config, 3);
+    LOGI(tag, "Setting TRX with: %s (%d)", config, trx_baud);
+    if(trx_baud != CMD_OK) {
+        trx_node = trx_node_tmp;
+        return CMD_ERROR;
+    }
+
+    trx_node = trx_node_tmp;
+    return CMD_OK;
+}
+
+int com_set_uplink(char *fmt, char *params, int nparams)
+{
+    int baud;
+    char trx_node_tmp = trx_node;
+    char config[32];
+
+    if(params == NULL || sscanf(params, fmt, &baud) != nparams)
+        baud = 4800;
+
+    if(!(baud == 4800 || baud == 9600 || baud == 19200))
+    {
+        LOGE(tag, "Invalid baud rate %d selected! Please use 4800, 9600 or 19200.", baud);
+        return CMD_SYNTAX_ERROR;
+    }
+
+    //CONFIGURE NODE TRX (5)
+    trx_node = 5;
+    memset(config, 0, 32);
+    snprintf(config, 32, "1 baud %d", baud); // TABLE 1 -> RX
+    int trx_baud = com_set_config("%d %s %s", config, 3);
+    LOGI(tag, "Setting TRX with: %s (%d)", config, trx_baud);
+    if(trx_baud != CMD_OK) {
+        trx_node = trx_node_tmp;
+        return CMD_ERROR;
+    }
+
+    //CONFIGURE NODE TNC (29)
+    trx_node = 29;
+    memset(config, 0, 32);
+    snprintf(config, 32, "5 baud %d", baud);  // TABLE 5 -> TX
+    int tnc_baud = com_set_config("%d %s %s", config, 3);
+    LOGI(tag, "Setting TNC with: %s (%d)", config, tnc_baud);
+    if(tnc_baud != CMD_OK) {
+        trx_node = trx_node_tmp;
+        return CMD_ERROR;
+    }
+
+    trx_node = trx_node_tmp;
+    return CMD_OK;
 }
