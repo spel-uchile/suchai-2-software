@@ -106,7 +106,7 @@ int sensors_take_sample(char *fmt, char *params, int nparams)
     return CMD_ERROR;
 }
 
-int sensors_init(char *fmt, char *params, int nparams
+int sensors_init(char *fmt, char *params, int nparams)
 {
     LOGD(tag, "Initializing dummy sensor");
     return CMD_OK;
