@@ -148,4 +148,29 @@ int com_update_status_vars(char *fmt, char *params, int nparams);
 /* TODO: ADD documentation */
 int com_set_beacon(char *fmt, char *params, int nparams);
 
+/**
+ * Set UPLINK/DOWNLINK baud rates by modifying both TRX and TNC parameters
+ * tables. Available baud rates are 4800, 9600, 19200. If executed without
+ * parameters, the baud rate is set to default value of 4800
+ *
+ * @param fmt Str. Parameters format: "%d"
+ * @param params Str. Parameters: [baudrate], the desired baud rate [4800, 9600, 19200]
+ *               If executed without parameters, the baudrate is set to default value of 4800
+ * @param nparams Str. Number of parameters: 1
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
+ *
+ * @code
+ *      // Usage in the console
+ *      // Set baudrate to 9600
+ *      com_set_uplink 9600
+ *      com_set_downlink 9600
+ *
+ *      // Restore to default value
+ *      com_set_uplink
+ *      com_set_downlink
+ * @endcode
+ */
+int com_set_downlink(char *fmt, char *params, int nparams);
+int com_set_uplink(char *fmt, char *params, int nparams);
+
 #endif /* CMD_AX100_H */

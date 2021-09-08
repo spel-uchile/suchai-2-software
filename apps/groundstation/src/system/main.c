@@ -70,6 +70,8 @@ void initAppHook(void *params)
     csp_zmqhub_init_w_name_endpoints_rxfilter(CSP_ZMQHUB_IF_NAME, rxfilter, rxfilter_count,
                                               SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN, &csp_if_zmqhub);
     csp_route_set(CSP_DEFAULT_ROUTE, csp_if_zmqhub, CSP_NODE_MAC);
+    // Add route to TNC (default node is 29)
+    csp_route_set(29, &csp_if_kiss, 255);
 
     /** Init app tasks */
 }
