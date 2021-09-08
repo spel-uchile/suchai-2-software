@@ -405,7 +405,7 @@ int com_set_downlink(char *fmt, char *params, int nparams)
     }
 
     //CONFIGURE NODE TNC (29)
-    trx_node = 29;
+    trx_node = 9;
     memset(config, 0, 32);
     snprintf(config, 32, "1 baud %d", baud);  // TABLE 1 -> RX
     int tnc_baud = com_set_config("%d %s %s", config, 3);
@@ -457,7 +457,7 @@ int com_set_uplink(char *fmt, char *params, int nparams)
     }
 
     //CONFIGURE NODE TNC (29)
-    trx_node = 29;
+    trx_node = 9;
     memset(config, 0, 32);
     snprintf(config, 32, "5 baud %d", baud);  // TABLE 5 -> TX
     int tnc_baud = com_set_config("%d %s %s", config, 3);
