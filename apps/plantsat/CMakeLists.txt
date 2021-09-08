@@ -56,7 +56,7 @@ set(GS_INCLUDE_PATH
         src/drivers/suchai-drivers-obc/lib/libembed/include
 )
 
-include_directories(include/app/drivers)
+include_directories(include/app/drivers ${GS_INCLUDE_PATH})
 add_executable(suchai-app ${SOURCE_FILES})
 target_include_directories(suchai-app PUBLIC ${GS_INCLUDE_PATH})
 target_include_directories(suchai-app PUBLIC include)

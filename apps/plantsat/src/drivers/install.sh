@@ -17,9 +17,9 @@ echo SSH_ACTIVE=$SSH_ACTIVE
 echo "Downloading OBC drivers SDK..."
 if [ ! -d "suchai-drivers-obc" ]; then
     if [ -z "$SSH_ACTIVE" ]; then
-         git clone https://gitlab.com/spel-uchile/suchai-drivers-obc
+         git clone -b framework https://gitlab.com/spel-uchile/suchai-drivers-obc
     else
-         git clone git@gitlab.com:spel-uchile/suchai-drivers-obc.git
+         git clone -b framework git@gitlab.com:spel-uchile/suchai-drivers-obc.git
     fi
 else
     cd suchai-drivers-obc
