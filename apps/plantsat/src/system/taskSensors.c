@@ -31,7 +31,7 @@ void taskSensors(void *param)
     cmd_t *cmd_get;
     int nsensors = 4;
     char *init_cmds[] = {"sen_init_dummy", "sen_init_dummy", "sen_init_dummy", "sen_init_dummy"};
-    char *get_cmds[] = {"sen_take_sample", "sen_take_sample", "sen_take_sample", "sen_take_sample"};
+    char *get_cmds[] = {"sen_get_temp", "sen_get_adcs", "sen_get_eps", "sen_get_status"};
 
 
     int action = dat_get_system_var(dat_drp_mach_action);
@@ -45,7 +45,6 @@ void taskSensors(void *param)
     } else {
         status_machine = (dat_stmachine_t) {state, action, active_payloads, step, samples_left, nsensors};
     }
-//    status_machine = (dat_stmachine_t) {ST_PAUSE, ACT_START, 1, 3600, -1, nsensors};
 
     if(osSemaphoreCreate(&repo_machine_sem) != OS_SEMAPHORE_OK)
     {
@@ -54,8 +53,7 @@ void taskSensors(void *param)
 
     for(i=0; i < status_machine.total_sensors; i++)
     {
-        cmd_init = cmd_get_str(init_cmds[i]);
-//        cmd_add_params_str(cmd_init, "1010");
+        cmd_init = cmd_build_from_str(init_cmds[i]);
         cmd_send(cmd_init);
     }
 
@@ -93,19 +91,16 @@ void taskSensors(void *param)
             else if (elapsed_sec % status_machine.step == 0) {
                 LOGD(tag, "SAMPLING...");
 
-                for(i=0; i<nsensors; i++) {
-//                    printf("payload %d active status %d\n", i, dat_stmachine_is_sensor_active(i, status_machine.active_payloads, nsensors));
-                    if (dat_stmachine_is_sensor_active(i,
-                                                       status_machine.active_payloads,
-                                                       status_machine.total_sensors)) {
-                        cmd_get = cmd_get_str(get_cmds[i]);
-                        char cmd_args[20];
-                        sprintf(cmd_args, " %d", i);
-                        cmd_add_params_str(cmd_get, cmd_args);
+                for(i=0; i<nsensors; i++)
+                {
+                    if (dat_stmachine_is_sensor_active(i, status_machine.active_payloads, status_machine.total_sensors))
+                    {
+                        cmd_get = cmd_build_from_str(get_cmds[i]);
                         cmd_send(cmd_get);
                     }
                 }
-                if (status_machine.samples_left != -1) {
+                if (status_machine.samples_left != -1)
+                {
                     osSemaphoreTake(&repo_machine_sem, portMAX_DELAY);
                     status_machine.samples_left -= 1;
                     osSemaphoreGiven(&repo_machine_sem);

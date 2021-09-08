@@ -37,15 +37,15 @@ void cmd_sensors_init(void);
  * @code
  *
  * //Start status_machine, every 2 seconds, 10 samples max.
- * set_state 1 2 10
+ * sensors_set_state 1 2 10
  * //Start status_machine, every 1 seconds, for ever
- * set_state 1 1 -1
+ * sensors_set_state 1 1 -1
  * //Stpo status_machine [keep 2 seconds, 10 samples]
- * set_state 2 2 10
+ * sensors_set_state 2 2 10
  *
  * @return
  */
-int set_state(char *fmt, char *params, int nparams);
+int sensors_set_state(char *fmt, char *params, int nparams);
 
 /**
  *
@@ -54,12 +54,12 @@ int set_state(char *fmt, char *params, int nparams);
  * @param nparams 1
  * @code
  * // Activate first payload sensor
- * activate_sensor 1
+ * sensors_set_active 1
  * // Activate second payload sensor
- * activate_sensor 2
+ * sensors_set_active 2
  * @return
  */
-int activate_sensor(char *fmt, char *params, int nparams);
+int sensors_set_active(char *fmt, char *params, int nparams);
 
 /**
  *
@@ -68,7 +68,7 @@ int activate_sensor(char *fmt, char *params, int nparams);
  * @param nparams 1
  * @return
  */
-int take_sample(char *fmt, char *params, int nparams);
+int sensors_take_sample(char *fmt, char *params, int nparams);
 
 /**
  * Initialize a dummy sensor.
@@ -77,6 +77,12 @@ int take_sample(char *fmt, char *params, int nparams);
  * @param nparams Int. Number of parameters 0
  * @return CMD_OK if executed correctly
  */
-int init_dummy_sensor(char *fmt, char *params, int nparams);
+int sensors_init(char *fmt, char *params, int nparams);
+
+int sensors_get_adcs_basic(char *fmt, char *params, int nparams);
+int sensors_get_adcs_full(char *fmt, char *params, int nparams);
+int sensors_get_eps(char *fmt, char *params, int nparams);
+int sensors_get_temperatures(char *fmt, char *params, int nparams);
+int sensors_get_status_basic(char *fmt, char *params, int nparams);
 
 #endif /* _CMD_SENS_H */

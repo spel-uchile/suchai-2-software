@@ -15,17 +15,6 @@
 #include "suchai/storage.h"
 #include "app/system/config.h"
 
-///**
-// * Struct for storing a single timed command, set to execute in the future.
-// */
-//typedef struct __attribute__((packed)) fp_entry {
-//    int unixtime;               ///< Unix-time, sets when the command should next execute
-//    char* cmd;                  ///< Command to execute
-//    char* args;                 ///< Command's arguments
-//    int executions;             ///< Amount of times the command will be executed per periodic cycle
-//    int periodical;             ///< Period of time between executions
-//} fp_entry_t;
-
 /**
  * Enum constants for dynamically identifying system status fields at execution time.
  *
@@ -143,15 +132,6 @@ typedef enum dat_status_address_enum {
     dat_status_last_address           ///< Dummy element, the amount of status variables
 } dat_status_address_t;
 
-///**
-// * A 32 bit variable that can be interpreted as int, uint or float
-// */
-//typedef union value32_u{
-//    int32_t i;
-//    uint32_t u;
-//    float f;
-//} value32_t;
-
 ///< Define opeartion modes
 #define DAT_OBC_OPMODE_NORMAL        (0) ///< Normal operation
 #define DAT_OBC_OPMODE_WARN          (1) ///< Fail safe operation
@@ -228,12 +208,12 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_eps_cur_sun,       "eps_cur_sun",       'u', DAT_IS_STATUS, 0},         ///< Current from boost converters [mA]
         {dat_eps_cur_sys,       "eps_cur_sys",       'u', DAT_IS_STATUS, 0},         ///< Current from the battery [mA]
         {dat_eps_temp_bat0,     "eps_temp_bat0",     'u', DAT_IS_STATUS, 0},         ///< Battery temperature sensor
-        {dat_drp_idx_temp,          "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
-        {dat_drp_idx_ads,           "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
-        {dat_drp_idx_eps,           "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
-        {dat_drp_idx_sta,           "drp_sta",           'u', DAT_IS_STATUS, 0},          ///< Status data index
-        {dat_drp_idx_stt,           "drp_stt",           'u', DAT_IS_STATUS, 0},          ///< STT data index
-        {dat_drp_idx_stt_exp_time,  "drp_stt_exp_time",  'u', DAT_IS_STATUS, 0},          ///< STT data exposure time index
+        {dat_drp_idx_temp,      "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
+        {dat_drp_idx_ads,       "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
+        {dat_drp_idx_eps,       "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
+        {dat_drp_idx_sta,       "drp_sta",           'u', DAT_IS_STATUS, 0},          ///< Status data index
+        {dat_drp_idx_stt,       "drp_stt",           'u', DAT_IS_STATUS, 0},          ///< STT data index
+        {dat_drp_idx_stt_exp_time, "drp_stt_exp_time",  'u', DAT_IS_STATUS, 0},          ///< STT data exposure time index
         {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
@@ -322,27 +302,12 @@ typedef struct __attribute__((__packed__)) ads_data {
 typedef struct __attribute__((__packed__)) eps_data {
     uint32_t index;
     uint32_t timestamp;
-    uint32_t cursun;            ///< Current from boost converters [mA]
-    uint32_t cursys;            ///< Current out of battery [mA]
-    uint32_t vbatt;            ///< Voltage of battery [mV]
-    int32_t temp1;
-    int32_t temp2;
-    int32_t temp3;
-    int32_t temp4;
-    int32_t temp5;
-    int32_t temp6;              ///< Temperature sensors [0 = TEMP1, TEMP2, TEMP3, TEMP4, BATT0, BATT1]
+    uint32_t cursun; ///< Current from boost converters [mA]
+    uint32_t cursys; ///< Current out of battery [mA]
+    uint32_t vbatt; ///< Voltage of battery [mV]
+    int32_t temp1; ///< EPS temperature = 10*(TEMP1+TEMP2+TEMP3+TEMP4)/4
+    int32_t temp2; ///< BAT temperature = 10*(BATT0 + BATT1)/2
 } eps_data_t;
-
-
-/**
- * Struct for storing data collected by status variables.
- */
-typedef struct __attribute__((__packed__)) sta_data {
-    uint32_t index;
-    uint32_t timestamp;
-    uint32_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
-} sta_data_t;
-
 
 /**
  * Struct for storing data collected by stt.
@@ -357,23 +322,43 @@ typedef struct __attribute__((__packed__)) stt_data {
     float exec_time;
 } stt_data_t;
 
-typedef struct __attribute__((__packed__)) stt_exp_time_data{
+/**
+ * Struct for storing data collected by status variables.
+ */
+typedef struct __attribute__((__packed__)) sta_data {
     uint32_t index;
     uint32_t timestamp;
-    int exp_time;
-    int n_stars;
-}stt_exp_time_data_t;
-
-typedef struct __attribute__((__packed__)) stt_gyro_data{
-    float gx, gy, gz;
-} stt_gyro_data_t;
+    uint32_t dat_obc_opmode;
+    uint32_t dat_rtc_date_time;
+    uint32_t dat_obc_last_reset;
+    uint32_t dat_obc_hrs_alive;
+    uint32_t dat_obc_hrs_wo_reset;
+    uint32_t dat_obc_reset_counter;
+    uint32_t dat_obc_executed_cmds;
+    uint32_t dat_obc_failed_cmds;
+    uint32_t dat_com_count_tm;
+    uint32_t dat_com_count_tc;
+    uint32_t dat_com_last_tc;
+    uint32_t dat_fpl_last;
+    uint32_t dat_fpl_queue;
+    uint32_t dat_ads_tle_epoch;
+    uint32_t dat_eps_vbatt;
+    uint32_t dat_eps_cur_sun;
+    uint32_t dat_eps_cur_sys;
+    uint32_t dat_obc_temp_1;
+    uint32_t dat_eps_temp_bat0;
+    uint32_t dat_drp_mach_action;
+    uint32_t dat_drp_mach_state;
+    uint32_t dat_drp_mach_payloads;
+    uint32_t dat_drp_mach_step;
+} sta_data_t;
 
 static char status_var_string[] = "sat_index timestamp obc_last_reset obc_hrs_alive obc_hrs_wo_reset obc_reset_counter "
                                   "obc_sw_wdt obc_temp_1 obc_temp_2 obc_temp_3 obc_executed_cmds obc_failed_cmds "
                                   "dep_deployed dep_ant_deployed dep_date_time com_count_tm com_count_tc com_last_tc "
                                   "fpl_last fpl_queue ads_omega_x ads_omega_y ads_omega_z ads_mag_x ads_mag_y ads_mag_z "
                                   "ads_pos_x ads_pos_y ads_pos_z ads_tle_epoch ads_tle_last ads_q0 ads_q1 ads_q2 ads_q3"
-                                  " eps_vbatt eps_cur_sun eps_cur_sys eps_temp_bat0 drp_temp drp_ads drp_eps drp_sta drp_stt drp_stt_exp_time"
+                                  "eps_vbatt eps_cur_sun eps_cur_sys eps_temp_bat0 drp_temp drp_ads drp_eps drp_sta drp_stt drp_stt_exp_time"
                                   "drp_mach_action drp_mach_state drp_mach_left obc_opmode rtc_date_time com_freq "
                                   "com_tx_pwr com_baud com_mode com_bcn_period obc_bcn_offset tgt_omega_x tgt_omega_y "
                                   "tgt_omega_z tgt_q0 tgt_q1 tgt_q2 tgt_q3 drp_ack_temp drp_ack_ads drp_ack_eps "
@@ -384,12 +369,11 @@ static char status_var_types[] = "%u %u %u %u %u %u %u %f %f %f %u %u %u %u %u %
                                  "%f %f %f %f %f %f %u %u %u %u %u %u %u %i %u";
 
 static data_map_t data_map[] = {
-{"temp_data",      (uint16_t) (sizeof(temp_data_t)),         dat_drp_idx_temp,     dat_drp_ack_temp,         "%u %u %f %f %f",                   "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
-{ "ads_data",      (uint16_t) (sizeof(ads_data_t)),          dat_drp_idx_ads,      dat_drp_ack_ads,          "%u %u %f %f %f %f %f %f",          "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
-{ "eps_data",      (uint16_t) (sizeof(eps_data_t)),          dat_drp_idx_eps,      dat_drp_ack_eps,          "%u %u %u %u %u %d %d %d %d %d %d", "sat_index timestamp cursun cursys vbatt temp1 temp2 temp3 temp4 temp5 temp6"},
-{"sta_data",       (uint16_t) (sizeof(sta_data_t)),          dat_drp_idx_sta,      dat_drp_ack_sta,          status_var_types,                   status_var_string},
-{"stt_data",       (uint16_t) (sizeof(stt_data_t)),          dat_drp_idx_stt,      dat_drp_ack_stt,          "%u %u %f %f %f %d %f",             "sat_index timestamp ra dec roll time exec_time"},
-{"stt_exp_time",   (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_idx_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"}
+        {"dat_temp_data",    (uint16_t) (sizeof(temp_data_t)),         dat_drp_idx_temp,     dat_drp_ack_temp,         "%u %u %f %f %f",                   "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
+        {"dat_ads_data",     (uint16_t) (sizeof(ads_data_t)),          dat_drp_idx_ads,      dat_drp_ack_ads,          "%u %u %f %f %f %f %f %f",          "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
+        {"dat_eps_data",     (uint16_t) (sizeof(eps_data_t)),          dat_drp_idx_eps,      dat_drp_ack_eps,          "%u %u %u %u %u %d %d",             "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
+        {"dat_sta_data",     (uint16_t) (sizeof(sta_data_t)),          dat_drp_idx_sta,      dat_drp_ack_sta,          status_var_types,                   status_var_string},
+        {"dat_stt_data",     (uint16_t) (sizeof(stt_data_t)),          dat_drp_idx_stt,      dat_drp_ack_stt,          "%u %u %f %f %f %d %f",             "sat_index timestamp ra dec roll time exec_time"},
 };
 
 /** The repository's name */
