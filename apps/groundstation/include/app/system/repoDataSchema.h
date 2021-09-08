@@ -297,8 +297,8 @@ static data_map_t data_map[] = {
         {"dat_eps_data",     (uint16_t) (sizeof(eps_data_t)),          dat_drp_idx_eps,      dat_drp_ack_eps,          "%u %u %u %u %u %d %d",             "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
         {"dat_sta_data",     (uint16_t) (sizeof(sta_data_t)),          dat_drp_idx_sta,      dat_drp_ack_sta,          status_var_types,                   status_var_string},
         {"dat_stt_data",     (uint16_t) (sizeof(stt_data_t)),          dat_drp_idx_stt,      dat_drp_ack_stt,          "%u %u %f %f %f %d %f",             "sat_index timestamp ra dec roll time exec_time"},
-        {"stt_exp_time",   (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_idx_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"}
-        {"sdat_tt_exp_time",   (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_idx_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"}
+        {"stt_exp_time",     (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_idx_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"},
+        {"sdat_tt_exp_time", (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_idx_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"}
 };
 
 /** The repository's name */
