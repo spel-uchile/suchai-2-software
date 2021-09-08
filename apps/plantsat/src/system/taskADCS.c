@@ -41,15 +41,15 @@ void taskADCS(void *param)
     /**
      * Set-up SGP4 propagator
      */
-    cmd_t *tle1 = cmd_get_str("obc_set_tle");
+    cmd_t *tle1 = cmd_get_str("tle_set");
     cmd_add_params_str(tle1, "1 42788U 17036Z   20027.14771603  .00000881  00000-0  39896-4 0  9992");
     cmd_send(tle1);
-    cmd_t *tle2 = cmd_get_str("obc_set_tle");
+    cmd_t *tle2 = cmd_get_str("tle_set");
     cmd_add_params_str(tle2, "2 42788  97.3234  85.2817 0012095 159.3521 200.8207 15.23399088144212");
     cmd_send(tle2);
-    cmd_t *tle_u = cmd_get_str("obc_update_tle");
+    cmd_t *tle_u = cmd_get_str("tle_update");
     cmd_send(tle_u);
-    tle_u = cmd_get_str("obc_get_tle");
+    tle_u = cmd_get_str("tle_get");
     cmd_send(tle_u);
     dat_set_system_var(dat_obc_opmode, DAT_OBC_OPMODE_DETUMB_MAG);
 
@@ -71,7 +71,7 @@ void taskADCS(void *param)
             if(elapsed_msec % 500 == 0)
             {
 
-                cmd_t *cmd_tle_prop = cmd_get_str("obc_prop_tle");
+                cmd_t *cmd_tle_prop = cmd_get_str("tle_prop");
                 cmd_add_params_str(cmd_tle_prop, "0");
                 cmd_send(cmd_tle_prop);
 
@@ -118,7 +118,7 @@ void taskADCS(void *param)
          */
         if ((elapsed_msec % _adcs_ctrl_period) == 0)
         {
-            cmd_t *cmd_tle_prop = cmd_get_str("obc_prop_tle");
+            cmd_t *cmd_tle_prop = cmd_get_str("tle_prop");
             cmd_add_params_str(cmd_tle_prop, "0");
             cmd_send(cmd_tle_prop);
             // Update attitude

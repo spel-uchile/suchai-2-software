@@ -1,8 +1,8 @@
 /*                                 SUCHAI
  *                      NANOSATELLITE FLIGHT SOFTWARE
  *
- *      Copyright 2020, Carlos Gonzalez Cortes, carlgonz@uchile.cl
- *      Copyright 2020, Tomas Opazo Toro, tomas.opazo.t@gmail.com
+ *      Copyright 2021, Carlos Gonzalez Cortes, carlgonz@uchile.cl
+ *      Copyright 2021, Tomas Opazo Toro, tomas.opazo.t@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,8 +81,7 @@ void taskHousekeeping(void *param)
             if(tle_epoch > 0)
             {
                 cmd_t *cmd_tle_prop;
-                cmd_tle_prop = cmd_get_str("obc_prop_tle");
-                cmd_add_params_str(cmd_tle_prop, "0");
+                cmd_tle_prop = cmd_build_from_str("tle_prop 0");
                 cmd_send(cmd_tle_prop);
             }
         }
@@ -99,27 +98,16 @@ void taskHousekeeping(void *param)
         }
 
         /* 5 minutes actions */
-        //  Sample OBC payloads
         if ((elapsed_sec % _05min_check) == 0)
         {
-            if ((elapsed_sec % _05min_check*2) == 0)
-            {
-                cmd_t *cmd_get_eps = cmd_get_str("eps_get_hk");
-                cmd_send(cmd_get_eps);
-            }
-            else
-            {
-                cmd_t *cmd_get_obc = cmd_get_str("obc_get_sensors");
-                cmd_send(cmd_get_obc)
-            }
+
         }
 
         /* 1 hours actions */
         if((elapsed_sec % _1hour_check) == 0)
         {
             LOGD(tag, "1 hour check");
-            cmd_t *cmd_1h = cmd_get_str("drp_add_hrs_alive");
-            cmd_add_params_var(cmd_1h, 1); // Add 1hr
+            cmd_t *cmd_1h = cmd_build_from_str("drp_add_hrs_alive 1");
             cmd_send(cmd_1h);
         }
     }
