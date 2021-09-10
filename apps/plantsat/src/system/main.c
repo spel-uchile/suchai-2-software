@@ -68,100 +68,70 @@ int init_setup_libcsp_2(void)
 
 int init_setup_trx(void) {
     LOGD(tag, "\t Init TRX...");
+
+    typedef struct trx_config_s {
+        int table;
+        char *param;
+        int value;
+    }trx_config_t;
+
+    // Define the list of commands and parameters
+    const int N_CONFIGS = 8;
+    trx_config_t trx_configs[] = {
+            {0, "tx_inhibit", SCH_TX_INHIBIT},
+            {0, "bcn_holdoff", dat_get_status_var(dat_com_bcn_period).i},
+            {0, "bcn_interval", dat_get_status_var(dat_com_bcn_period).i},
+            {0, "tx_pwr", dat_get_status_var(dat_com_tx_pwr).i},
+            {1, "freq", dat_get_status_var(dat_com_freq).i},
+            {5, "freq", dat_get_status_var(dat_com_freq).i},
+            {1, "baud", dat_get_status_var(dat_com_baud).i},
+            {5, "baud", dat_get_status_var(dat_com_baud).i},
+        };
+
     cmd_t *trx_cmd;
-    // Set TX_INHIBIT to implement silent time
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, 0, "tx_inhibit", TOSTRING(SCH_TX_INHIBIT));
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
+    char *trx_str = calloc(SCH_CMD_MAX_STR_PARAMS, 1);
+
+    // Send all commands to config the TRX
+    for(int i=0; i<N_CONFIGS; i++)
     {
-        trx_cmd = cmd_build_from_str("com_get_config 0 tx_inhibit");
+        trx_config_t trx_config = trx_configs[i];
+        memset(trx_str, 0, SCH_CMD_MAX_STR_PARAMS);
+        sprintf(trx_str, "com_set_config %d %s %d", trx_config.table, trx_config.param, trx_config.value);
+        trx_cmd = cmd_build_from_str(trx_str);
         cmd_send(trx_cmd);
+        if(log_lvl >= LOG_LVL_DEBUG)
+        {
+            memset(trx_str, 0, SCH_CMD_MAX_STR_PARAMS);
+            sprintf(trx_str, "com_get_config %d %s", trx_config.table, trx_config.param);
+            trx_cmd = cmd_build_from_str(trx_str);
+            cmd_send(trx_cmd);
+        }
     }
-    trx_cmd = cmd_build_from_str("com_set_config 0 bcn_holdoff 60)");
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_build_from_str("com_get_config 0 bcn_holdoff");
-        cmd_send(trx_cmd);
-    }
-    // Set TX_PWR
-    trx_cmd = cmd_get_str("com_set_config");
-    cmd_add_params_var(trx_cmd, 0, "tx_pwr", dat_get_status_var(dat_com_tx_pwr).i);
-    cmd_send(trx_cmd);
-    if(log_lvl >= LOG_LVL_DEBUG)
-    {
-        trx_cmd = cmd_build_from_str("com_get_config 0 tx_pwr");
-        cmd_send(trx_cmd);
-    }
-//    // Set TX_BEACON_PERIOD
-//    trx_cmd = cmd_get_str("com_set_config");
-//    cmd_add_params_var(trx_cmd, 0, "bcn_interval", dat_get_status_var(dat_com_bcn_period).i);
-//    cmd_send(trx_cmd);
-//    if(log_lvl >= LOG_LVL_DEBUG)
-//    {
-//        trx_cmd = cmd_build_from_str("com_get_config 0 bcn_interval");
-//        cmd_send(trx_cmd);
-//    }
-//    // Set TRX Freq
-//    trx_cmd = cmd_get_str("com_set_config");
-//    cmd_add_params_var(trx_cmd, 1, "freq", dat_get_status_var(dat_com_freq).i);
-//    cmd_send(trx_cmd);
-//    trx_cmd = cmd_get_str("com_set_config");
-//    cmd_add_params_var(trx_cmd, 5, "freq", dat_get_status_var(dat_com_freq).i);
-//    cmd_send(trx_cmd);
-//    if(log_lvl >= LOG_LVL_DEBUG)
-//    {
-//        trx_cmd = cmd_build_from_str("com_get_config 1 freq");
-//        cmd_send(trx_cmd);
-//        trx_cmd = cmd_build_from_str("com_get_config 5 freq");
-//        cmd_send(trx_cmd);
-//    }
-//    // Set TRX Baud
-//    trx_cmd = cmd_get_str("com_set_config");
-//    cmd_add_params_var(trx_cmd, 1, "baud", dat_get_status_var(dat_com_baud).i);
-//    cmd_send(trx_cmd);
-//    trx_cmd = cmd_get_str("com_set_config");
-//    cmd_add_params_var(trx_cmd, 5, "baud", dat_get_status_var(dat_com_baud).i);
-//    cmd_send(trx_cmd);
-//    if(log_lvl >= LOG_LVL_DEBUG)
-//    {
-//        trx_cmd = cmd_build_from_str("com_get_config 1 baud");
-//        cmd_send(trx_cmd);
-//        trx_cmd = cmd_build_from_str("com_get_config 5 baud");
-//        cmd_send(trx_cmd);
-//    }
+
+    free(trx_str);
+
 }
 
 int init_antenna_deploy(void)
 {
     LOGD(tag, "\tAntenna deployment...")
-    //Turn on gssb and update antenna deployment status
-    cmd_t *cmd_dep;
-    cmd_dep = cmd_get_str("gssb_pwr");
-    cmd_add_params_str(cmd_dep, "1 1");
-    cmd_send(cmd_dep);
+    // Define commands
+    const int N_CMDS = 6;
+    char *cmds_str[] = {
+            "gssb_pwr 1 1",                  // Turn-on istages
+            "gssb_update_status",            // Update deployment status variables
+            "gssb_antenna_release 16 2 1 5", // istage 1. On: 2s, off: 1s, rep: 5
+            "gssb_antenna_release 17 2 1 5", // istage 2. On: 2s, off: 1s, rep: 5
+            "gssb_antenna_release 18 2 1 5", // istage 3. On: 2s, off: 1s, rep: 5
+            "gssb_antenna_release 19 2 1 5", // istage 4. On: 2s, off: 1s, rep: 5
+    };
 
-    cmd_dep = cmd_get_str("gssb_update_status");
-    cmd_send(cmd_dep);
-
-    //Try to deploy antennas if necessary
-    //      istage 1. On: 2s, off: 1s, rep: 5
-    cmd_dep = cmd_get_str("gssb_antenna_release");
-    cmd_add_params_var(cmd_dep, 16, 2, 1, 5);
-    cmd_send(cmd_dep);
-    //      istage 2. On: 2s, off: 1s, rep: 5
-    cmd_dep = cmd_get_str("gssb_antenna_release");
-    cmd_add_params_var(cmd_dep, 17, 2, 1, 5);
-    cmd_send(cmd_dep);
-    //      istage 3. On: 2s, off: 1s, rep: 5
-    cmd_dep = cmd_get_str("gssb_antenna_release");
-    cmd_add_params_var(cmd_dep, 18, 2, 1, 5);
-    cmd_send(cmd_dep);
-    //      istage 4. On: 2s, off: 1s, rep: 5
-    cmd_dep = cmd_get_str("gssb_antenna_release");
-    cmd_add_params_var(cmd_dep, 19, 2, 1, 5);
-    cmd_send(cmd_dep);
+    for(int i=0; i<N_CMDS; i++) {
+        //Turn on gssb and update antenna deployment status
+        cmd_t *cmd_dep;
+        cmd_dep = cmd_build_from_str(cmds_str[i]);
+        cmd_send(cmd_dep);
+    }
 
     return 0;
 }
@@ -227,13 +197,6 @@ void initAppHook(void *params)
 {
     int rc;
 
-    /** Finish CSP setup */
-    init_setup_libcsp_2();
-
-    /** Init TRX */
-    LOGI(tag, "SETUP TRX...");
-    rc = init_setup_trx();
-
     /** Include app commands */
     cmd_adcs_init();
     cmd_ax100_init();
@@ -241,6 +204,13 @@ void initAppHook(void *params)
     cmd_gssb_init();
     cmd_rw_init();
     cmd_sensors_init();
+
+    /** Finish CSP setup */
+    init_setup_libcsp_2();
+
+    /** Init TRX */
+    LOGI(tag, "SETUP TRX...");
+    rc = init_setup_trx();
 
     /** Init app tasks */
     int t_ok;

@@ -3,6 +3,7 @@
 
 #define SCH_TNC_ADDRESS        9  ///< Nanocom GS100 address
 #define SCH_TRX_ADDRESS        5  ///< Nanocom GS100 address
+#cmakedefine SCH_TX_INHIBIT         @SCH_TX_INHIBIT@  /// Default silent time in seconds [0, 1800 (30min)]
 #cmakedefine SCH_TX_FREQ            @SCH_TX_FREQ@  ///< Nanocom TX freq in Hz
 #define SCH_TX_PWR             @SCH_TX_PWR@  ///< Nanocom TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
 #cmakedefine SCH_TX_BAUD            @SCH_TX_BAUD@  ///< Nanocom TX Baudrate bps (4800, 9600, 19200)
