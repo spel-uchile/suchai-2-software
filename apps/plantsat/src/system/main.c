@@ -226,8 +226,6 @@ int init_deployment_routine(void)
 void initAppHook(void *params)
 {
     int rc;
-    /** Finish init drivers */
-    on_init_task(NULL);
 
     /** Finish CSP setup */
     init_setup_libcsp_2();
