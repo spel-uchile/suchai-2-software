@@ -81,17 +81,6 @@ int eps_get_config(char *fmt, char *params, int nparams);
 int eps_set_heater(char *fmt, char *params, int nparams);
 
 /**
- * Update EPS related status system vars.
- * Read EPS hk and set status variables
- *
- * @param fmt Str. Parameters format ""
- * @param params Str. Parameters as string ""
- * @param nparams Int. Number of parameters 0
- * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
- */
-int eps_update_status_vars(char *fmt, char *params, int nparams);
-
-/**
  * Turn on/off EPS User outputs
  *
  * @param fmt Str. Parameters format "<%d> <%d>"
@@ -149,5 +138,16 @@ int eps_set_pptmode(char *fmt, char *params, int nparams);
  * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
  */
 int eps_reset_wdt(char *fmt, char *params, int nparams);
+
+/**
+ * Update EPS related status system vars.
+ * Read EPS hk and set status variables
+ *
+ * @param fmt Str. Parameters format ""
+ * @param params Str. Parameters as string ""
+ * @param nparams Int. Number of parameters 0
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int eps_update_status_vars(char *fmt, char *params, int nparams);
 
 #endif //CMDEPS_H

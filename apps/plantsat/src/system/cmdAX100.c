@@ -35,7 +35,6 @@ void cmd_ax100_init(void)
     cmd_add("com_reset_wdt", com_reset_wdt, "%d", 1);
     cmd_add("com_get_config", com_get_config, "%d %s", 2);
     cmd_add("com_set_config", com_set_config, "%d %s %s", 3);
-    cmd_add("com_update_status", com_update_status_vars, "", 0);
     cmd_add("com_set_beacon", com_set_beacon, "%d %d", 2);
 }
 
@@ -218,52 +217,6 @@ int com_set_config(char *fmt, char *params, int nparams)
 
     return CMD_SYNTAX_ERROR;
 }
-
-int com_update_status_vars(char *fmt, char *params, int nparams)
-{
-    char *names[5] = {"freq", "tx_pwr", "baud", "mode", "bcn_interval"};
-    int tables[5] = {AX100_PARAM_TX(0), AX100_PARAM_RUNNING, AX100_PARAM_TX(0), AX100_PARAM_TX(0), AX100_PARAM_RUNNING};
-    dat_status_address_t vars[5] = {dat_com_freq, dat_com_tx_pwr, dat_com_bcn_period,
-                             dat_com_mode, dat_com_bcn_period};
-    int table = 0;
-    param_table_t *param_i = NULL;
-    int rc;
-
-    int i = 0;
-    for(i=0; i<5; i++)
-    {
-        // Find the given parameter by name and get the size, index, type and
-        // table; param_i is set to NULL if the parameter is not found.
-        table = tables[i];
-        _com_config_find(names[i], table, &param_i);
-
-        // Warning if the parameter name was not found
-        if(param_i == NULL)
-            LOGE(tag, "Parameter (%d) %s not found!", table, names[i]);
-
-        // Actually get the parameter value
-        void *out = malloc(param_i->size);
-        rc = rparam_get_single(out, param_i->addr, param_i->type, param_i->size,
-                               table, trx_node, AX100_PORT_RPARAM, 1000);
-
-        // Process the answer, save value to status variables
-        if(rc > 0)
-        {
-            if(param_i->size == sizeof(int))
-                dat_set_system_var(vars[i], *((int *)out));
-            else if(param_i->size == sizeof(uint8_t))
-                dat_set_system_var(vars[i], *((uint8_t *)out));
-            else
-                LOGE(tag, "Error casting status variable");
-
-            LOGR(tag, "Param %s (table %d) %d", param_i->name, table, dat_get_system_var(vars[i]));
-            free(out);
-        }
-    }
-
-    return CMD_OK;
-}
-
 
 /* Auxiliary functions */
 

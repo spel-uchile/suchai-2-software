@@ -60,21 +60,7 @@ int eps_get_hk(char *fmt, char *params, int nparams)
     if(rc == 0) return CMD_ERROR;
 
     eps_hk_print(&hk);
-    int32_t curr_time = dat_get_time();
-    uint32_t cursun = hk.cursun;
-    uint32_t cursys = hk.cursys;
-    uint32_t vbatt = hk.vbatt;
-    int32_t teps =  (hk.temp[0]+hk.temp[1]+hk.temp[2]+hk.temp[3])*10/4;
-    int32_t tbat = (hk.temp[4]+hk.temp[5])*10/2;
-
-    int index_eps = dat_get_system_var(data_map[eps_sensors].sys_index);
-    eps_data_t data_eps = {index_eps, curr_time, cursun, cursys, vbatt, teps, tbat};
-    rc = dat_add_payload_sample(&data_eps, eps_sensors);
-
-    LOGI(tag, "Saving payload %d: EPS (%d). Index: %d, time %d, cursun: %d, cursys: %d, vbatt: %d, teps: %d, tbat: %d ",
-         eps_sensors, rc, index_eps, curr_time, cursun, cursys, vbatt, teps, tbat);
-
-    return rc == -1 ? CMD_ERROR : CMD_OK;
+    return CMD_OK;
 }
 
 int eps_get_config(char *fmt, char *params, int nparams)
@@ -190,4 +176,21 @@ int eps_reset_wdt(char *fmt, char *params, int nparams)
 {
     int rc = eps_wdt_gnd_reset();
     return rc > 0 ? CMD_OK : CMD_ERROR;
+}
+
+int eps_update_status_vars(char *fmt, char *params, int nparams)
+{
+    eps_hk_t hk = {};
+    if(eps_hk_get(&hk) > 0)
+    {
+        dat_set_system_var(dat_eps_vbatt, hk.vbatt);
+        dat_set_system_var(dat_eps_cur_sun, hk.cursun);
+        dat_set_system_var(dat_eps_cur_sys, hk.cursys);
+        dat_set_system_var(dat_eps_temp_bat0, (hk.temp[4]+hk.temp[5])*10/2);
+    }
+    else
+    {
+        return CMD_ERROR;
+    }
+    return CMD_OK;
 }
