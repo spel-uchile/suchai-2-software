@@ -54,20 +54,31 @@ typedef enum upper_istage_cmd_enum
 void cmd_rw_init(void);
 
 /**
- * Get RW speed.
- * @param fmt Str. Parameters format ""
- * @param param Str. Parameters as string: ""
- * @param nparams Int. Number of parameters 0
- * @return 1 if executed correctly
+ * Set delay between consecutive reaction wheels commands
+ * @param fmt "%d"
+ * @param params <delay_ms>
+ * @param nparams 1
+ * @return CMD_OK if executed correctly
+ */
+int rw_set_delay(char *fmt, char *params, int nparams);
+
+/**
+ * Get RW speed. Call without parameters to read all speeds
+ *
+ * @param fmt Str. Parameters format "%d"
+ * @param param Str. Parameters as string: [rw_id]
+ * @param nparams Int. Number of parameters 1
+ * @return CMD_OK if executed correctly
  */
 int rw_get_speed(char *fmt, char *params, int nparams);
 
 /**
- * Get RW current.
- * @param fmt Str. Parameters format ""
- * @param param Str. Parameters as string: ""
- * @param nparams Int. Number of parameters 0
- * @return 1 if executed correctly
+ * Get RW current. Call without parameters to read all speeds
+ *
+ * @param fmt Str. Parameters format "%d"
+ * @param param Str. Parameters as string: [rw_id]
+ * @param nparams Int. Number of parameters 1
+ * @return CMD_OK if executed correctly
  */
 int rw_get_current(char *fmt, char *params, int nparams);
 
@@ -76,7 +87,7 @@ int rw_get_current(char *fmt, char *params, int nparams);
  * @param fmt Str. Parameters format "%d %d"
  * @param param Str. Parameters as string: "<motor_id> <speed>"
  * @param nparams Int. Number of parameters 2
- * @return 1 if executed correctly
+ * @return CMD_OK if executed correctly
  */
 int rw_set_speed(char *fmt, char *params, int nparams);
 

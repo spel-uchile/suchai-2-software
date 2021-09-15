@@ -22,8 +22,11 @@
 
 #include "app/system/cmdRW.h"
 
-static const char* tag = "cmdRW";
-static const char* tag2 = "cmdIstage";
+//#define RW_COMM_DELAY_MS 500
+
+static const char* tag = "cmd_rw";
+static const char* tag2 = "cmd_istage";
+static int RW_COMM_DELAY_MS = 150;
 
 void cmd_rw_init(void)
 {
@@ -31,6 +34,7 @@ void cmd_rw_init(void)
     cmd_add("rw_get_speed", rw_get_speed, "%d", 1);
     cmd_add("rw_get_current", rw_get_current, "%d", 1);
     cmd_add("rw_set_speed", rw_set_speed, "%d %d", 2);
+    cmd_add("rw_set_delay", rw_set_delay, "%d", 1);
     /** UPPER ISTAGE COMMANDS **/
 #ifdef SCH_USE_ISTAGE2
     cmd_add("is2_get_temp", istage2_get_temp, "", 0);
@@ -38,6 +42,16 @@ void cmd_rw_init(void)
     cmd_add("is2_deploy", istage2_deploy_panel, "%d", 1);
     cmd_add("is2_set_deploy", istage2_set_deploy, "%d", 1);
 #endif
+}
+
+int rw_set_delay(char *fmt, char *params, int nparams)
+{
+    int delay;
+    if(params == NULL || sscanf(params, fmt, &delay) != nparams) {
+        return CMD_SYNTAX_ERROR;
+    }
+    RW_COMM_DELAY_MS = delay;
+    return CMD_OK;
 }
 
 int rw_get_speed(char *fmt, char *params, int nparams)
@@ -56,9 +70,12 @@ int rw_get_speed(char *fmt, char *params, int nparams)
     else
     {
         LOGI(tag, "Getting all speeds");
-        uint16_t speed1 = rwdrv10987_get_speed(MOTOR1_ID);
-        uint16_t speed2 = rwdrv10987_get_speed(MOTOR2_ID);
-        uint16_t speed3 = rwdrv10987_get_speed(MOTOR3_ID);
+        uint16_t speed1 = rwdrv10987_get_speed(RW_MOTOR1_ID);
+        osDelay(RW_COMM_DELAY_MS);
+        uint16_t speed2 = rwdrv10987_get_speed(RW_MOTOR2_ID);
+        osDelay(RW_COMM_DELAY_MS);
+        uint16_t speed3 = rwdrv10987_get_speed(RW_MOTOR3_ID);
+        osDelay(RW_COMM_DELAY_MS);
         LOGR(tag, "Sampled speed1: %d, speed2: %d, speed3: %d", speed1, speed2, speed3);
     }
 
@@ -81,9 +98,12 @@ int rw_get_current(char *fmt, char *params, int nparams)
     else
     {
         LOGI(tag, "Sampling all currents");
-        float current1 = rwdrv10987_get_current(MOTOR1_ID); //[mA]
-        float current2 = rwdrv10987_get_current(MOTOR2_ID); //[mA]
-        float current3 = rwdrv10987_get_current(MOTOR3_ID); //[mA]
+        float current1 = rwdrv10987_get_current(RW_MOTOR1_ID); //[mA]
+        osDelay(RW_COMM_DELAY_MS);
+        float current2 = rwdrv10987_get_current(RW_MOTOR2_ID); //[mA]
+        osDelay(RW_COMM_DELAY_MS);
+        float current3 = rwdrv10987_get_current(RW_MOTOR3_ID); //[mA]
+        osDelay(RW_COMM_DELAY_MS);
         LOGR(tag, "Sampled current1: %f, current2: %f, current3: %f", current1, current2, current3);
     }
 
@@ -95,13 +115,45 @@ int rw_set_speed(char *fmt, char *params, int nparams)
     LOGI(tag, "Speed command");
     int motor_id;
     int speed;
+    uint8_t dir;
 
     if(params == NULL || sscanf(params, fmt, &motor_id, &speed) != nparams)
         return CMD_SYNTAX_ERROR;
+    if(speed < -511 || speed > 511)
+    {
+        LOGE(tag, "Invalid speed %d. Use values between -511 and 511");
+        return CMD_SYNTAX_ERROR;
+    }
 
-    int rc = rwdrv10987_set_speed(motor_id, speed);
-    LOGR(tag, "Setting motor: %d speed: %d (%d)", motor_id, speed, rc);
-    return rc == GS_OK ? CMD_OK : CMD_ERROR;
+    if(speed < 0) {
+        dir = RW_DIR_ANTICLOCKWISE;
+        speed = -speed;
+    }
+    else
+        dir = RW_DIR_CLOCKWISE;
+
+    if(motor_id == -1)
+    {
+        int rc = 0;
+        rc += (int) rwdrv10987_set_speed(RW_MOTOR1_ID, (int16_t) speed, dir);
+        osDelay(RW_COMM_DELAY_MS);
+        rc += (int) rwdrv10987_set_speed(RW_MOTOR2_ID, (int16_t) speed, dir);
+        osDelay(RW_COMM_DELAY_MS);
+        rc += (int) rwdrv10987_set_speed(RW_MOTOR3_ID, (int16_t) speed, dir);
+        osDelay(RW_COMM_DELAY_MS);
+        LOGR(tag, "Setting motor: %d speed: %d (%d)", 1, speed, rc);
+        LOGR(tag, "Setting motor: %d speed: %d (%d)", 2, speed, rc);
+        LOGR(tag, "Setting motor: %d speed: %d (%d)", 3, speed, rc);
+        return rc != 0 ? CMD_ERROR : CMD_OK;
+    }
+    else if(motor_id == RW_MOTOR1_ID || motor_id == RW_MOTOR2_ID || motor_id == RW_MOTOR3_ID)
+    {
+        int rc = (int) rwdrv10987_set_speed((uint8_t) motor_id, (int16_t) speed, dir);
+        LOGR(tag, "Setting motor: %d speed: %d (%d)", motor_id, speed, rc);
+        return rc != 0 ? CMD_ERROR : CMD_OK;
+    }
+    else
+        return CMD_SYNTAX_ERROR;
 }
 
 /** UPPER ISTAGE COMMANDS **/
