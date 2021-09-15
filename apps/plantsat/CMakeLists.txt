@@ -2,7 +2,7 @@
 # PLANTSAT APP CMAKE FILE
 ##
 set(SCH_TX_INHIBIT 10 CACHE STRING "Default silent time in seconds [0, 1800 (30min)]")
-set(SCH_TX_FREQ 425000000 CACHE STRING "Nanocom TX freq in Hz")
+set(SCH_TX_FREQ 437250000 CACHE STRING "Nanocom TX freq in Hz")
 set(SCH_TX_PWR 0 CACHE STRING "Nanocom TX power")
 set(SCH_TX_BAUD 4800 CACHE STRING "Nanocom TX Baudrate")
 set(SCH_TX_BCN_PERIOD 600 CACHE STRING "Number of seconds between trx beacon packets")
