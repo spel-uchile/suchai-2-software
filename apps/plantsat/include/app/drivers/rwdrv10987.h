@@ -9,7 +9,7 @@
 *
 */
 
-#include "i2c.h"
+#include "suchai/i2c.h"
 #include "suchai/osDelay.h"
 
 #define OBC_ADDR 0x10
