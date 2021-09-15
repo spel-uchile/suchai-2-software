@@ -23,6 +23,15 @@
 void cmd_eps_init(void);
 
 /**
+ * Configure CSP address for outgoing EPS requests
+ * @param fmt "%d"
+ * @param params <node>
+ * @param nparams 1
+ * @return  CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors
+ */
+int eps_node_set(char *fmt, char *params, int nparams);
+
+/**
  * Send the hard reset command to the EPS
  *
  * @param fmt Str. Parameters format ""

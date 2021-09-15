@@ -21,7 +21,7 @@
 #include "app/system/cmdEPS.h"
 
 #ifndef SCH_EPS_ADDRESS
-#define SCH_EPS_ADDRESS 2
+#define SCH_EPS_ADDRESS 3
 #endif
 
 static const char *tag = "cmdEPS";
@@ -33,6 +33,7 @@ void cmd_eps_init(void)
     eps_set_timeout(1000);
 
     // Register commands
+    cmd_add("eps_set_node", eps_node_set, "%d", 1);
     cmd_add("eps_hard_reset", eps_hard_reset, "", 0);
     cmd_add("eps_get_hk", eps_get_hk, "", 0);
     cmd_add("eps_get_config", eps_get_config, "", 0);
@@ -42,6 +43,19 @@ void cmd_eps_init(void)
     cmd_add("eps_set_vboost", eps_set_vboost, "%d", 1);
     cmd_add("eps_set_mppt", eps_set_pptmode, "%d", 1);
     cmd_add("eps_reset_wdt", eps_reset_wdt, "", 0);
+    cmd_add("eps_update_status", eps_update_status_vars, "", 0);
+}
+
+int eps_node_set(char *fmt, char *params, int nparams)
+{
+    int node;
+    if (params == NULL || sscanf(params, fmt, &node) != nparams) {
+        LOGE(tag, "Error parsing parameters!");
+        return CMD_SYNTAX_ERROR;
+    }
+
+    eps_set_node(node);
+    return CMD_OK;
 }
 
 int eps_hard_reset(char *fmt, char *params, int nparams)
