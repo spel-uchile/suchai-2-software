@@ -103,6 +103,7 @@ int sensors_set_active(char *fmt, char *params, int nparams)
 
 int sensors_take_sample(char *fmt, char *params, int nparams)
 {
+    LOGW(tag, "DEPRECATED!");
     return CMD_ERROR;
 }
 
@@ -119,10 +120,20 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
     int rc1 = gs_mpu3300_read_gyro(&gyro_reading);
     int rc2 = gs_hmc5843_read_single(&hmc_reading);
     int curr_time = dat_get_time();
-
     if(rc1 != 0 || rc2 != 0)
     {
         LOGE(tag, "Error reading adcs sensors (%d, %d)", rc1, rc2);
+        return CMD_ERROR;
+    }
+
+    uint16_t sun1, sun2, sun3, sun4 = 0;
+    int rc3 = gs_gssb_istage_get_sun_voltage(0x10, 500, &sun1);
+    int rc4 = gs_gssb_istage_get_sun_voltage(0x11, 500, &sun2);
+    int rc5 = gs_gssb_istage_get_sun_voltage(0x12, 500, &sun3);
+    int rc6 = gs_gssb_istage_get_sun_voltage(0x13, 500, &sun4);
+    if(rc3 != 0 || rc4 != 0 || rc5 != 0 || rc6 != 0)
+    {
+        LOGE(tag, "Error reading coarse sun sensors (%d, %d, %d, %d)", rc3, rc4, rc5, rc6);
         return CMD_ERROR;
     }
 
@@ -130,15 +141,16 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
     int index_ads = dat_get_system_var(data_map[ads_sensors].sys_index);
     ads_data_t data_ads = {index_ads, curr_time,
                            gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z,
-                           hmc_reading.x, hmc_reading.y, hmc_reading.z};
+                           hmc_reading.x, hmc_reading.y, hmc_reading.z,
+                           sun1, sun2, sun3, sun4};
     int ret = dat_add_payload_sample(&data_ads, ads_sensors);
 
-    LOGI(tag, "Saving payload %d: ADS (%d). Index: %d, time %d, gyro_x: %.04f, gyro_y: %.04f, gyro_z: %.04f, mag_x: %.04f, mag_y: %.04f, mag_z: %.04f",
+    LOGI(tag, "Saving payload %d: ADS (%d). Index: %d, time %d, gyro_x: %.04f, gyro_y: %.04f, gyro_z: %.04f, mag_x: %.04f, mag_y: %.04f, mag_z: %.04f, sun1: %d, sun2, %d, sun3: %d, sun4, %d",
          ads_sensors, ret, index_ads, curr_time, gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z,
-         hmc_reading.x, hmc_reading.y, hmc_reading.z);
+         hmc_reading.x, hmc_reading.y, hmc_reading.z,
+         sun1, sun2, sun3, sun4);
 
     return ret == -1 ? CMD_ERROR : CMD_OK;
-
 }
 
 int sensors_get_adcs_full(char *fmt, char *params, int nparams)
@@ -171,29 +183,121 @@ int sensors_get_eps(char *fmt, char *params, int nparams)
 
 int sensors_get_temperatures(char *fmt, char *params, int nparams)
 {
-    int16_t tobc1, tobc2 = 0;
+    /** OBC TEMPERATURES */
+    int16_t tobc1, tobc2, tobc3 = 0;
     float tgyro = 1;
     int curr_time = dat_get_time();
     int rc = 0;
 
     /* Read board temperature sensors */
+    LOGD(tag, "OBC Temperatures");
     rc += gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_0, 100, &tobc1); //sensor1 = lm70_read_temp(1);
     rc += gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_1, 100, &tobc2); //sensor2 = lm70_read_temp(2);
     rc += gs_mpu3300_read_temp(&tgyro);
+    tobc3 = (uint16_t)tgyro;
     if(rc != 0)
+    {
+        LOGE(tag, "Error reading OBC temperatures");
         return CMD_ERROR;
+    }
+
+    /** EPS TEMPERATURES */
+    LOGD(tag, "EPS Temperatures");
+    eps_hk_t hk = {0};
+    rc = eps_hk_get(&hk);
+    if(rc == 0)
+    {
+        LOGE(tag, "Error reading eps temperatures");
+        return CMD_ERROR;
+    }
+
+    gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
+    gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB2);
+
+    /** GSSB TEMPERATURES */
+    LOGD(tag, "GSSB Temperatures");
+    int16_t gtemp1, gtemp2, gtemp3, gtemp4 = 0;
+    rc = gs_gssb_istage_get_internal_temp(0x10, 500, &gtemp1);
+    rc += gs_gssb_istage_get_internal_temp(0x11, 500, &gtemp2);
+    rc += gs_gssb_istage_get_internal_temp(0x12, 500, &gtemp3);
+    rc += gs_gssb_istage_get_internal_temp(0x13, 500, &gtemp4);
+    if(rc != 0)
+    {
+        LOGW(tag, "Error reading GSSB temperatures (%d)", rc);
+        //return CMD_ERROR;
+    }
+
+    /** SOLAR PANELS TEMPERATURES */
+    LOGD(tag, "SP Temperatures");
+    float stempf1, stempf2, stempf3, stempf4 = 0;
+    rc = gs_gssb_istage_get_temp(0x10, 500, &stempf1);
+    rc += gs_gssb_istage_get_temp(0x11, 500, &stempf2);
+    rc += gs_gssb_istage_get_temp(0x12, 500, &stempf3);
+    rc += gs_gssb_istage_get_temp(0x13, 500, &stempf4);
+    if(rc != 0)
+    {
+        LOGW(tag, "Error reading SOLAR PANELS temperatures (%d)", rc);
+        //return CMD_ERROR;
+    }
+    int16_t stemp1 = (int16_t)stempf1*10;
+    int16_t stemp2 = (int16_t)stempf2*10;
+    int16_t stemp3 = (int16_t)stempf3*10;
+    int16_t stemp4 = (int16_t)stempf4*10;
+
+    /** UPPER INTER STAGE TEMPERATURES */
+    LOGD(tag, "IS2 Temperatures");
+    int16_t is2_int_temp1, is2_int_temp2, is2_int_temp3, is2_int_temp4, is2_ext_temp1, is2_ext_temp2, is2_ext_temp3, is2_ext_temp4 = 0;
+    //TODO: READ UPPER INTER STAGE PANELS TEMPERATURES
 
     /* Save temperature data */
+    LOGD(tag, "Fill Temperatures");
     int index_temp = dat_get_system_var(data_map[temp_sensors].sys_index);
-    struct temp_data data_temp = {index_temp, curr_time, (float)(tobc1 / 10.0), (float)(tobc2 / 10.0), tgyro};
+    temp_data_t data_temp = {
+            index_temp, curr_time,
+            tobc1, tobc3, tobc3,
+            hk.temp[0], hk.temp[1], hk.temp[2], hk.temp[3], hk.temp[4], hk.temp[5],
+            gtemp1, gtemp2, gtemp3, gtemp4, stemp1, stemp2, stemp3, stemp4,
+            is2_int_temp1, is2_int_temp2, is2_int_temp3, is2_int_temp4, is2_ext_temp1, is2_ext_temp2, is2_ext_temp3, is2_ext_temp4
+    };
+    LOGD(tag, "Save Temperatures");
     rc = dat_add_payload_sample(&data_temp, temp_sensors);
 
-    LOGI(tag, "Saving payload %d: TEMP (%d). Index: %d, time %d, tobc1: %d, tobc2: %d, tgyro: %.02f.",
-         temp_sensors, rc, index_temp, curr_time, tobc1, tobc2, tgyro)
+    LOGI(tag, "Saving payload %d: TEMP (%d). Index: %d, time %d, tobc1: %d, teps1: %d, istage1: %d, panel1: %d, istage1: %d, istageext1: %d",
+         temp_sensors, rc, index_temp, curr_time, tobc1, hk.temp[0], gtemp1, stemp1, is2_int_temp1, is2_ext_temp1);
     return rc != 0 ? CMD_ERROR : CMD_OK;
 }
 
 int sensors_get_status_basic(char *fmt, char *params, int nparams)
 {
-    return CMD_ERROR;
+    status_data_t status;
+    status.timestamp = dat_get_time();
+    status.index = dat_get_system_var(data_map[temp_sensors].sys_index);
+    status.dat_obc_opmode = dat_get_system_var(dat_obc_opmode);
+    status.dat_rtc_date_time = dat_get_system_var(dat_rtc_date_time);
+    status.dat_obc_last_reset = dat_get_system_var(dat_obc_last_reset);
+    status.dat_obc_hrs_alive = dat_get_system_var(dat_obc_hrs_alive);
+    status.dat_obc_hrs_wo_reset = dat_get_system_var(dat_obc_hrs_wo_reset);
+    status.dat_obc_reset_counter = dat_get_system_var(dat_obc_reset_counter);
+    status.dat_obc_executed_cmds = dat_get_system_var(dat_obc_executed_cmds);
+    status.dat_obc_failed_cmds = dat_get_system_var(dat_obc_failed_cmds);
+    status.dat_com_count_tm = dat_get_system_var(dat_com_count_tm);
+    status.dat_com_count_tc = dat_get_system_var(dat_com_count_tc);
+    status.dat_com_last_tc = dat_get_system_var(dat_com_last_tc);
+    status.dat_fpl_last = dat_get_system_var(dat_fpl_last);
+    status.dat_fpl_queue = dat_get_system_var(dat_fpl_queue);
+    status.dat_ads_tle_epoch = dat_get_system_var(dat_ads_tle_epoch);
+    status.dat_eps_vbatt = dat_get_system_var(dat_eps_vbatt);
+    status.dat_eps_cur_sun = dat_get_system_var(dat_eps_cur_sun);
+    status.dat_eps_cur_sys = dat_get_system_var(dat_eps_cur_sys);
+    status.dat_obc_temp_1 = dat_get_system_var(dat_obc_temp_1);
+    status.dat_eps_temp_bat0 = dat_get_system_var(dat_eps_temp_bat0);
+    status.dat_drp_mach_action = dat_get_system_var(dat_drp_mach_action);
+    status.dat_drp_mach_state = dat_get_system_var(dat_drp_mach_state);
+    status.dat_drp_mach_payloads = dat_get_system_var(dat_drp_mach_payloads);
+    status.dat_drp_mach_step = dat_get_system_var(dat_drp_mach_step);
+
+    int rc = dat_add_payload_sample(&status, status_sensors);
+
+    LOGI(tag, "Saving payload %d: STATUS (%d). Index: %d, time %d", status_sensors, rc, index, status.timestamp);
+    return rc != 0 ? CMD_ERROR : CMD_OK;
 }

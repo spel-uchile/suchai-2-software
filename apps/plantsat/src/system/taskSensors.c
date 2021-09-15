@@ -62,7 +62,7 @@ void taskSensors(void *param)
     while(1)
     {
         osTaskDelayUntil(&xLastWakeTime, 1000); //Suspend task
-        LOGD(tag, "state: %d, action %d, samples left: %d", status_machine.state, status_machine.action, status_machine.samples_left)
+        LOGV(tag, "state: %d, action %d, samples left: %d", status_machine.state, status_machine.action, status_machine.samples_left)
 
         // Apply action
         if (status_machine.action != ACT_STAND_BY) {
@@ -89,7 +89,7 @@ void taskSensors(void *param)
             }
             // Check for step
             else if (elapsed_sec % status_machine.step == 0) {
-                LOGD(tag, "SAMPLING...");
+                LOGV(tag, "SAMPLING...");
 
                 for(i=0; i<nsensors; i++)
                 {
