@@ -83,7 +83,17 @@ int rw_get_speed(char *fmt, char *params, int nparams);
 int rw_get_current(char *fmt, char *params, int nparams);
 
 /**
- * Set RW speed.
+ * Read speed and current values from each wheel and store results as payload data
+ * @param fmt ""
+ * @param params <>
+ * @param nparams 0
+ * @return CMD_OK, CMD_ERROR
+ */
+int rw_get_data(char *fmt, char *params, int nparams);
+
+/**
+ * Set RW speed. Use <motor_id>=-1 to setup all speeds.
+ *
  * @param fmt Str. Parameters format "%d %d"
  * @param param Str. Parameters as string: "<motor_id> <speed>"
  * @param nparams Int. Number of parameters 2

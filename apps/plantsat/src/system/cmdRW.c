@@ -33,6 +33,7 @@ void cmd_rw_init(void)
     /** RW COMMANDS **/
     cmd_add("rw_get_speed", rw_get_speed, "%d", 1);
     cmd_add("rw_get_current", rw_get_current, "%d", 1);
+    cmd_add("rw_get_data", rw_get_data, "0", 0);
     cmd_add("rw_set_speed", rw_set_speed, "%d %d", 2);
     cmd_add("rw_set_delay", rw_set_delay, "%d", 1);
     /** UPPER ISTAGE COMMANDS **/
@@ -108,6 +109,30 @@ int rw_get_current(char *fmt, char *params, int nparams)
     }
 
     return CMD_OK; //TODO: check error code
+}
+
+int rw_get_data(char *fmt, char *params, int nparams)
+{
+    rw_data_t data;
+    data.index = dat_get_system_var(data_map[rw_sensors].sys_index);
+    data.timestamp = dat_get_time();
+
+    data.speed1 = rwdrv10987_get_speed(RW_MOTOR1_ID);
+    osDelay(RW_COMM_DELAY_MS);
+    data.speed2 = rwdrv10987_get_speed(RW_MOTOR2_ID);
+    osDelay(RW_COMM_DELAY_MS);
+    data.speed3 = rwdrv10987_get_speed(RW_MOTOR3_ID);
+    osDelay(RW_COMM_DELAY_MS);
+    data.current1 = rwdrv10987_get_current(RW_MOTOR1_ID); //[mA]
+    osDelay(RW_COMM_DELAY_MS);
+    data.current2 = rwdrv10987_get_current(RW_MOTOR2_ID); //[mA]
+    osDelay(RW_COMM_DELAY_MS);
+    data.current3 = rwdrv10987_get_current(RW_MOTOR3_ID); //[mA]
+    osDelay(RW_COMM_DELAY_MS);
+
+    int rc = dat_add_payload_sample(&data, rw_sensors);
+    dat_print_payload_struct(&data, rw_sensors);
+    return rc;
 }
 
 int rw_set_speed(char *fmt, char *params, int nparams)
