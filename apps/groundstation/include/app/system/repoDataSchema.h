@@ -47,6 +47,11 @@ typedef enum dat_status_address_enum {
     dat_obc_executed_cmds,        ///< Total number of executed commands
     dat_obc_failed_cmds,          ///< Total number of failed commands
 
+    /// DEP: Deployment related variables.
+    dat_dep_deployed,             ///< Was the satellite deployed?
+    dat_dep_ant_deployed,         ///< Was the antenna deployed?
+    dat_dep_date_time,            ///< Antenna deployment unix time
+
     /// RTC: Rtc related variables
     dat_rtc_date_time,            ///< RTC current unix time
 
@@ -65,21 +70,51 @@ typedef enum dat_status_address_enum {
     dat_fpl_last,                 ///< Last executed flight plan (unix time)
     dat_fpl_queue,                ///< Flight plan queue length
 
+    /// ADS: Altitude determination system
+    dat_ads_omega_x,              ///< Gyroscope acceleration value along the x axis
+    dat_ads_omega_y,              ///< Gyroscope acceleration value along the y axis
+    dat_ads_omega_z,              ///< Gyroscope acceleration value along the z axis
+    dat_tgt_omega_x,              ///< Target acceleration value along the x axis
+    dat_tgt_omega_y,              ///< Target acceleration value along the y axis
+    dat_tgt_omega_z,              ///< Target acceleration value along the z axis
+    dat_ads_mag_x,                ///< Magnetometer value along the x axis
+    dat_ads_mag_y,                ///< Magnetometer value along the y axis
+    dat_ads_mag_z,                ///< Magnetometer value along the z axis
+    dat_ads_pos_x,                ///< Satellite orbit position x (ECI)
+    dat_ads_pos_y,                ///< Satellite orbit position y (ECI)
+    dat_ads_pos_z,                ///< Satellite orbit position z (ECI)
+    dat_ads_tle_epoch,            ///< Current TLE epoch, 0 if TLE is invalid
+    dat_ads_tle_last,             ///< Las time position was propagated
+    dat_ads_q0,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_q1,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_q2,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_q3,                   ///< Attitude quaternion (Inertial to body)
+    dat_tgt_q0,                   ///< Target quaternion (Inertial to body)
+    dat_tgt_q1,                   ///< Target quaternion (Inertial to body)
+    dat_tgt_q2,                   ///< Target quaternion (Inertial to body)
+    dat_tgt_q3,                   ///< Target quaternion (Inertial to body)
+
+    /// EPS: Energy power system
+    dat_eps_vbatt,                ///< Voltage of the battery [mV]
+    dat_eps_cur_sun,              ///< Current from boost converters [mA]
+    dat_eps_cur_sys,              ///< Current from the battery [mA]
+    dat_eps_temp_bat0,            ///< Battery temperature sensor
+
     /// Memory: Current payload memory addresses
-    dat_drp_idx_temp,                 ///< Temperature data index
-    dat_drp_idx_ads,                  ///< ADS data index
-    dat_drp_idx_eps,                  ///< EPS data index
-    dat_drp_idx_sta,                 ///< Status data index
-    dat_drp_idx_stt,
-    dat_drp_idx_stt_exp_time,
+    dat_drp_idx_temp,             ///< Temperature data index
+    dat_drp_idx_ads,              ///< ADS data index
+    dat_drp_idx_eps,              ///< EPS data index
+    dat_drp_idx_sta,              ///< Status data index
+    dat_drp_idx_stt,              ///< Data from STT index
+    dat_drp_idx_rw,               ///< Temperature data index
 
     /// Memory: Current send acknowledge data
     dat_drp_ack_temp,             ///< Temperature data acknowledge
     dat_drp_ack_ads,              ///< ADS data index acknowledge
     dat_drp_ack_eps,              ///< EPS data index acknowledge
-    dat_drp_ack_sta,             ///< Status data index acknowledge
-    dat_drp_ack_stt,
-    dat_drp_ack_stt_exp_time,
+    dat_drp_ack_sta,              ///< Status data index acknowledge
+    dat_drp_ack_stt,              ///< Data from STT index acknowledge
+    dat_drp_ack_rw,               ///< Temperature data acknowledge
 
     /// Sample Machine: Current state of sample status_machine
     dat_drp_mach_action,          ///< Current action of sampling state machine
@@ -96,9 +131,10 @@ typedef enum dat_status_address_enum {
 } dat_status_address_t;
 
 ///< Define opeartion modes
-#define DAT_OBC_OPMODE_NORMAL        (0) ///< Normal operation
-#define DAT_OBC_OPMODE_WARN          (1) ///< Fail safe operation
-#define DAT_OBC_OPMODE_FAIL          (2) ///< Generalized fail operation
+#define DAT_OBC_OPMODE_DEPLOYING     (0) ///< Normal operation
+#define DAT_OBC_OPMODE_NORMAL        (1) ///< Normal operation
+#define DAT_OBC_OPMODE_WARN          (2) ///< Fail safe operation
+#define DAT_OBC_OPMODE_FAIL          (3) ///< Generalized fail operation
 #define DAT_OBC_OPMODE_REF_POINT     (4) ///< Point to vector
 #define DAT_OBC_OPMODE_NAD_POINT     (5) ///< Point to nadir
 #define DAT_OBC_OPMODE_DETUMB_MAG    (6) ///< Detumbling
@@ -134,42 +170,71 @@ typedef struct __attribute__((packed)) dat_sys_var_short {
  * This list is useful to decide how to store and send the status variables
  */
 static const dat_sys_var_t dat_status_list[] = {
-        {dat_obc_last_reset,    "obc_last_reset",    'u', DAT_IS_STATUS, 0},         ///< Last reset source
+        {dat_rtc_date_time,     "rtc_date_time",     'd', DAT_IS_CONFIG, 0},          ///< RTC current unix time
+        {dat_obc_last_reset,    "obc_last_reset",    'u', DAT_IS_STATUS, 0},          ///< Last reset source
+        {dat_obc_opmode,        "obc_opmode",        'd', DAT_IS_CONFIG, DAT_OBC_OPMODE_DEPLOYING}, ///< General operation mode
         {dat_obc_hrs_alive,     "obc_hrs_alive",     'u', DAT_IS_STATUS, 0},          ///< Hours since first boot
         {dat_obc_hrs_wo_reset,  "obc_hrs_wo_reset",  'u', DAT_IS_STATUS, 0},          ///< Hours since last reset
         {dat_obc_reset_counter, "obc_reset_counter", 'u', DAT_IS_STATUS, 0},          ///< Number of reset since first boot
         {dat_obc_sw_wdt,        "obc_sw_wdt",        'u', DAT_IS_STATUS, 0},          ///< Software watchdog timer counter
         {dat_obc_temp_1,        "obc_temp_1",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the first sensor
-        {dat_obc_executed_cmds, "obc_executed_cmds", 'u', DAT_IS_STATUS, 0},
-        {dat_obc_failed_cmds,  "obc_failed_cmds",  'u', DAT_IS_STATUS, 0},
-        {dat_com_count_tm,         "com_count_tm",     'u', DAT_IS_STATUS, 0},          ///< Number of Telemetries sent
-        {dat_com_count_tc,         "com_count_tc",     'u', DAT_IS_STATUS, 0},          ///< Number of received Telecommands
-        {dat_com_last_tc,          "com_last_tc",      'u', DAT_IS_STATUS, 0},         ///< Unix time of the last received Telecommand
-        {dat_fpl_last,             "fpl_last",         'u', DAT_IS_STATUS, 0},          ///< Last executed flight plan (unix time)
-        {dat_fpl_queue,            "fpl_queue",        'u', DAT_IS_STATUS, 0},          ///< Flight plan queue length
-        {dat_drp_idx_temp,         "drp_temp",         'u', DAT_IS_STATUS, 0},          ///< Temperature data index
-        {dat_drp_idx_ads,          "drp_ads",          'u', DAT_IS_STATUS, 0},          ///< ADS data index
-        {dat_drp_idx_eps,          "drp_eps",          'u', DAT_IS_STATUS, 0},          ///< EPS data index
-        {dat_drp_idx_sta,          "drp_sta",          'u', DAT_IS_STATUS, 0},          ///< Status data index
-        {dat_drp_idx_stt,          "drp_stt",          'u', DAT_IS_STATUS, 0},          ///< STT data index
-        {dat_drp_idx_stt_exp_time, "drp_stt_exp_time", 'u', DAT_IS_STATUS, 0},          ///< STT data exposure time index
-        {dat_drp_mach_action,      "drp_mach_action",  'u', DAT_IS_STATUS, 0},          ///<
-        {dat_drp_mach_state,       "drp_mach_state",   'u', DAT_IS_STATUS, 0},          ///<
-        {dat_drp_mach_left,        "drp_mach_left",    'u', DAT_IS_STATUS, 0},          ///<
-        {dat_obc_opmode,           "obc_opmode",       'd', DAT_IS_CONFIG, -1},          ///< General operation mode
-        {dat_rtc_date_time,        "rtc_date_time",    'd', DAT_IS_CONFIG, -1},          ///< RTC current unix time
-        {dat_com_freq,             "com_freq",         'u', DAT_IS_CONFIG, SCH_TX_FREQ},        ///< Communications frequency [Hz]
-        {dat_com_tx_pwr,           "com_tx_pwr",       'u', DAT_IS_CONFIG, SCH_TX_PWR},         ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
-        {dat_com_baud,             "com_baud",         'u', DAT_IS_CONFIG, SCH_TX_BAUD},        ///< Baudrate [bps]
-        {dat_com_mode,             "com_mode",         'u', DAT_IS_CONFIG, 0},          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
-        {dat_com_bcn_period,       "com_bcn_period",   'u', DAT_IS_CONFIG, SCH_TX_BCN_PERIOD},  ///< Number of seconds between trx beacon packets
+        {dat_obc_executed_cmds, "obc_executed_cmds", 'u', DAT_IS_STATUS, 0},          ///< Execute commands counter
+        {dat_obc_failed_cmds,   "obc_failed_cmds",   'u', DAT_IS_STATUS, 0},          ///< Commands execute with errors counter
+        {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 2},          ///< Was the satellite deployed?
+        {dat_dep_ant_deployed,  "dep_ant_deployed",  'u', DAT_IS_STATUS, 1},          ///< Was the antenna deployed?
+        {dat_dep_date_time,     "dep_date_time",     'u', DAT_IS_STATUS, 0},          ///< Antenna deployment unix time
+        {dat_com_count_tm,      "com_count_tm",      'u', DAT_IS_STATUS, 0},          ///< Number of Telemetries sent
+        {dat_com_count_tc,      "com_count_tc",      'u', DAT_IS_STATUS, 0},          ///< Number of received Telecommands
+        {dat_com_last_tc,       "com_last_tc",       'd', DAT_IS_STATUS, 0},          ///< Unix time of the last received Telecommand
+        {dat_com_freq,          "com_freq",          'u', DAT_IS_CONFIG, SCH_TX_FREQ},       ///< Communications frequency [Hz]
+        {dat_com_tx_pwr,        "com_tx_pwr",        'u', DAT_IS_CONFIG, SCH_TX_PWR},        ///< TX power (0: 25dBm, 1: 27dBm, 2: 28dBm, 3: 30dBm)
+        {dat_com_baud,          "com_baud",          'u', DAT_IS_CONFIG, SCH_TX_BAUD},       ///< Baudrate [bps]
+        {dat_com_mode,          "com_mode",          'u', DAT_IS_CONFIG, 0},          ///< Framing mode (1: RAW, 2: ASM, 3: HDLC, 4: Viterbi, 5: GOLAY, 6: AX25)
+        {dat_com_bcn_period,    "com_bcn_period",    'u', DAT_IS_CONFIG, SCH_TX_BCN_PERIOD},  ///< Number of seconds between trx beacon packets
         {dat_obc_bcn_offset,    "obc_bcn_offset",    'u', DAT_IS_CONFIG, SCH_OBC_BCN_OFFSET}, ///< Number of seconds between obc beacon packets
+        {dat_fpl_last,          "fpl_last",          'd', DAT_IS_STATUS, 0},          ///< Last executed flight plan (unix time)
+        {dat_fpl_queue,         "fpl_queue",         'u', DAT_IS_STATUS, 0},          ///< Flight plan queue length
+        {dat_ads_omega_x,       "ads_omega_x",       'f', DAT_IS_STATUS, -1},         ///< Gyroscope acceleration value along the x axis
+        {dat_ads_omega_y,       "ads_omega_y",       'f', DAT_IS_STATUS, -1},         ///< Gyroscope acceleration value along the y axis
+        {dat_ads_omega_z,       "ads_omega_z",       'f', DAT_IS_STATUS, -1},         ///< Gyroscope acceleration value along the z axis
+        {dat_ads_mag_x,         "ads_mag_x",         'f', DAT_IS_STATUS, -1},         ///< Magnetometer value along the x axis
+        {dat_ads_mag_y,         "ads_mag_y",         'f', DAT_IS_STATUS, -1},         ///< Magnetometer value along the y axis
+        {dat_ads_mag_z,         "ads_mag_z",         'f', DAT_IS_STATUS, -1},         ///< Magnetometer value along the z axis
+        {dat_ads_pos_x,         "ads_pos_x",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position x (ECI)
+        {dat_ads_pos_y,         "ads_pos_y",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position y (ECI)
+        {dat_ads_pos_z,         "ads_pos_z",         'f', DAT_IS_STATUS, -1},         ///< Satellite orbit position z (ECI)
+        {dat_ads_tle_epoch,     "ads_tle_epoch",     'd', DAT_IS_STATUS, 0},          ///< Current TLE epoch, 0 if TLE is invalid
+        {dat_ads_tle_last,      "ads_tle_last",      'u', DAT_IS_STATUS, 0},          ///< Last time position was propagated
+        {dat_ads_q0,            "ads_q0",            'f', DAT_IS_STATUS, 0},          ///< Attitude quaternion (Inertial to body)
+        {dat_ads_q1,            "ads_q1",            'f', DAT_IS_STATUS, 0},          ///< Attitude quaternion (Inertial to body)
+        {dat_ads_q2,            "ads_q2",            'f', DAT_IS_STATUS, 0},          ///< Attitude quaternion (Inertial to body)
+        {dat_ads_q3,            "ads_q3",            'f', DAT_IS_STATUS, 0},          ///< Attitude quaternion (Inertial to body)
+        {dat_tgt_omega_x,       "tgt_omega_x",       'f', DAT_IS_CONFIG, 0},          ///< Target acceleration value along the x axis
+        {dat_tgt_omega_y,       "tgt_omega_y",       'f', DAT_IS_CONFIG, 0},          ///< Target acceleration value along the y axis
+        {dat_tgt_omega_z,       "tgt_omega_z",       'f', DAT_IS_CONFIG, 0},          ///< Target acceleration value along the z axis
+        {dat_tgt_q0,            "tgt_q0",            'f', DAT_IS_CONFIG, 0},          ///< Target quaternion (Inertial to body)
+        {dat_tgt_q1,            "tgt_q1",            'f', DAT_IS_CONFIG, 0},          ///< Target quaternion (Inertial to body)
+        {dat_tgt_q2,            "tgt_q2",            'f', DAT_IS_CONFIG, 0},          ///< Target quaternion (Inertial to body)
+        {dat_tgt_q3,            "tgt_q3",            'f', DAT_IS_CONFIG, 0},          ///< Target quaternion (Inertial to body)
+        {dat_eps_vbatt,         "eps_vbatt",         'u', DAT_IS_STATUS, 0},          ///< Voltage of the battery [mV]
+        {dat_eps_cur_sun,       "eps_cur_sun",       'u', DAT_IS_STATUS, 0},          ///< Current from boost converters [mA]
+        {dat_eps_cur_sys,       "eps_cur_sys",       'u', DAT_IS_STATUS, 0},          ///< Current from the battery [mA]
+        {dat_eps_temp_bat0,     "eps_temp_bat0",     'd', DAT_IS_STATUS, 0},          ///< Battery temperature sensor
+        {dat_drp_idx_temp,      "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
+        {dat_drp_idx_ads,       "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
+        {dat_drp_idx_eps,       "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
+        {dat_drp_idx_sta,       "drp_sta",           'u', DAT_IS_STATUS, 0},          ///< Status data index
+        {dat_drp_idx_stt,       "drp_stt",           'u', DAT_IS_STATUS, 0},          ///< STT data index
+        {dat_drp_idx_rw,        "drp_idx_rw",        'u', DAT_IS_STATUS, 0},          ///< RW data index
         {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads,       "drp_ack_ads",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
         {dat_drp_ack_eps,       "drp_ack_eps",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
         {dat_drp_ack_sta,       "drp_ack_sta",       'u', DAT_IS_CONFIG, 0},          ///< Status data index acknowledge
         {dat_drp_ack_stt,       "drp_ack_stt",       'u', DAT_IS_CONFIG, 0},          ///< Stt data index acknowledge
-        {dat_drp_ack_stt_exp_time, "drp_ack_stt_exp_time",'u', DAT_IS_CONFIG, 0},     ///< Stt data exp time index acknowledge
+        {dat_drp_ack_rw,        "drp_ack_rw",        'u', DAT_IS_CONFIG, 0},          ///< RW data acknowledge
+        {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
+        {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
+        {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_step,     "drp_mach_step",     'd', DAT_IS_CONFIG, 0},          ///<
         {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0}           ///<
 };
@@ -196,9 +261,9 @@ typedef enum payload_id {
     temp_sensors=0,         ///< Temperature sensors
     ads_sensors,            ///< Ads sensors
     eps_sensors,            ///< Eps sensors
-    sta_sensors,            ///< Status Variables
-    stt_sensors,
-    stt_exp_time_sensors,
+    status_sensors,         ///< Status Variables
+    stt_sensors,            ///<
+    rw_sensors,             ///< RW Speed and current sensor
     //custom_sensor,           ///< Add custom sensors here
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -209,10 +274,40 @@ typedef enum payload_id {
 typedef struct __attribute__((__packed__)) temp_data {
     uint32_t index;
     uint32_t timestamp;
-    float obc_temp_1;
-    float obc_temp_2;
-    float obc_temp_3;
-} temp_data_t;
+    int16_t obc_temp_1;
+    int16_t obc_temp_2;
+    int16_t obc_temp_3;
+    int16_t eps_temp1;
+    int16_t eps_temp2;
+    int16_t eps_temp3;
+    int16_t eps_temp4;
+    int16_t bat_temp1;
+    int16_t bat_temp2;
+    int16_t istage_temp1;
+    int16_t istage_temp2;
+    int16_t istage_temp3;
+    int16_t istage_temp4;
+    int16_t spanel_temp1;
+    int16_t spanel_temp2;
+    int16_t spanel_temp3;
+    int16_t spanel_temp4;
+    int16_t is2_int_temp1;
+    int16_t is2_int_temp2;
+    int16_t is2_int_temp3;
+    int16_t is2_int_temp4;
+    int16_t is2_ext_temp1;
+    int16_t is2_ext_temp2;
+    int16_t is2_ext_temp3;
+    int16_t is2_ext_temp4;
+    int16_t dummy;
+} temp_data_t; //2*4+26*2 bytes = 60
+
+static char temp_var_string[] = "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3 eps_temp1 eps_temp2 eps_temp3 "
+                                  "eps_temp4 bat_temp1 bat_temp2 istage_temp1 istage_temp2 istage_temp3 istage_temp4 "
+                                  "spanel_temp1 spanel_temp2 spanel_temp3 spanel_temp4 is2_int_temp1 is2_int_temp2 "
+                                  "is2_int_temp3 is2_int_temp4 is2_ext_temp1 is2_ext_temp2 is2_ext_temp3 is2_ext_temp4 dummy";
+
+static char temp_var_types[] = "%u %u %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h";
 
 /**
  * Struct for storing data collected by ads sensors.
@@ -226,6 +321,12 @@ typedef struct __attribute__((__packed__)) ads_data {
     float mag_x;            ///< Magnetometer x axis
     float mag_y;            ///< Magnetometer y axis
     float mag_z;            ///< Magnetometer z axis
+    int32_t sun1;           ///< Coarse sun sensor 1
+    int32_t sun2;           ///< Coarse sun sensor 2
+    int32_t sun3;           ///< Coarse sun sensor 3
+    int32_t sun4;           ///< Coarse sun sensor 4
+    int32_t sun5;           ///< Coarse sun sensor 5
+    int32_t sun6;           ///< Coarse sun sensor 6
 } ads_data_t;
 
 /**
@@ -241,17 +342,6 @@ typedef struct __attribute__((__packed__)) eps_data {
     int32_t temp2; ///< BAT temperature = 10*(BATT0 + BATT1)/2
 } eps_data_t;
 
-
-/**
- * Struct for storing data collected by status variables.
- */
-typedef struct __attribute__((__packed__)) sta_data {
-    uint32_t index;
-    uint32_t timestamp;
-    uint32_t sta_buff[sizeof(dat_status_list) / sizeof(dat_status_list[0])];
-} sta_data_t;
-
-
 /**
  * Struct for storing data collected by stt.
  */
@@ -265,6 +355,59 @@ typedef struct __attribute__((__packed__)) stt_data {
     float exec_time;
 } stt_data_t;
 
+/**
+ * Struct for storing data collected by status variables.
+ */
+typedef struct __attribute__((__packed__)) sta_data {
+    uint32_t index;
+    uint32_t timestamp;
+    uint32_t dat_obc_opmode;
+    uint32_t dat_rtc_date_time;
+    uint32_t dat_obc_last_reset;
+    uint32_t dat_obc_hrs_alive;
+    uint32_t dat_obc_hrs_wo_reset;
+    uint32_t dat_obc_reset_counter;
+    uint32_t dat_obc_executed_cmds;
+    uint32_t dat_obc_failed_cmds;
+    uint32_t dat_com_count_tm;
+    uint32_t dat_com_count_tc;
+    uint32_t dat_com_last_tc;
+    uint32_t dat_fpl_last;
+    uint32_t dat_fpl_queue;
+    uint32_t dat_ads_tle_epoch;
+    uint32_t dat_eps_vbatt;
+    uint32_t dat_eps_cur_sun;
+    uint32_t dat_eps_cur_sys;
+    uint32_t dat_obc_temp_1;
+    uint32_t dat_eps_temp_bat0;
+    uint32_t dat_drp_mach_action;
+    uint32_t dat_drp_mach_state;
+    uint32_t dat_drp_mach_payloads;
+    uint32_t dat_drp_mach_step;
+} status_data_t;
+
+static char status_var_string[] = "sat_index timestamp dat_obc_opmode rtc_date_time obc_last_reset obc_hrs_alive "
+                                  "obc_hrs_wo_reset obc_reset_counter obc_executed_cmds obc_failed_cmds com_count_tm "
+                                  "com_count_tc com_last_tc fpl_last fpl_queue ads_tle_epoch eps_vbatt eps_cur_sun "
+                                  "eps_cur_sys obc_temp_1 eps_temp_bat0 drp_mach_action drp_mach_state drp_mach_payloads "
+                                  "drp_mach_step";
+
+static char status_var_types[] = "%u %u %u %d %u %u %u %u %u %u %u %u %d %d %u %d %d %u %u %f %d %u %u %u %u";
+
+/**
+ * Struct for storing rw data.
+ */
+typedef struct __attribute__((__packed__)) rw_data {
+    uint32_t index;
+    uint32_t timestamp;
+    float current1;
+    float current2;
+    float current3;
+    int32_t speed1;
+    int32_t speed2;
+    int32_t speed3;
+} rw_data_t;
+
 typedef struct __attribute__((__packed__)) stt_exp_time_data{
     uint32_t index;
     uint32_t timestamp;
@@ -276,29 +419,13 @@ typedef struct __attribute__((__packed__)) stt_gyro_data{
     float gx, gy, gz;
 } stt_gyro_data_t;
 
-static char status_var_string[] = "sat_index timestamp obc_last_reset obc_hrs_alive obc_hrs_wo_reset obc_reset_counter "
-                                  "obc_sw_wdt obc_temp_1 obc_temp_2 obc_temp_3 obc_executed_cmds obc_failed_cmds "
-                                  "dep_deployed dep_ant_deployed dep_date_time com_count_tm com_count_tc com_last_tc "
-                                  "fpl_last fpl_queue ads_omega_x ads_omega_y ads_omega_z ads_mag_x ads_mag_y ads_mag_z "
-                                  "ads_pos_x ads_pos_y ads_pos_z ads_tle_epoch ads_tle_last ads_q0 ads_q1 ads_q2 ads_q3"
-                                  "eps_vbatt eps_cur_sun eps_cur_sys eps_temp_bat0 drp_temp drp_ads drp_eps drp_sta drp_stt drp_stt_exp_time"
-                                  "drp_mach_action drp_mach_state drp_mach_left obc_opmode rtc_date_time com_freq "
-                                  "com_tx_pwr com_baud com_mode com_bcn_period obc_bcn_offset tgt_omega_x tgt_omega_y "
-                                  "tgt_omega_z tgt_q0 tgt_q1 tgt_q2 tgt_q3 drp_ack_temp drp_ack_ads drp_ack_eps "
-                                  "drp_ack_sta drp_ack_stt dr_ack_stt_exp_time drp_mach_step drp_mach_payloads";
-
-static char status_var_types[] = "%u %u %u %u %u %u %u %f %f %f %u %u %u %u %u %u %u %u %u %u %f %f %f %f %f %f %f %f "
-                                 "%f %u %u %f %f %f %f %u %u %u %u %u %u %u %u %u %u %u %u %i %i %u %u %u %u %u %u %u %u %f "
-                                 "%f %f %f %f %f %f %u %u %u %u %u %u %u %i %u";
-
 static data_map_t data_map[] = {
-        {"dat_temp_data",    (uint16_t) (sizeof(temp_data_t)),         dat_drp_idx_temp,     dat_drp_ack_temp,         "%u %u %f %f %f",                   "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3"},
-        {"dat_ads_data",     (uint16_t) (sizeof(ads_data_t)),          dat_drp_idx_ads,      dat_drp_ack_ads,          "%u %u %f %f %f %f %f %f",          "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z"},
-        {"dat_eps_data",     (uint16_t) (sizeof(eps_data_t)),          dat_drp_idx_eps,      dat_drp_ack_eps,          "%u %u %u %u %u %d %d",             "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
-        {"dat_sta_data",     (uint16_t) (sizeof(sta_data_t)),          dat_drp_idx_sta,      dat_drp_ack_sta,          status_var_types,                   status_var_string},
-        {"dat_stt_data",     (uint16_t) (sizeof(stt_data_t)),          dat_drp_idx_stt,      dat_drp_ack_stt,          "%u %u %f %f %f %d %f",             "sat_index timestamp ra dec roll time exec_time"},
-        {"stt_exp_time",     (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_idx_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"},
-        {"sdat_tt_exp_time", (uint16_t) (sizeof(stt_exp_time_data_t)), dat_drp_idx_stt_exp_time, dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"}
+        {"dat_temp_data",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp, dat_drp_ack_temp, temp_var_types, temp_var_string},
+        {"dat_ads_data",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads,  dat_drp_ack_ads,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
+        {"dat_eps_data",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps,  dat_drp_ack_eps,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
+        {"dat_sta_data",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta,  dat_drp_ack_sta,  status_var_types, status_var_string},
+        {"dat_stt_data",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt,  dat_drp_ack_stt,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
+        {"dat_rw_data",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw,   dat_drp_ack_rw,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"}
 };
 
 /** The repository's name */
