@@ -299,14 +299,15 @@ typedef struct __attribute__((__packed__)) temp_data {
     int16_t is2_ext_temp2;
     int16_t is2_ext_temp3;
     int16_t is2_ext_temp4;
-} temp_data_t; //2*4+24*2 bytes = 56
+    int16_t dummy;
+} temp_data_t; //2*4+26*2 bytes = 60
 
 static char temp_var_string[] = "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3 eps_temp1 eps_temp2 eps_temp3 "
                                   "eps_temp4 bat_temp1 bat_temp2 istage_temp1 istage_temp2 istage_temp3 istage_temp4 "
                                   "spanel_temp1 spanel_temp2 spanel_temp3 spanel_temp4 is2_int_temp1 is2_int_temp2 "
-                                  "is2_int_temp3 is2_int_temp4 is2_ext_temp1 is2_ext_temp2 is2_ext_temp3 is2_ext_temp4";
+                                  "is2_int_temp3 is2_int_temp4 is2_ext_temp1 is2_ext_temp2 is2_ext_temp3 is2_ext_temp4 dummy";
 
-static char temp_var_types[] = "%u %u %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h";
+static char temp_var_types[] = "%u %u %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h";
 
 /**
  * Struct for storing data collected by ads sensors.
