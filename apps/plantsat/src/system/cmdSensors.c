@@ -126,6 +126,9 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
         return CMD_ERROR;
     }
 
+    gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
+    gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB2);
+
     uint16_t sun1, sun2, sun3, sun4 = 0;
     int rc3 = gs_gssb_istage_get_sun_voltage(0x10, 500, &sun1);
     int rc4 = gs_gssb_istage_get_sun_voltage(0x11, 500, &sun2);
@@ -134,7 +137,7 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
     if(rc3 != 0 || rc4 != 0 || rc5 != 0 || rc6 != 0)
     {
         LOGE(tag, "Error reading coarse sun sensors (%d, %d, %d, %d)", rc3, rc4, rc5, rc6);
-        return CMD_ERROR;
+        //return CMD_ERROR;
     }
 
     /* Save ADCS data */
