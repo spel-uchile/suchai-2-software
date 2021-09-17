@@ -3,6 +3,7 @@ set(SCH_TX_PWR 0 CACHE STRING "Nanocom TX power")
 set(SCH_TX_BAUD 4800 CACHE STRING "Nanocom TX Baudrate")
 set(SCH_TX_BCN_PERIOD 600 CACHE STRING "Number of seconds between trx beacon packets")
 set(SCH_OBC_BCN_OFFSET 600 CACHE STRING "Number of seconds between obc beacon packets")
+set(SCH_GND_ADD_PAYLOADS 0 CACHE BOOL "Enable payloads commands")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/app/system/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/app/system/config.h)
 
@@ -54,9 +55,14 @@ set(SOURCE_FILES
         src/system/cmdAPP.c
         src/system/cmdAX100.c
         src/system/cmdEPS.c
-        src/system/cmdMAG.c
         src/system/hookCommunications.c
 )
+
+if(${SCH_GND_ADD_PAYLOADS})
+    list(APPEND SOURCE_FILES
+            src/system/cmdMAG.c
+            )
+endif()
 
 add_executable(ground-app ${GS_SOURCE_FILES} ${SOURCE_FILES})
 target_include_directories(ground-app PRIVATE ${GS_INCLUDE_PATH})
