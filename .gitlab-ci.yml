@@ -6,6 +6,8 @@ configure_docker:
   stage: configure_docker
   script:
     - echo "Configure docker image"
+    - echo "($pwd)"
+    - echo "($ls)"
     - cd $HOME/suchai-docker
     - git pull
     - cd suchai-fs-2
