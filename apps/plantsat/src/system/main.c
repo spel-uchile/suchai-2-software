@@ -35,6 +35,10 @@
 
 static char *tag = "app_main";
 
+#define INIT_DEP_FIRST      0
+#define INIT_DEP_DEPLOYING  1
+#define INIT_DEP_CONFIRMED  2
+
 int init_setup_libcsp_2(void)
 {
     /* Init communications */
@@ -97,6 +101,7 @@ int init_setup_trx(void) {
         trx_config_t trx_config = trx_configs[i];
         memset(trx_str, 0, SCH_CMD_MAX_STR_PARAMS);
         sprintf(trx_str, "com_set_config %d %s %d", trx_config.table, trx_config.param, trx_config.value);
+        LOGD(tag, "TRX CMD: %s", trx_str);
         trx_cmd = cmd_build_from_str(trx_str);
         cmd_send(trx_cmd);
         if(log_lvl >= LOG_LVL_DEBUG)
@@ -141,7 +146,7 @@ int init_deployment_routine(void)
     LOGI(tag, "DEPLOYMENT...");
     int deployed = dat_get_system_var(dat_dep_deployed);
     LOGI(tag, "dat_dep_deployed: %d...", deployed);
-    if(deployed == 0) // First deploy
+    if(deployed == INIT_DEP_FIRST) // First deploy
     {
         LOGI(tag, "FIRST DEPLOY");
         /* First deploy - 30min TRX Silence */
@@ -164,12 +169,10 @@ int init_deployment_routine(void)
 
     deployed = dat_get_system_var(dat_dep_deployed);
     LOGI(tag, "dat_dep_deployed: %d...", deployed);
-    if(deployed == 1) // Deployed not confirmed, but silence time
+    if(deployed == INIT_DEP_DEPLOYING) // Deployed not confirmed, but silence time
     {
         LOGI(tag, "ANTENNA DEPLOYMENT");
-        cmd_t *eps_update_status_cmd = cmd_get_str("eps_update_status");
-        cmd_send(eps_update_status_cmd);
-        osDelay(500);
+        eps_update_status_vars(NULL, NULL, 0);
         int vbat_mV = dat_get_system_var(dat_eps_vbatt);
 
         // Deploy antenna
@@ -178,8 +181,12 @@ int init_deployment_routine(void)
             init_antenna_deploy();
 
         //Update antenna deployment status
-        cmd_t *cmd_dep = cmd_get_str("gssb_update_status");
-        cmd_send(cmd_dep);
+        gssb_update_status(NULL, NULL, 0);
+    }
+
+    if(deployed == INIT_DEP_CONFIRMED)
+    {
+        LOGI(tag, "Deployment confirmed!");
     }
 
     LOGI(tag, "Restore TRX Inhibit to: %d seconds", 0);
@@ -235,13 +242,4 @@ int main(void)
 {
     /** Call framework main, shouldn't return */
     suchai_main();
-}
-
-void on_close(int signal)
-{
-    dat_repo_close();
-    cmd_repo_close();
-
-    LOGI(tag, "Exit system!");
-    exit(signal);
 }

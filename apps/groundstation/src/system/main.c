@@ -83,12 +83,3 @@ int main(void)
 
 
 }
-
-void on_close(int signal)
-{
-    dat_repo_close();
-    cmd_repo_close();
-
-    LOGI(tag, "Exit system!");
-    exit(signal);
-}
