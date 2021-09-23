@@ -3,12 +3,13 @@
 //
 
 #include "suchai/taskCommunications.h"
-#include "app/system/cmdMAG.h"
 
 static char *tag = "Communications*";
 
 #define SCH_TRX_PORT_STT (SCH_TRX_PORT_APP+1)  ///< 16 STT app port
 #define STT_TYPE_GYRO 30 ///< STT Gyro telemetry type
+#define SCH_TRX_PORT_MAG (SCH_TRX_PORT_APP+2)
+#define MAG_TYPE_LIST_FILE 25
 
 void parse_stt_data(csp_packet_t *packet);
 void parse_mag_data(csp_packet_t *packet);

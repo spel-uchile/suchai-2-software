@@ -24,7 +24,10 @@
 #include "app/system/cmdAPP.h"
 #include "app/system/cmdAX100.h"
 #include "app/system/cmdEPS.h"
+
+#if SCH_GND_ADD_PAYLOADS
 #include "app/system/cmdMAG.h"
+#endif
 
 static char *tag = "app_main";
 
@@ -49,7 +52,10 @@ void initAppHook(void *params)
     cmd_app_init();
     cmd_ax100_init();
     cmd_eps_init();
+
+#if SCH_GND_ADD_PAYLOADS
     cmd_mag_init();
+#endif
 
     /** Init CSP **/
     /* KISS INTERFACE */
