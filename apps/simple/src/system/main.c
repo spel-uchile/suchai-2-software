@@ -23,6 +23,9 @@
 #include "suchai/log_utils.h"
 #include "app/system/taskHousekeeping.h"
 #include "app/system/cmdAPP.h"
+#ifdef RPI
+#include "csp_if_i2c_uart.h"
+#endif
 
 static char *tag = "app_main";
 
@@ -36,6 +39,15 @@ void initAppHook(void *params)
 {
     /** Include app commands */
     cmd_app_init();
+
+#ifdef LINUX
+    csp_add_zmq_iface(SCH_COMM_NODE);
+#endif
+#ifdef RPI
+    csp_i2c_uart_init(SCH_COMM_NODE, 0, 19200);
+    csp_rtable_set(8, 2, &csp_if_i2c_uart, 5); // Traffic to GND (8-15) via I2C to TRX node
+    csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c_uart, CSP_NODE_MAC); // Rest of the traffic to I2C using node i2c address
+#endif
 
     /** Init app tasks */
     int t_ok = osCreateTask(taskHousekeeping, "housekeeping", 1024, NULL, 2, NULL);

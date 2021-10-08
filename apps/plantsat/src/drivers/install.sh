@@ -29,9 +29,8 @@ fi
 
 echo "Linking source code into SDK..."
 cd suchai-drivers-obc
-#mv src/ src.old/
 ln -s -f ../../../../../suchai-flight-software
-ln -s -f ../../../../plantsat
+ln -s -f ../../../ app
 cd -
 
 echo "Downloading BUS drivers..."
