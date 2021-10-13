@@ -1014,12 +1014,12 @@ int gssb_update_status(char *fmt, char *params, int nparams)
         }
         rel_status = status.release_status;
         deploy_status += rel_status;
-        LOGI(tag, "Interstage selected: %#x. Released: %d", istage_addr[i], rel_status);
+        LOGR(tag, "Interstage selected: %#x. Released: %d", istage_addr[i], rel_status);
     }
 
     if(deploy_status >= 0)
     {
-        LOGI(tag, "Antennas release status: %d", deploy_status);
+        LOGR(tag, "Antennas release status: %d", deploy_status);
         dat_set_system_var(dat_dep_ant_deployed, deploy_status);
         return CMD_OK;
     }

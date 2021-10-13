@@ -29,6 +29,7 @@
 #include "app/system/cmdGSSB.h"
 #include "app/system/cmdRW.h"
 #include "app/system/cmdSensors.h"
+#include "app/system/cmdCDH.h"
 #include "app/system/taskHousekeeping.h"
 #include "app/system/taskADCS.h"
 #include "app/system/taskSensors.h"
@@ -144,6 +145,7 @@ int init_antenna_deploy(void)
 int init_deployment_routine(void)
 {
     LOGI(tag, "DEPLOYMENT...");
+    dat_set_system_var(dat_obc_opmode, DAT_OBC_OPMODE_DEPLOYING);
     int deployed = dat_get_system_var(dat_dep_deployed);
     LOGI(tag, "dat_dep_deployed: %d...", deployed);
     if(deployed == INIT_DEP_FIRST) // First deploy
@@ -151,7 +153,7 @@ int init_deployment_routine(void)
         LOGI(tag, "FIRST DEPLOY");
         /* First deploy - 30min TRX Silence */
         LOGI(tag, "Setting TRX Inhibit to: %d seconds...", 1860);
-        cmd_t *tx_silence = cmd_build_from_str("com_set_config tx_inhibit 1860");
+        cmd_t *tx_silence = cmd_build_from_str("com_set_config 0 tx_inhibit 1860");
         cmd_send(tx_silence);
 
         /* Wait 30 minutes before antenna deployment */
@@ -162,9 +164,10 @@ int init_deployment_routine(void)
             LOGI(tag, "Deployment delay: %d/%d seconds...", seconds, 1800);
             osTaskDelayUntil(&xLastWakeTime, 1000); //Suspend task
             seconds ++;
-            //TODO CANCEL
+            if(dat_get_system_var(dat_obc_opmode) != DAT_OBC_OPMODE_DEPLOYING)
+                goto cancel;
         }
-        dat_set_system_var(dat_dep_deployed, 1);
+        dat_set_system_var(dat_dep_deployed, INIT_DEP_DEPLOYING);
     }
 
     deployed = dat_get_system_var(dat_dep_deployed);
@@ -189,8 +192,10 @@ int init_deployment_routine(void)
         LOGI(tag, "Deployment confirmed!");
     }
 
+cancel:
+    dat_set_system_var(dat_obc_opmode, DAT_OBC_OPMODE_NORMAL);
     LOGI(tag, "Restore TRX Inhibit to: %d seconds", 0);
-    cmd_t *tx_silence = cmd_build_from_str("com_get_config tx_inhibit 0");
+    cmd_t *tx_silence = cmd_build_from_str("com_set_config 0 tx_inhibit 0");
     cmd_send(tx_silence);
 }
 
@@ -211,6 +216,7 @@ void initAppHook(void *params)
     cmd_gssb_init();
     cmd_rw_init();
     cmd_sensors_init();
+    cmd_cdh_init();
 
     /** Finish CSP setup */
     init_setup_libcsp_2();
@@ -235,7 +241,7 @@ void initAppHook(void *params)
 #endif
 
     /** DEPLOYMENT */
-    //init_deployment_routine();
+    init_deployment_routine();
 }
 
 int main(void)

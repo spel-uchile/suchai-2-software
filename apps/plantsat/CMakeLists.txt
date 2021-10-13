@@ -22,6 +22,7 @@ set(SOURCE_FILES
         src/system/cmdGSSB.c
         src/system/cmdRW.c
         src/system/cmdSensors.c
+        src/system/cmdCDH.c
         src/system/hookCommunications.c
         src/system/taskHousekeeping.c
         src/system/taskSensors.c

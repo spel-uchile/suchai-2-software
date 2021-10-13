@@ -172,7 +172,7 @@ typedef struct __attribute__((packed)) dat_sys_var_short {
 static const dat_sys_var_t dat_status_list[] = {
         {dat_rtc_date_time,     "rtc_date_time",     'd', DAT_IS_CONFIG, 0},          ///< RTC current unix time
         {dat_obc_last_reset,    "obc_last_reset",    'u', DAT_IS_STATUS, 0},          ///< Last reset source
-        {dat_obc_opmode,        "obc_opmode",        'd', DAT_IS_CONFIG, DAT_OBC_OPMODE_DEPLOYING}, ///< General operation mode
+        {dat_obc_opmode,        "obc_opmode",        'd', DAT_IS_CONFIG, DAT_OBC_OPMODE_NORMAL}, ///< General operation mode
         {dat_obc_hrs_alive,     "obc_hrs_alive",     'u', DAT_IS_STATUS, 0},          ///< Hours since first boot
         {dat_obc_hrs_wo_reset,  "obc_hrs_wo_reset",  'u', DAT_IS_STATUS, 0},          ///< Hours since last reset
         {dat_obc_reset_counter, "obc_reset_counter", 'u', DAT_IS_STATUS, 0},          ///< Number of reset since first boot
@@ -180,7 +180,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_obc_temp_1,        "obc_temp_1",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the first sensor
         {dat_obc_executed_cmds, "obc_executed_cmds", 'u', DAT_IS_STATUS, 0},          ///< Execute commands counter
         {dat_obc_failed_cmds,   "obc_failed_cmds",   'u', DAT_IS_STATUS, 0},          ///< Commands execute with errors counter
-        {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 2},          ///< Was the satellite deployed?
+        {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 0},          ///< Was the satellite deployed?
         {dat_dep_ant_deployed,  "dep_ant_deployed",  'u', DAT_IS_STATUS, 1},          ///< Was the antenna deployed?
         {dat_dep_date_time,     "dep_date_time",     'u', DAT_IS_STATUS, 0},          ///< Antenna deployment unix time
         {dat_com_count_tm,      "com_count_tm",      'u', DAT_IS_STATUS, 0},          ///< Number of Telemetries sent
