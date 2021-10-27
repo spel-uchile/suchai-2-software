@@ -57,7 +57,7 @@ void cmd_gssb_init(void)
     cmd_add("gssb_reset", gssb_soft_reset, "", 0);
     cmd_add("gssb_get_status", gssb_interstage_get_status, "", 0);
     cmd_add("gssb_update_status", gssb_update_status, "", 0);
-    cmd_add("gssb_antenna_release", gssb_antenna_release, "%d %d %d %d", 4);
+    cmd_add("gssb_antenna_release", gssb_antenna_release, "%i %d %d %d", 4);
 
 }
 
@@ -1029,7 +1029,8 @@ int gssb_update_status(char *fmt, char *params, int nparams)
 
 int gssb_antenna_release(char *fmt, char *params, int nparams)
 {
-    int addr, knife_on, knife_off, repeats = 0;
+    int iaddr, knife_on, knife_off, repeats = 0;
+    uint8_t addr = 0;
 
     if(params == NULL)
     {
@@ -1040,18 +1041,28 @@ int gssb_antenna_release(char *fmt, char *params, int nparams)
     int rc = 1;
     gs_gssb_istage_burn_settings_t settings;
 
-    if(sscanf(params, fmt, &addr, &knife_on, &knife_off, &repeats) == nparams)
+    if(sscanf(params, fmt, &iaddr, &knife_on, &knife_off, &repeats) == nparams)
     {
+        addr = (uint8_t)iaddr;
         //Get current config
         if (gs_gssb_istage_get_burn_settings(addr, i2c_timeout_ms, &settings) != GS_OK)
             return CMD_ERROR_FAIL;
-
         // Fill parameters
-        settings.std_time_ms = knife_on;
+        settings.std_time_ms = (uint16_t)knife_on;
         settings.increment_ms = 0;
         settings.short_cnt_down = 0;
-        settings.max_repeat = repeats;
-        settings.rep_time_s = knife_off;
+        settings.max_repeat = (uint8_t)repeats;
+        settings.rep_time_s = (uint8_t)knife_off;
+
+        LOGR(tag, "-------- Deploy algorithm config ----------");
+        LOGR(tag, "Deploy delay from boot:\t %"PRIu8" s", settings.short_cnt_down);
+        LOGR(tag, "Deploy status:\t %"PRIu16" s", settings.status);
+        LOGR(tag, "Knife on time:\t\t %i ms", settings.std_time_ms);
+        LOGR(tag, "Increment:\t\t %i ms", settings.increment_ms);
+        LOGR(tag, "Max repeats:\t\t %i", settings.max_repeat);
+        LOGR(tag, "Repeat time:\t\t %i s", settings.rep_time_s);
+        LOGR(tag, "Switch polarity:\t %"PRIu8"", settings.switch_polarity);
+        LOGR(tag, "Settings locked:\t %"PRIu8"", settings.locked);
 
         // Unlock parameters
         if (gs_gssb_istage_settings_unlock(addr, i2c_timeout_ms) != GS_OK)
@@ -1060,28 +1071,50 @@ int gssb_antenna_release(char *fmt, char *params, int nparams)
         if (gs_gssb_istage_set_burn_settings(addr, i2c_timeout_ms, &settings) != GS_OK)
             return CMD_ERROR_FAIL;
         /* We need to have a delay as we write the settings to EEPROM which takes some time */
-        osDelay(50);
+        osDelay(500);
         // "Setting burn cnt...
         if (gs_gssb_istage_set_burn_settings_cnt(addr, i2c_timeout_ms, &settings) != GS_OK)
             return CMD_ERROR_FAIL;
         /* We need to have a delay as we write the settings to EEPROM which takes some time */
-        osDelay(20);
+        osDelay(100);
         if (gs_gssb_istage_settings_lock(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
-        LOGI(tag, "Resetting interstage...");
+
         gs_gssb_soft_reset(addr, i2c_timeout_ms);
-        LOGR(tag, "istage on: %d. Off: %d. Rep: %d. (rc: %d)",
-             knife_on, knife_off, repeats, rc);
+        osDelay(100);
 
         // Deploy manual
         if (gs_gssb_istage_settings_unlock(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
-        if (gs_gssb_istage_set_arm(addr, i2c_timeout_ms, 0x08) != GS_OK)
+        //if (gs_gssb_istage_set_arm(addr, i2c_timeout_ms, 0x08) != GS_OK)
+        if (gs_gssb_istage_set_state(addr, i2c_timeout_ms, 1) != GS_OK)
+                return CMD_ERROR_FAIL;
+        if (gs_gssb_istage_settings_lock(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
+        osDelay(100);
         // Burn
         if (gs_gssb_istage_burn(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
         LOGR(tag, "GSSB istage %d deploying! (rc: %d)", addr, rc);
+
+        i2c_addr = addr;
+        gssb_interstage_get_status("", "", 0);
+        osDelay(500);
+        gssb_interstage_get_status("", "", 0);
+        osDelay(500);
+        gssb_interstage_get_status("", "", 0);
+        osDelay(500);
+        gssb_interstage_get_status("", "", 0);
+        osDelay(500);
+        gssb_interstage_get_status("", "", 0);
+        osDelay(500);
+        gssb_interstage_get_status("", "", 0);
+        osDelay(500);
+        gssb_interstage_get_status("", "", 0);
+        osDelay(500);
+        gssb_interstage_get_status("", "", 0);
+        osDelay(500);
+
 
         return CMD_OK;
     }
