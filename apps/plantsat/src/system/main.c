@@ -126,10 +126,10 @@ int init_antenna_deploy(void)
     char *cmds_str[] = {
             "gssb_pwr 1 1",                  // Turn-on istages
             "gssb_update_status",            // Update deployment status variables
-            "gssb_antenna_release 16 2 1 5", // istage 1. On: 2s, off: 1s, rep: 5
-            "gssb_antenna_release 17 2 1 5", // istage 2. On: 2s, off: 1s, rep: 5
-            "gssb_antenna_release 18 2 1 5", // istage 3. On: 2s, off: 1s, rep: 5
-            "gssb_antenna_release 19 2 1 5", // istage 4. On: 2s, off: 1s, rep: 5
+            "gssb_antenna_release 16 2000 1 5", // istage 1. On: 2s, off: 1s, rep: 5
+            "gssb_antenna_release 17 2000 1 5", // istage 2. On: 2s, off: 1s, rep: 5
+            "gssb_antenna_release 18 2000 1 5", // istage 3. On: 2s, off: 1s, rep: 5
+            "gssb_antenna_release 19 2000 1 5", // istage 4. On: 2s, off: 1s, rep: 5
     };
 
     for(int i=0; i<N_CMDS; i++) {

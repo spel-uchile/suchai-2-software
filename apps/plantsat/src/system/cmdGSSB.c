@@ -1096,26 +1096,6 @@ int gssb_antenna_release(char *fmt, char *params, int nparams)
         if (gs_gssb_istage_burn(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
         LOGR(tag, "GSSB istage %d deploying! (rc: %d)", addr, rc);
-
-        i2c_addr = addr;
-        gssb_interstage_get_status("", "", 0);
-        osDelay(500);
-        gssb_interstage_get_status("", "", 0);
-        osDelay(500);
-        gssb_interstage_get_status("", "", 0);
-        osDelay(500);
-        gssb_interstage_get_status("", "", 0);
-        osDelay(500);
-        gssb_interstage_get_status("", "", 0);
-        osDelay(500);
-        gssb_interstage_get_status("", "", 0);
-        osDelay(500);
-        gssb_interstage_get_status("", "", 0);
-        osDelay(500);
-        gssb_interstage_get_status("", "", 0);
-        osDelay(500);
-
-
         return CMD_OK;
     }
     else
