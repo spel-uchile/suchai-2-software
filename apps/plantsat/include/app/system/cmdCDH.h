@@ -45,4 +45,22 @@ int obc_cancel_deploy(char *fmt, char *params, int nparams);
 
 int obc_read_status_basic(status_data_t *status_data);
 
+/**
+ * Sends a string message
+ * @param fmt "%d %s"
+ * @param params <dest_node> <message>
+ * @param nparams 2
+ * @return CMD_OK if executed correctly
+ */
+int tm_send_msg(char *fmt, char *params, int nparams);
+
+/**
+ * Parses a string message
+ * @param fmt ""
+ * @param params <>
+ * @param nparams 0
+ * @return CMD_OK if executed correctly
+ */
+int tm_parse_msg(char *fmt, char *params, int nparams);
+
 #endif //_CMDCDH_H
