@@ -22,6 +22,7 @@
 #include "suchai/osDelay.h"
 
 #include "suchai/repoCommand.h"
+#include "app/system/cmdCDH.h"
 
 void cmd_sensors_init(void);
 

@@ -107,6 +107,7 @@ typedef enum dat_status_address_enum {
     dat_drp_idx_sta,              ///< Status data index
     dat_drp_idx_stt,              ///< Data from STT index
     dat_drp_idx_rw,               ///< Temperature data index
+    dat_drp_idx_str,              ///< String data index
 
     /// Memory: Current send acknowledge data
     dat_drp_ack_temp,             ///< Temperature data acknowledge
@@ -115,6 +116,7 @@ typedef enum dat_status_address_enum {
     dat_drp_ack_sta,              ///< Status data index acknowledge
     dat_drp_ack_stt,              ///< Data from STT index acknowledge
     dat_drp_ack_rw,               ///< Temperature data acknowledge
+    dat_drp_ack_str,              ///< String data acknowledge
 
     /// Sample Machine: Current state of sample status_machine
     dat_drp_mach_action,          ///< Current action of sampling state machine
@@ -237,6 +239,8 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_step,     "drp_mach_step",     'd', DAT_IS_CONFIG, 0},          ///<
         {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0}           ///<
+        {dat_drp_idx_str,       "drp_idx_str",       'u', DAT_IS_STATUS, 0},          ///< String data index
+        {dat_drp_ack_str,       "drp_ack_str",       'u', DAT_IS_CONFIG, 0},          ///< String data acknowledge
 };
 ///< The dat_status_last_var constant serves for looping through all status variables
 static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_status_list[0]);
@@ -265,6 +269,7 @@ typedef enum payload_id {
     stt_sensors,            ///<
     rw_sensors,             ///< RW Speed and current sensor
     //custom_sensor,           ///< Add custom sensors here
+    received_msgs,
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
 
@@ -419,13 +424,23 @@ typedef struct __attribute__((__packed__)) stt_gyro_data{
     float gx, gy, gz;
 } stt_gyro_data_t;
 
+/**
+ * Struct for storing string data.
+ */
+typedef struct __attribute__((__packed__)) string_data {
+    uint32_t index;
+    uint32_t timestamp;
+    char msg[SCH_ST_STR_SIZE];
+} string_data_t;
+
 static data_map_t data_map[] = {
         {"dat_temp_data",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp, dat_drp_ack_temp, temp_var_types, temp_var_string},
         {"dat_ads_data",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads,  dat_drp_ack_ads,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
         {"dat_eps_data",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps,  dat_drp_ack_eps,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
         {"dat_sta_data",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta,  dat_drp_ack_sta,  status_var_types, status_var_string},
         {"dat_stt_data",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt,  dat_drp_ack_stt,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
-        {"dat_rw_data",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw,   dat_drp_ack_rw,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"}
+        {"dat_rw_data",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw,   dat_drp_ack_rw,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
+        {"string_data",      (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str, dat_drp_ack_str,   "%u %u %s",                "sat_index timestamp string_data"}
 };
 
 /** The repository's name */

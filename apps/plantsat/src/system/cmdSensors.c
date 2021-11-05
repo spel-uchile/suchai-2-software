@@ -273,32 +273,7 @@ int sensors_get_temperatures(char *fmt, char *params, int nparams)
 int sensors_get_status_basic(char *fmt, char *params, int nparams)
 {
     status_data_t status;
-    status.timestamp = dat_get_time();
-    status.index = dat_get_system_var(data_map[temp_sensors].sys_index);
-    status.dat_obc_opmode = dat_get_system_var(dat_obc_opmode);
-    status.dat_rtc_date_time = dat_get_system_var(dat_rtc_date_time);
-    status.dat_obc_last_reset = dat_get_system_var(dat_obc_last_reset);
-    status.dat_obc_hrs_alive = dat_get_system_var(dat_obc_hrs_alive);
-    status.dat_obc_hrs_wo_reset = dat_get_system_var(dat_obc_hrs_wo_reset);
-    status.dat_obc_reset_counter = dat_get_system_var(dat_obc_reset_counter);
-    status.dat_obc_executed_cmds = dat_get_system_var(dat_obc_executed_cmds);
-    status.dat_obc_failed_cmds = dat_get_system_var(dat_obc_failed_cmds);
-    status.dat_com_count_tm = dat_get_system_var(dat_com_count_tm);
-    status.dat_com_count_tc = dat_get_system_var(dat_com_count_tc);
-    status.dat_com_last_tc = dat_get_system_var(dat_com_last_tc);
-    status.dat_fpl_last = dat_get_system_var(dat_fpl_last);
-    status.dat_fpl_queue = dat_get_system_var(dat_fpl_queue);
-    status.dat_ads_tle_epoch = dat_get_system_var(dat_ads_tle_epoch);
-    status.dat_eps_vbatt = dat_get_system_var(dat_eps_vbatt);
-    status.dat_eps_cur_sun = dat_get_system_var(dat_eps_cur_sun);
-    status.dat_eps_cur_sys = dat_get_system_var(dat_eps_cur_sys);
-    status.dat_obc_temp_1 = dat_get_system_var(dat_obc_temp_1);
-    status.dat_eps_temp_bat0 = dat_get_system_var(dat_eps_temp_bat0);
-    status.dat_drp_mach_action = dat_get_system_var(dat_drp_mach_action);
-    status.dat_drp_mach_state = dat_get_system_var(dat_drp_mach_state);
-    status.dat_drp_mach_payloads = dat_get_system_var(dat_drp_mach_payloads);
-    status.dat_drp_mach_step = dat_get_system_var(dat_drp_mach_step);
-
+    obc_read_status_basic(&status);
     int rc = dat_add_payload_sample(&status, status_sensors);
 
     LOGI(tag, "Saving payload %d: STATUS (%d). Index: %d, time %d", status_sensors, rc, index, status.timestamp);

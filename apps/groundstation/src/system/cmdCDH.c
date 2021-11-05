@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define TM_TYPE_STRING 104
-
 #include "app/system/cmdCDH.h"
 
 static const char* tag = "cmd_cdh";

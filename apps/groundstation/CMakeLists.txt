@@ -56,6 +56,7 @@ set(SOURCE_FILES
         src/system/cmdAX100.c
         src/system/cmdEPS.c
         src/system/hookCommunications.c
+        src/system/cmdCDH.c
 )
 
 if(${SCH_GND_ADD_PAYLOADS})

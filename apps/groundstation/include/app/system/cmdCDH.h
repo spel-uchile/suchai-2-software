@@ -10,6 +10,8 @@
 #ifndef _CMDCDH_H
 #define _CMDCDH_H
 
+#define TM_TYPE_STRING 104
+
 #define SCH_TRX_PORT_CDH (SCH_TRX_PORT_APP+0)
 
 #include "app/system/config.h"
