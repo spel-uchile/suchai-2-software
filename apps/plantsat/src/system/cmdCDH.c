@@ -30,7 +30,7 @@ void cmd_cdh_init(void)
     cmd_add("obc_cancel_deploy", obc_cancel_deploy, "", 0);
     cmd_add("tm_send_msg", tm_send_msg, "%d %s",  2);
     cmd_add("tm_parse_msg", tm_parse_msg, "", 0);
-    //cmd_add("tm_send_beacon", tm_send_beacon, "", 0);
+    cmd_add("tm_send_beacon", tm_send_beacon, "%d", 1);
     //cmd_add("tm_parse_beacon", tm_parse_beacon, "", 0);
 }
 
@@ -81,10 +81,6 @@ int obc_cancel_deploy(char *fmt, char *params, int nparams)
     }
 }
 
-/*int obc_send_beacon(char *fmt, char* params, int nparams) {
-
-}*/
-
 int tm_send_msg(char *fmt, char *params, int nparams) {
     int node;
     char msg[SCH_ST_STR_SIZE];
@@ -116,6 +112,19 @@ int tm_parse_msg(char *fmt, char *params, int nparams) {
     int rc = dat_add_payload_sample(&message, received_msgs);
     LOGI(tag, "String message is %s", message.msg);
     return rc != -1 ? CMD_OK : CMD_ERROR;
+}
+
+int tm_send_beacon(char *fmt, char *params, int nparams)
+{
+    int node;
+    if(params == NULL || sscanf(params, fmt, &node) != nparams)
+    {
+        return CMD_SYNTAX_ERROR;
+    }
+
+    status_data_t status[1];
+    obc_read_status_basic(&status);
+    return com_send_telemetry(node, SCH_TRX_PORT_CDH, TM_TYPE_STATUS, status, sizeof(status), 1, 0);
 }
 
 int obc_read_status_basic(status_data_t *status)

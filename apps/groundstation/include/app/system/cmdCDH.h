@@ -13,6 +13,7 @@
 #define TM_TYPE_STRING 104
 
 #define SCH_TRX_PORT_CDH (SCH_TRX_PORT_APP+0)
+#define SCH_TRX_PORT_BCN (SCH_TRX_PORT_APP+3)
 
 #include "app/system/config.h"
 #include "config.h"
@@ -64,5 +65,14 @@ int tm_send_msg(char *fmt, char *params, int nparams);
  * @return CMD_OK if executed correctly
  */
 int tm_parse_msg(char *fmt, char *params, int nparams);
+
+/**
+ * Sends a status basic struct
+ * @param fmt "%d"
+ * @param params <node>
+ * @param nparams 1
+ * @return CMD_OK if executed correctly
+ */
+int tm_send_beacon(char *fmt, char *params, int nparams);
 
 #endif //_CMDCDH_H
