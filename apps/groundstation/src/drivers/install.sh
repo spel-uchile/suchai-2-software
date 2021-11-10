@@ -1,4 +1,8 @@
 #!/bin/sh
+if  [ -n "$1" ] && [ $1 = "--ssh" ]; then
+    SSH_ACTIVE="TRUE"
+fi
+
 echo "Downloading BUS drivers..."
 if [ ! -d "suchai-drivers-bus" ]; then
     if [ -z "$SSH_ACTIVE" ]; then
