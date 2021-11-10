@@ -3,6 +3,7 @@
 //
 
 #include "suchai/taskCommunications.h"
+#include "app/system/cmdCDH.h"
 
 static char *tag = "Communications*";
 
@@ -12,7 +13,6 @@ static char *tag = "Communications*";
 
 void parse_stt_data(csp_packet_t *packet);
 void parse_mag_data(csp_packet_t *packet);
-
 static void com_receive_cmdh_tm(csp_packet_t *packet);
 
 void taskCommunicationsHook(csp_conn_t *conn, csp_packet_t *packet)

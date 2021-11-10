@@ -70,7 +70,7 @@ typedef enum dat_status_address_enum {
     dat_fpl_last,                 ///< Last executed flight plan (unix time)
     dat_fpl_queue,                ///< Flight plan queue length
 
-    /// ADS: Altitude determination system
+    /// ADS: Attitude determination system
     dat_ads_omega_x,              ///< Gyroscope acceleration value along the x axis
     dat_ads_omega_y,              ///< Gyroscope acceleration value along the y axis
     dat_ads_omega_z,              ///< Gyroscope acceleration value along the z axis

@@ -238,7 +238,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_step,     "drp_mach_step",     'd', DAT_IS_CONFIG, 0},          ///<
-        {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0}           ///<
+        {dat_drp_mach_payloads, "drp_mach_payloads", 'u', DAT_IS_CONFIG, 0},          ///<
         {dat_drp_idx_str,       "drp_idx_str",       'u', DAT_IS_STATUS, 0},          ///< String data index
         {dat_drp_ack_str,       "drp_ack_str",       'u', DAT_IS_CONFIG, 0},          ///< String data acknowledge
 };
