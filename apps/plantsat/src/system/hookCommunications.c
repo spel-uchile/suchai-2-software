@@ -51,4 +51,10 @@ void com_receive_cmdh_tm(csp_packet_t *packet) {
         cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
         cmd_send(cmd_parse_tm);
     }
+    if(frame->type == TM_TYPE_PAYLOAD_STA)
+    {
+        cmd_parse_tm = cmd_get_str("tm_parse_beacon");
+        cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
+        cmd_send(cmd_parse_tm);
+    }
 }

@@ -11,6 +11,7 @@
 #define _CMDCDH_H
 
 #define TM_TYPE_STRING 104
+#define TM_TYPE_PAYLOAD_STA 13
 
 #define SCH_TRX_PORT_CDH (SCH_TRX_PORT_APP+0)
 #define SCH_TRX_PORT_BCN (SCH_TRX_PORT_APP+3) //VERIFY VALUES IN ALL THE APPS INVOLVED BEFORE MODIFYING THIS NUMBER
@@ -74,4 +75,13 @@ int tm_parse_msg(char *fmt, char *params, int nparams);
  * @return CMD_OK if executed correctly
  */
 int tm_send_beacon(char *fmt, char *params, int nparams);
+
+/**
+ * Parses a status basic struct
+ * @param fmt ""
+ * @param params <>
+ * @param nparams 0
+ * @return CMD_OK if executed correctly
+ */
+int tm_parse_beacon(char *fmt, char *params, int nparams);
 #endif //_CMDCDH_H

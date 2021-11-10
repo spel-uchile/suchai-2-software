@@ -31,7 +31,7 @@ void cmd_cdh_init(void)
     cmd_add("tm_send_msg", tm_send_msg, "%d %s",  2);
     cmd_add("tm_parse_msg", tm_parse_msg, "", 0);
     cmd_add("tm_send_beacon", tm_send_beacon, "%d", 1);
-    //cmd_add("tm_parse_beacon", tm_parse_beacon, "", 0);
+    cmd_add("tm_parse_beacon", tm_parse_beacon, "", 0);
 }
 
 int obc_set_mode(char *fmt, char *params, int nparams)
@@ -122,9 +122,21 @@ int tm_send_beacon(char *fmt, char *params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    status_data_t status[1];
+    status_data_t status;
     obc_read_status_basic(&status);
-    return com_send_telemetry(node, SCH_TRX_PORT_CDH, TM_TYPE_STATUS, status, sizeof(status), 1, 0);
+    return com_send_telemetry(node, SCH_TRX_PORT_CDH, TM_TYPE_PAYLOAD_STA, &status, sizeof(status_data_t), 1, 0);
+}
+
+int tm_parse_beacon(char *fmt, char *params, int nparams)
+{
+    if(params == NULL)
+        return CMD_SYNTAX_ERROR;
+
+    com_frame_t *frame = (com_frame_t *)params;
+    status_data_t sta_data;
+    memcpy(&sta_data, frame->data.data8, sizeof(status_data_t));
+    _hton32_buff((uint32_t *)&sta_data, sizeof(status_data_t));
+    dat_print_payload_struct(&sta_data, status_sensors);
 }
 
 int obc_read_status_basic(status_data_t *status)
