@@ -7,4 +7,6 @@ source ~/.profile
 export LC_ALL=C
 cd apps/plantsat/src/drivers
 sh build.sh $PROGRAM
+status=$?
 cd -
+exit $status
