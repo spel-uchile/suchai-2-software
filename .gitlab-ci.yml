@@ -16,12 +16,12 @@ configure_docker:
   rules:
     - if: '$CI_COMMIT_BRANCH == "framework"'
 
-build_linux:
+build_groundstation:
   stage: build
   script:
     - echo "Building in Linux"
-    - echo "Going to execute the following commands" && docker run -i suchai-fs-2 cat install_build_linux.sh
-    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs-2 sh install_build_linux.sh
+    - echo "Going to execute the following commands" && docker run -i suchai-fs-2 cat install_build_groundstation.sh
+    - docker run -v ~/.ssh:/root/.ssh -i suchai-fs-2 sh install_build_groundstation.sh
     - docker system prune -f
   rules:
     - if: '$CI_COMMIT_BRANCH == "framework"'
