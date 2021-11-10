@@ -124,6 +124,7 @@ int tm_send_beacon(char *fmt, char *params, int nparams)
 
     status_data_t status;
     obc_read_status_basic(&status);
+    _hton32_buff((uint32_t *)&status, sizeof(status_data_t)/sizeof(uint32_t));
     return com_send_telemetry(node, SCH_TRX_PORT_CDH, TM_TYPE_PAYLOAD_STA, &status, sizeof(status_data_t), 1, 0);
 }
 
@@ -135,7 +136,7 @@ int tm_parse_beacon(char *fmt, char *params, int nparams)
     com_frame_t *frame = (com_frame_t *)params;
     status_data_t sta_data;
     memcpy(&sta_data, frame->data.data8, sizeof(status_data_t));
-    _hton32_buff((uint32_t *)&sta_data, sizeof(status_data_t));
+    _ntoh32_buff((uint32_t *)&sta_data, sizeof(status_data_t)/sizeof(uint32_t));
     dat_print_payload_struct(&sta_data, status_sensors);
 }
 

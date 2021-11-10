@@ -59,7 +59,7 @@ void taskHousekeeping(void *param)
         if (obc_bcn_period < 0)
         {
             cmd_t *cmd_tm_send_status;
-            cmd_tm_send_status = cmd_build_from_str("tm_send_status 10");
+            cmd_tm_send_status = cmd_build_from_str("tm_send_beacon 10");
             cmd_send(cmd_tm_send_status);
             obc_bcn_period = curr_obc_beacon_period;
         }

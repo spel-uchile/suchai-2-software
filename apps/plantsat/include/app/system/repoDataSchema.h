@@ -262,12 +262,12 @@ static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_stat
  */
 
 typedef enum payload_id {
-    temp_sensors=0,         ///< Temperature sensors
-    ads_sensors,            ///< Ads sensors
-    eps_sensors,            ///< Eps sensors
-    status_sensors,         ///< Status Variables
-    stt_sensors,            ///<
-    rw_sensors,             ///< RW Speed and current sensor
+    temp_sensors=0,         ///< 0: Temperature sensors
+    ads_sensors,            ///< 1: Ads sensors
+    eps_sensors,            ///< 2: Eps sensors
+    status_sensors,         ///< 3: Status Variables
+    stt_sensors,            ///< 4:
+    rw_sensors,             ///< 5: RW Speed and current sensor
     //custom_sensor,           ///< Add custom sensors here
     received_msgs,
     last_sensor             ///< Dummy element, the amount of payload variables

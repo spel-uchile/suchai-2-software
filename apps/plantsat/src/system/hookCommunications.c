@@ -22,7 +22,7 @@ void taskCommunicationsHook(csp_conn_t *conn, csp_packet_t *packet)
         case SCH_TRX_PORT_CDH:
             // Process TM packet
             com_receive_cmdh_tm(packet);
-            csp_buffer_free(packet);
+            break;
         default:
             break;
     }
