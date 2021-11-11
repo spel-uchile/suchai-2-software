@@ -222,11 +222,11 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_eps_cur_sun,       "eps_cur_sun",       'u', DAT_IS_STATUS, 0},          ///< Current from boost converters [mA]
         {dat_eps_cur_sys,       "eps_cur_sys",       'u', DAT_IS_STATUS, 0},          ///< Current from the battery [mA]
         {dat_eps_temp_bat0,     "eps_temp_bat0",     'd', DAT_IS_STATUS, 0},          ///< Battery temperature sensor
-        {dat_drp_idx_temp,      "drp_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
-        {dat_drp_idx_ads,       "drp_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
-        {dat_drp_idx_eps,       "drp_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
-        {dat_drp_idx_sta,       "drp_sta",           'u', DAT_IS_STATUS, 0},          ///< Status data index
-        {dat_drp_idx_stt,       "drp_stt",           'u', DAT_IS_STATUS, 0},          ///< STT data index
+        {dat_drp_idx_temp,      "drp_idx_temp",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
+        {dat_drp_idx_ads,       "drp_idx_ads",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
+        {dat_drp_idx_eps,       "drp_idx_eps",           'u', DAT_IS_STATUS, 0},          ///< EPS data index
+        {dat_drp_idx_sta,       "drp_idx_sta",           'u', DAT_IS_STATUS, 0},          ///< Status data index
+        {dat_drp_idx_stt,       "drp_idx_stt",           'u', DAT_IS_STATUS, 0},          ///< STT data index
         {dat_drp_idx_rw,        "drp_idx_rw",        'u', DAT_IS_STATUS, 0},          ///< RW data index
         {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads,       "drp_ack_ads",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
