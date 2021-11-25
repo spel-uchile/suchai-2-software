@@ -144,14 +144,9 @@ int rw_set_speed(char *fmt, char *params, int nparams)
 
     if(params == NULL || sscanf(params, fmt, &motor_id, &speed) != nparams)
         return CMD_SYNTAX_ERROR;
-    if(speed < -511 || speed > 511)
+    if(speed != 0 && (speed < -511 || speed > 511 || speed > -100 && speed < 100))
     {
-        LOGE(tag, "Invalid speed %d. Use values between [-511, -100] or [100, 511]");
-        return CMD_SYNTAX_ERROR;
-    }
-    else if(speed > -100 && speed < 100)
-    {
-        LOGE(tag, "Invalid speed %d. Use values between [-511, -100] or [100, 511]");
+        LOGE(tag, "Invalid speed %d. Use values between [-511, -100], [100, 511] or 0");
         return CMD_SYNTAX_ERROR;
     }
 

@@ -27,7 +27,7 @@ set(SOURCE_FILES
         src/system/taskHousekeeping.c
         src/system/taskSensors.c
         src/system/taskADCS.c
-        src/drivers/rwdrv10987.c
+        src/drivers/rwdrv10987_2.c
 )
 
 set(GS_INCLUDE_PATH
