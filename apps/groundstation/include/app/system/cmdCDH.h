@@ -84,4 +84,14 @@ int tm_send_beacon(char *fmt, char *params, int nparams);
  * @return CMD_OK if executed correctly
  */
 int tm_parse_beacon(char *fmt, char *params, int nparams);
+
+/**
+ * Download current TLE for <satellite_name> and send tle_set <tle1>, tle_set <tle2>, and tle_update
+ * commands to <node>
+ * @param fmt "%d %s"
+ * @param params <node> <satellte_name>
+ * @param nparams 2
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
+ */
+int tle_send_to_node(char *fmt, char *params, int nparams);
 #endif //_CMDCDH_H
