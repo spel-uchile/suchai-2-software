@@ -1,12 +1,11 @@
 ###
 # PLANTSAT APP CMAKE FILE
 ##
-set(SCH_NAME_LIST SUCHAI2;SUCHAI3;PLANTSAT)
-set(SCH_NAME PLANTSAT CACHE STRING "Select SAT from ${SCH_NAME_LIST}")
-if(SCH_NAME IN_LIST SCH_NAME_LIST)
+set(SCH_NAME_LIST \"SUCHAI2\";\"SUCHAI3\";\"PLANTSAT\")
+if(${SCH_NAME} IN_LIST SCH_NAME_LIST)
     set(${SCH_NAME} ON)
 else()
-    message(FATAL_ERROR "Invalid SCH_NAME selected, please select from ${SCH_NAME_LIST}")
+    message(FATAL_ERROR "Invalid SCH_NAME=${SCH_NAME} selected, please select from ${SCH_NAME_LIST}")
 endif()
 set(SCH_TX_INHIBIT 10 CACHE STRING "Default silent time in seconds [0, 1800 (30min)]")
 set(SCH_TX_FREQ 437250000 CACHE STRING "Nanocom TX freq in Hz")
