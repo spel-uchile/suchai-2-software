@@ -413,17 +413,6 @@ typedef struct __attribute__((__packed__)) rw_data {
     int32_t speed3;
 } rw_data_t;
 
-typedef struct __attribute__((__packed__)) stt_exp_time_data{
-    uint32_t index;
-    uint32_t timestamp;
-    int exp_time;
-    int n_stars;
-}stt_exp_time_data_t;
-
-typedef struct __attribute__((__packed__)) stt_gyro_data{
-    float gx, gy, gz;
-} stt_gyro_data_t;
-
 /**
  * Struct for storing string data.
  */

@@ -4,18 +4,18 @@
 
 #include "suchai/taskCommunications.h"
 #include "app/system/cmdCDH.h"
+#include "app/payloads/stt/repoDataSchemaSTT.h"
 
 static char *tag = "Communications*";
 
-#define SCH_TRX_PORT_CDH (SCH_TRX_PORT_APP+0)
-#define SCH_TRX_PORT_STT (SCH_TRX_PORT_APP+1)  ///< 16 STT app port
-#define STT_TYPE_GYRO 30 ///< STT Gyro telemetry type
-#define SCH_TRX_PORT_MAG (SCH_TRX_PORT_APP+2)
-#define MAG_TYPE_LIST_FILE 25
+#define SCH_TRX_PORT_CDH (SCH_TRX_PORT_APP+1)  ///< 16 CDH app port
+#define SCH_TRX_PORT_STT (SCH_TRX_PORT_APP+2)  ///< 17 STT app port
+#define SCH_TRX_PORT_GPS (SCH_TRX_PORT_APP+3)  ///< 18 GPS app port
+#define SCH_TRX_PORT_PHY (SCH_TRX_PORT_APP+4)  ///< 19 PHY-LANG app port
 
-void parse_stt_data(csp_packet_t *packet);
-void parse_mag_data(csp_packet_t *packet);
+int pay_parse_tm(char *data, int n_structs, int payload, data_map_t *pay_data_map);
 void com_receive_cmdh_tm(csp_packet_t *packet);
+void parse_stt_data(csp_packet_t *packet);
 
 void taskCommunicationsHook(csp_conn_t *conn, csp_packet_t *packet)
 {
@@ -28,56 +28,34 @@ void taskCommunicationsHook(csp_conn_t *conn, csp_packet_t *packet)
         case SCH_TRX_PORT_STT:
             parse_stt_data(packet);
             break;
-        case SCH_TRX_PORT_MAG:
-            parse_mag_data(packet);
-            break;
         default:
             break;
     }
 
 }
 
-void parse_stt_data(csp_packet_t *packet)
+/**
+ * Save payload telemetry to database. Receive the payload specific data_map struct to parse
+ * telemetry definitions.
+ * @param data Buffer with one or more payload telemetry structs
+ * @param n_structs Number of structs in data buffer
+ * @param payload Payload telemetry id
+ * @param pay_data_map Payload data_map struct
+ * @return CMD_OK or CMD_ERROR
+ */
+int pay_parse_tm(char *data, int n_structs, int payload, data_map_t *pay_data_map)
 {
-    com_frame_t *frame = (com_frame_t *)packet->data;
-    frame->nframe = csp_ntoh16(frame->nframe);
-    frame->ndata = csp_ntoh32(frame->ndata);
-    int tm_type = frame->type;
+    int j, offset, errors = 0;
 
-    LOGI(tag, "Node    : %d", frame->node);
-    LOGI(tag, "Type    : %d", frame->type);
-    LOGI(tag, "Frame   : %d", frame->nframe);
-    LOGI(tag, "Samples : %d", frame->ndata);
-
-    if(tm_type == STT_TYPE_GYRO)
+    for(j=0; j < n_structs; j++)
     {
-        for(int i=0; i<frame->ndata; i++)
-        {
-            stt_gyro_data_t gyro_data;
-            memcpy(&gyro_data, frame->data.data8, sizeof(gyro_data));
-            LOGR(tag, "Gyro x: %f, y: %f, z: %f", gyro_data.gx, gyro_data.gy, gyro_data.gz)
-        }
+        offset = j * pay_data_map[payload].size; // Select next struct
+        int rc = dat_add_payload_sample(data + offset, payload); //Save next struct
+        if(rc == -1)
+            errors ++;
     }
-}
 
-void parse_mag_data(csp_packet_t *packet)
-{
-    com_frame_t *frame = (com_frame_t *)packet->data;
-    frame->nframe = csp_ntoh16(frame->nframe);
-    frame->ndata = csp_ntoh32(frame->ndata);
-    int tm_type = frame->type;
-
-    LOGI(tag, "Node    : %d", frame->node);
-    LOGI(tag, "Type    : %d", frame->type);
-    LOGI(tag, "Frame   : %d", frame->nframe);
-    LOGI(tag, "Samples : %d", frame->ndata);
-
-    if(tm_type == MAG_TYPE_LIST_FILE)
-    {
-        cmd_t *cmd = cmd_get_str("mag_parse_names");
-        cmd_add_params_raw(cmd, frame, sizeof(com_frame_t));
-        cmd_send(cmd);
-    }
+    return errors > 0 ? CMD_ERROR : CMD_OK;
 }
 
 /**
@@ -109,4 +87,23 @@ void com_receive_cmdh_tm(csp_packet_t *packet) {
         cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
         cmd_send(cmd_parse_tm);
     }
+}
+
+/**
+ * Receives STT telemetry data
+ * @param packet CSP packet with telemetry frame
+ */
+void parse_stt_data(csp_packet_t *packet)
+{
+    com_frame_t *frame = (com_frame_t *)packet->data;
+    frame->nframe = csp_ntoh16(frame->nframe);
+    frame->ndata = csp_ntoh32(frame->ndata);
+
+    LOGI(tag, "Node    : %d", frame->node);
+    LOGI(tag, "Type    : %d", frame->type);
+    LOGI(tag, "Frame   : %d", frame->nframe);
+    LOGI(tag, "Samples : %d", frame->ndata);
+
+    _ntoh32_buff(frame->data.data32, sizeof(frame->data.data32)/ sizeof(uint32_t));
+    pay_parse_tm((char *)(frame->data.data8), frame->ndata, frame->type-TM_TYPE_PAYLOAD, stt_data_map);
 }
