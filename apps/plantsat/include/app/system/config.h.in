@@ -1,6 +1,12 @@
 #ifndef SUCHAI_APP_CONFIG_H
 #define	SUCHAI_APP_CONFIG_H
 
+/* Select one operating system */
+#cmakedefine SUCHAI2                     1
+#cmakedefine SUCHAI3                     2
+#cmakedefine PLANTSAT                    3
+#cmakedefine SCH_NAME                    @SCH_NAME@  ///< Satellite name
+
 #define SCH_TNC_ADDRESS        9  ///< Nanocom GS100 address
 #define SCH_TRX_ADDRESS        5  ///< Nanocom GS100 address
 #cmakedefine SCH_TX_INHIBIT         @SCH_TX_INHIBIT@  /// Default silent time in seconds [0, 1800 (30min)]

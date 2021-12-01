@@ -61,7 +61,8 @@ set(SOURCE_FILES
 
 if(${SCH_GND_ADD_PAYLOADS})
     list(APPEND SOURCE_FILES
-            src/system/cmdMAG.c
+            src/payloads/stt/cmdSTT.c
+            src/payloads/stt/cmdCam.c
             )
 endif()
 
