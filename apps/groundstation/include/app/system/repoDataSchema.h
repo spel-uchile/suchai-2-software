@@ -433,14 +433,14 @@ typedef struct __attribute__((__packed__)) string_data {
     char msg[SCH_ST_STR_SIZE];
 } string_data_t;
 
-static data_map_t data_map[] = {
+static data_map_t data_map[last_sensor] = {
         {"dat_temp_data",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp, dat_drp_ack_temp, temp_var_types, temp_var_string},
         {"dat_ads_data",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads,  dat_drp_ack_ads,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
         {"dat_eps_data",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps,  dat_drp_ack_eps,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
         {"dat_sta_data",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta,  dat_drp_ack_sta,  status_var_types, status_var_string},
         {"dat_stt_data",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt,  dat_drp_ack_stt,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
         {"dat_rw_data",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw,   dat_drp_ack_rw,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
-        {"string_data",      (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str, dat_drp_ack_str,   "%u %u %s",                "sat_index timestamp string_data"}
+        {"string_data",      (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str, dat_drp_ack_str,   "%u %u %s",                "sat_index timestamp string_data"},
 };
 
 /** The repository's name */
