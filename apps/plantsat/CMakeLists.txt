@@ -16,6 +16,7 @@ set(SCH_OBC_BCN_OFFSET 600 CACHE STRING "Number of seconds between obc beacon pa
 set(SCH_HK_ENABLED 1 CACHE BOOL "Enable task housekeeping")
 set(SCH_SEN_ENABLED 1 CACHE BOOL "Enable task sensors")
 set(SCH_ADCS_ENABLED 0 CACHE BOOL "Enable task adcs")
+set(SCH_EPS_OUT_ENABLED 1 CACHE BOOL "Set EPS output (on/off)")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/app/system/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/app/system/config.h)
 
