@@ -173,4 +173,14 @@ int com_set_beacon(char *fmt, char *params, int nparams);
 int com_set_downlink(char *fmt, char *params, int nparams);
 int com_set_uplink(char *fmt, char *params, int nparams);
 
+/**
+ * Set current UPLINK/DOWNLINK frequency according to the selected satellites
+ * The following satellite names are allowed SUCHAI2, SCH2, 2, SUCHAI3, SCH3, 3, PLANTSAT, PS, P
+ * @param fmt Str. Parameters format: %s
+ * @param params Str. Parameters <sat_name> can be SUCHAI2, SCH2, 2, SUCHAI3, SCH3, 3, PLANTSAT, PS, P
+ * @param nparams Str. Number of parameters: 1
+ * @return CMD_OK if executed correctly, CMD_ERROR in case of failures, or CMD_ERROR_SYNTAX in case of parameters errors.
+ */
+int com_set_satellite(char *fmt, char *params, int nparams);
+
 #endif /* CMD_AX100_H */

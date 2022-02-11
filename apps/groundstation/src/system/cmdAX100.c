@@ -18,12 +18,16 @@
  */
 
 #include "app/system/cmdAX100.h"
+#include "suchai/taskConsole.h"
+
 #ifndef SCH_TRX_ADDRESS
 #define SCH_TRX_ADDRESS 5
 #endif
 
 static const char *tag = "cmdAX100";
 static char trx_node = SCH_TRX_ADDRESS;
+
+static int sat_freqs[3] = {437230000, 437250000, 437240000};  // SCH2, SCH3, PS
 
 static void _com_config_help(void);
 static void _com_config_find(char *param_name, int table, param_table_t **param);
@@ -39,6 +43,7 @@ void cmd_ax100_init(void)
     cmd_add("com_set_beacon", com_set_beacon, "%d %d", 2);
     cmd_add("com_set_uplink", com_set_uplink, "%d", 1);
     cmd_add("com_set_downlink", com_set_downlink, "%d", 1);
+    cmd_add("com_set_sat", com_set_satellite, "%s", 1);
 }
 
 int com_set_node(char *fmt, char *params, int nparams)
@@ -468,5 +473,50 @@ int com_set_uplink(char *fmt, char *params, int nparams)
     }
 
     trx_node = trx_node_tmp;
+    return CMD_OK;
+}
+
+int com_set_satellite(char *fmt, char *params, int nparams) {
+    if (params == NULL)
+        return CMD_SYNTAX_ERROR;
+
+    int freq = dat_get_system_var(dat_com_freq);
+    char prompt[12];
+    snprintf(prompt, 12, "%dkHz", freq/1000);
+
+    if (strncmp("2", params, 1) == 0 || strncmp("SCH2", params, 4) == 0 || strncmp("SUCHAI2", params, 7) == 0) {
+        freq = sat_freqs[0];
+        strncpy(prompt, "SUCHAI2", 12);
+    }
+    else if(strncmp("3", params, 1) == 0 || strncmp("SCH3", params, 4) == 0 || strncmp("SUCHAI3", params, 7) == 0) {
+        freq = sat_freqs[1];
+        strncpy(prompt, "SUCHAI3", 12);
+    }
+    else if(strncmp("P", params, 1) == 0 || strncmp("PS", params, 2) == 0 || strncmp("PLANTSAT", params, 8) == 0) {
+        freq = sat_freqs[2];
+        strncpy(prompt, "PLANTSAT", 12);
+    }
+
+    char config[32];
+    memset(config, 0, 32);
+    snprintf(config, 32, "1 freq %d", freq); // TABLE 1 -> RX
+    int ok = com_set_config("%d %s %s", config, 3);
+    LOGI(tag, "Setting TRX with: %s (%d)", config, ok);
+    if(ok != CMD_OK) {
+        LOGE(tag, "Error setting RX Freq %d", freq);
+        return CMD_ERROR;
+    }
+
+    memset(config, 0, 32);
+    snprintf(config, 32, "5 freq %d", freq); // TABLE 5 -> TX
+    ok = com_set_config("%d %s %s", config, 3);
+    LOGI(tag, "Setting TRX with: %s (%d)", config, ok);
+    if(ok != CMD_OK) {
+        LOGE(tag, "Error setting TX Freq %d", freq);
+        return CMD_ERROR;
+    }
+
+    console_set_prompt(prompt);
+
     return CMD_OK;
 }
