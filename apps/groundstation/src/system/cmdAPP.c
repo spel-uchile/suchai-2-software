@@ -44,10 +44,10 @@ int obc_get_sensors(char *fmt, char *params, int nparams)
         return CMD_ERROR;
     // Save temp
     systemp = millideg / 1000;
-    int index_temp = dat_get_system_var(data_map[temp_sensors].sys_index);
+    int index_temp = dat_get_system_var(data_map[temp_sensors_2].sys_index);
     struct temp_data data_temp = {index_temp, curr_time, systemp};
     LOGR(tag, "Temp1: %.1f", data_temp.obc_temp_1);
-    dat_add_payload_sample(&data_temp, temp_sensors);
+    dat_add_payload_sample(&data_temp, temp_sensors_2);
     return CMD_OK;
 #else
     return CMD_ERROR;

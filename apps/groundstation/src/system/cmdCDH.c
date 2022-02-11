@@ -107,13 +107,13 @@ int tm_parse_msg(char *fmt, char *params, int nparams) {
     strncpy(msg, (char *)frame->data.data8, SCH_ST_STR_SIZE);
 
     string_data_t message;
-    message.index = dat_get_system_var(data_map[received_msgs].sys_index);
+    message.index = dat_get_system_var(data_map[msg_sensors_2].sys_index);
     //message.index = dat_get_system_var(dat_drp_idx_str);
     message.timestamp = dat_get_time();
     memset(message.msg, 0, SCH_ST_STR_SIZE);
     strcpy(message.msg, (char *)frame->data.data8);
 
-    int rc = dat_add_payload_sample(&message, received_msgs);
+    int rc = dat_add_payload_sample(&message, msg_sensors_2); //TODO: Check payload id
     LOGI(tag, "String message is %s", message.msg);
     return rc != -1 ? CMD_OK : CMD_ERROR;
 }
@@ -141,13 +141,13 @@ int tm_parse_beacon(char *fmt, char *params, int nparams)
     status_data_t sta_data;
     memcpy(&sta_data, frame->data.data8, sizeof(status_data_t));
     _ntoh32_buff((uint32_t *)&sta_data, sizeof(status_data_t)/sizeof(uint32_t));
-    dat_print_payload_struct(&sta_data, status_sensors);
+    dat_print_payload_struct(&sta_data, status_sensors_2); //TODO: Check payload id
 }
 
 int obc_read_status_basic(status_data_t *status)
 {
     status->timestamp = dat_get_time();
-    status->index = dat_get_system_var(data_map[temp_sensors].sys_index);
+    status->index = dat_get_system_var(data_map[temp_sensors_2].sys_index);
     status->dat_obc_opmode = dat_get_system_var(dat_obc_opmode);
     status->dat_rtc_date_time = dat_get_system_var(dat_rtc_date_time);
     status->dat_obc_last_reset = dat_get_system_var(dat_obc_last_reset);

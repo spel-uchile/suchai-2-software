@@ -15,6 +15,11 @@
 #include "suchai/storage.h"
 #include "app/system/config.h"
 
+#include "app/payloads/repoDataSchemaSTT.h"
+#include "app/payloads/repoDataSchemaGPS.h"
+#include "app/payloads/repoDataSchemaMAG.h"
+#include "app/payloads/repoDataSchemaGRA.h"
+
 /**
  * Enum constants for dynamically identifying system status fields at execution time.
  *
@@ -125,8 +130,35 @@ typedef enum dat_status_address_enum {
     dat_drp_mach_payloads,        ///< Binary data storing active payload being sampled
     dat_drp_mach_left,            ///< Samples left for sampling state machine
 
-    /// Add a new status variables address here
-    //dat_custom,                 ///< Variable description
+    /// Payloads
+    stt_dat_drp_idx_temp,
+    stt_dat_drp_ack_temp,
+    stt_dat_drp_stt,
+    stt_dat_drp_ack_stt,
+    stt_dat_drp_stt_exp_time,
+    stt_dat_drp_ack_stt_exp_time,
+    stt_dat_drp_stt_gyro,
+    stt_dat_drp_ack_stt_gyro,
+    mag_dat_drp_idx_temp,
+    mag_dat_drp_ack_temp,
+    mag_dat_drp_idx_fod,
+    mag_dat_drp_ack_fod,
+    mag_dat_drp_idx_mag,
+    mag_dat_drp_ack_mag,
+    mag_dat_drp_stt,
+    mag_dat_drp_ack_stt,
+    mag_dat_drp_stt_exp_time,
+    mag_dat_drp_ack_stt_exp_time,
+    mag_dat_drp_stt_gyro,
+    mag_dat_drp_ack_stt_gyro,
+    mag_dat_drp_idx_iot,
+    mag_dat_drp_ack_iot,
+    mag_dat_drp_idx_aoa,
+    mag_dat_drp_ack_aoa,
+    gra_dat_drp_temp,
+    gra_dat_drp_ack_temp,
+    gps_dat_drp_idx_temp,
+    gps_dat_drp_ack_temp,
 
     /// LAST ELEMENT: DO NOT EDIT
     dat_status_last_address           ///< Dummy element, the amount of status variables
@@ -262,15 +294,72 @@ static const int dat_status_last_var = sizeof(dat_status_list) / sizeof(dat_stat
  */
 
 typedef enum payload_id {
-    temp_sensors=0,         ///< Temperature sensors
-    ads_sensors,            ///< Ads sensors
-    eps_sensors,            ///< Eps sensors
-    status_sensors,         ///< Status Variables
-    stt_sensors,            ///<
-    rw_sensors,             ///< RW Speed and current sensor
-    //custom_sensor,           ///< Add custom sensors here
-    received_msgs,
-    last_sensor             ///< Dummy element, the amount of payload variables
+    temp_sensors_2=0,           ///< 0: Temperature sensors
+    ads_sensors_2,              ///< Ads sensors
+    eps_sensors_2,              ///< Eps sensors
+    status_sensors_2,           ///< Status Variables
+    stt_sensors_2,              ///< STT sensors
+    rw_sensors_2,               ///< RW Speed and current sensor
+    msg_sensors_2,              ///< Store and forward messages payloads
+    temp_sensors_3,             ///< 7: Temperature sensors
+    ads_sensors_3,              ///< Ads sensors
+    eps_sensors_3,              ///< Eps sensors
+    status_sensors_3,           ///< Status Variables
+    stt_sensors_3,              ///< STT sensors
+    rw_sensors_3,               ///< RW Speed and current sensor
+    msg_sensors_3,              ///< Store and forward messages payloads
+    temp_sensors_P,             ///< 14: Temperature sensors
+    ads_sensors_P,              ///< Ads sensors
+    eps_sensors_P,              ///< Eps sensors
+    status_sensors_P,           ///< Status Variables
+    stt_sensors_P,              ///< STT sensors
+    rw_sensors_P,               ///< RW Speed and current sensor
+    msg_sensors_P,              ///< Store and forward messages payloads
+    ///< STT sensors
+    stt_temp_sensors_2,         ///< 21: STT Temperature sensors
+    stt_stt_sensors_2,
+    stt_exp_time_sensors_2,
+    stt_gyro_sensors_2,
+    stt_temp_sensors_3,         ///< 25: STT Temperature sensors
+    stt_stt_sensors_3,
+    stt_exp_time_sensors_3,
+    stt_gyro_sensors_3,
+    stt_temp_sensors_P,         ///< 29: STT Temperature sensors
+    stt_stt_sensors_P,
+    stt_exp_time_sensors_P,
+    stt_gyro_sensors_P,
+    ///< MAG sensors
+    mag_temp_sensors_2,         ///< 33: Temperature sensors
+    mag_fod_sensors_2,          ///< Data of the femto-satellites received at the FOD.
+    mag_mag_sensor_2,           ///< New mag sensor
+    mag_stt_sensors_2,          ///< STT sensors
+    mag_stt_exp_time_sensors_2, ///< STT exposure time sensors
+    mag_stt_gyro_sensors_2,     ///< STT gyro sensor
+    mag_iot_sensor_2,           ///< Data received by the IoT transceiver.
+    mag_aoa_sensors_2,          ///< Phase and magnitude difference in voltage of the antenna array.
+    mag_temp_sensors_3,         ///< 41: Temperature sensors
+    mag_fod_sensors_3,          ///< Data of the femto-satellites received at the FOD.
+    mag_mag_sensor_3,           ///< New mag sensor
+    mag_stt_sensors_3,          ///< STT sensors
+    mag_stt_exp_time_sensors_3, ///< STT exposure time sensors
+    mag_stt_gyro_sensors_3,     ///< STT gyro sensor
+    mag_iot_sensor_3,           ///< Data received by the IoT transceiver.
+    mag_aoa_sensors_3,          ///< Phase and magnitude difference in voltage of the antenna array.
+    mag_temp_sensors_P,         ///< 49: Temperature sensors
+    mag_fod_sensors_P,          ///< Data of the femto-satellites received at the FOD.
+    mag_mag_sensor_P,           ///< New mag sensor
+    mag_stt_sensors_P,          ///< STT sensors
+    mag_stt_exp_time_sensors_P, ///< STT exposure time sensors
+    mag_stt_gyro_sensors_P,     ///< STT gyro sensor
+    mag_iot_sensor_P,           ///< Data received by the IoT transceiver.
+    mag_aoa_sensors_P,          ///< Phase and magnitude difference in voltage of the antenna array.
+    ///< GRA sensors
+    gra_temp_sensors_P,         ///< 57: Temperature sensors
+    ///< GPS sensors
+    gps_temp_sensors_2,         ///< 58: Temperature sensors
+    gps_temp_sensors_3,         ///< 59: Temperature sensors
+    ///< Last
+    last_sensor               ///< Dummy element, the amount of payload variables
 } payload_id_t;
 
 /**
@@ -423,13 +512,71 @@ typedef struct __attribute__((__packed__)) string_data {
 } string_data_t;
 
 static data_map_t data_map[last_sensor] = {
-        {"dat_temp_data",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp, dat_drp_ack_temp, temp_var_types, temp_var_string},
-        {"dat_ads_data",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads,  dat_drp_ack_ads,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
-        {"dat_eps_data",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps,  dat_drp_ack_eps,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
-        {"dat_sta_data",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta,  dat_drp_ack_sta,  status_var_types, status_var_string},
-        {"dat_stt_data",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt,  dat_drp_ack_stt,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
-        {"dat_rw_data",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw,   dat_drp_ack_rw,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
-        {"string_data",      (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str, dat_drp_ack_str,   "%u %u %s",                "sat_index timestamp string_data"},
+        ///< CDH data
+        {"dat_temp_data_2",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp, dat_drp_ack_temp, temp_var_types, temp_var_string},
+        {"dat_ads_data_2",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads,  dat_drp_ack_ads,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
+        {"dat_eps_data_2",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps,  dat_drp_ack_eps,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
+        {"dat_sta_data_2",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta,  dat_drp_ack_sta,  status_var_types, status_var_string},
+        {"dat_stt_data_2",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt,  dat_drp_ack_stt,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
+        {"dat_rw_data_2",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw,   dat_drp_ack_rw,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
+        {"dat_str_data_2",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str, dat_drp_ack_str,   "%u %u %s",                "sat_index timestamp string_data"},
+        {"dat_temp_data_3",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp, dat_drp_ack_temp, temp_var_types, temp_var_string},
+        {"dat_ads_data_3",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads,  dat_drp_ack_ads,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
+        {"dat_eps_data_3",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps,  dat_drp_ack_eps,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
+        {"dat_sta_data_3",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta,  dat_drp_ack_sta,  status_var_types, status_var_string},
+        {"dat_stt_data_3",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt,  dat_drp_ack_stt,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
+        {"dat_rw_data_3",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw,   dat_drp_ack_rw,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
+        {"dat_str_data_3",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str, dat_drp_ack_str,   "%u %u %s",                "sat_index timestamp string_data"},
+        {"dat_temp_data_P",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp, dat_drp_ack_temp, temp_var_types, temp_var_string},
+        {"dat_ads_data_P",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads,  dat_drp_ack_ads,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
+        {"dat_eps_data_P",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps,  dat_drp_ack_eps,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
+        {"dat_sta_data_P",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta,  dat_drp_ack_sta,  status_var_types, status_var_string},
+        {"dat_stt_data_P",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt,  dat_drp_ack_stt,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
+        {"dat_rw_data_P",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw,   dat_drp_ack_rw,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
+        {"dat_str_data_P",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str, dat_drp_ack_str,   "%u %u %s",                "sat_index timestamp string_data"},
+        ///< STT data
+        {"stt_temp_data_2",    (uint16_t) (sizeof(stt_temp_data_t)),     stt_dat_drp_idx_temp,     stt_dat_drp_ack_temp,         "%u %u %f",             "sat_index timestamp obc_temp_1"},
+        {"stt_data_2",         (uint16_t) (sizeof(stt_stt_data_t)),      stt_dat_drp_stt,          stt_dat_drp_ack_stt,          "%u %u %f %f %f %d %f", "sat_index timestamp ra dec roll time exec_time"},
+        {"stt_exp_time_2",     (uint16_t) (sizeof(stt_exp_time_data_t)), stt_dat_drp_stt_exp_time, stt_dat_drp_ack_stt_exp_time, "%u %u %d %d",          "sat_index timestamp exp_time n_stars"},
+        {"stt_gyro_data_2",    (uint16_t) (sizeof(stt_gyro_data_t)),     stt_dat_drp_stt_gyro,     stt_dat_drp_ack_stt_gyro,     "%u %u %f %f %f",       "sat_index, timestamp gx gy gz"},
+        {"stt_temp_data_3",    (uint16_t) (sizeof(stt_temp_data_t)),     stt_dat_drp_idx_temp,     stt_dat_drp_ack_temp,         "%u %u %f",             "sat_index timestamp obc_temp_1"},
+        {"stt_data_3",         (uint16_t) (sizeof(stt_stt_data_t)),      stt_dat_drp_stt,          stt_dat_drp_ack_stt,          "%u %u %f %f %f %d %f", "sat_index timestamp ra dec roll time exec_time"},
+        {"stt_exp_time_3",     (uint16_t) (sizeof(stt_exp_time_data_t)), stt_dat_drp_stt_exp_time, stt_dat_drp_ack_stt_exp_time, "%u %u %d %d",          "sat_index timestamp exp_time n_stars"},
+        {"stt_gyro_data_3",    (uint16_t) (sizeof(stt_gyro_data_t)),     stt_dat_drp_stt_gyro,     stt_dat_drp_ack_stt_gyro,     "%u %u %f %f %f",       "sat_index, timestamp gx gy gz"},
+        {"stt_temp_data_P",    (uint16_t) (sizeof(stt_temp_data_t)),     stt_dat_drp_idx_temp,     stt_dat_drp_ack_temp,         "%u %u %f",             "sat_index timestamp obc_temp_1"},
+        {"stt_data_P",         (uint16_t) (sizeof(stt_stt_data_t)),      stt_dat_drp_stt,          stt_dat_drp_ack_stt,          "%u %u %f %f %f %d %f", "sat_index timestamp ra dec roll time exec_time"},
+        {"stt_exp_time_P",     (uint16_t) (sizeof(stt_exp_time_data_t)), stt_dat_drp_stt_exp_time, stt_dat_drp_ack_stt_exp_time, "%u %u %d %d",          "sat_index timestamp exp_time n_stars"},
+        {"stt_gyro_data_P",    (uint16_t) (sizeof(stt_gyro_data_t)),     stt_dat_drp_stt_gyro,     stt_dat_drp_ack_stt_gyro,     "%u %u %f %f %f",       "sat_index, timestamp gx gy gz"},
+        ///< MAG DATA
+        {"mag_temp_data_2",    (uint16_t) (sizeof(mag_temp_data_t)), mag_dat_drp_idx_temp, mag_dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
+        {"mag_fod_data_2",     (uint16_t) (sizeof(fod_data_t)), mag_dat_drp_idx_fod,  mag_dat_drp_ack_fod,  "%u %u %u %u %u %u %d %d %d %u %u %u %d %d %d", "sat_index timestamp node1 fe_index1 date time latitude longitude altitude num_sats node2 fe_index2 fe_mag_x fe_mag_y fe_mag_z"},
+        {"mag_mag_data_2",     (uint16_t) (sizeof(mag_data_t)), mag_dat_drp_idx_mag,  mag_dat_drp_ack_mag,  "%u %u %d %d %d %d %d %d %d %d %f %f", "sat_index timestamp splf magxf magyf magzf spls magxs magys magzs tmpf tmps"},
+        {"mag_stt_data_2",     (uint16_t) (sizeof(mag_stt_data_t)), mag_dat_drp_stt, mag_dat_drp_ack_stt, "%u %u %f %f %f %d %f", "sat_index timestamp ra dec roll time exec_time"},
+        {"mag_stt_exp_time_2", (uint16_t) (sizeof(mag_stt_exp_time_data_t)), mag_dat_drp_stt_exp_time, mag_dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"},
+        {"mag_stt_gyro_data_2",(uint16_t) (sizeof(mag_stt_gyro_data_t)), mag_dat_drp_stt_gyro, mag_dat_drp_ack_stt_gyro, "%u %u %f %f %f", "sat_index, timestamp gx gy gz"},
+        {"mag_iot_data_2",     (uint16_t) (sizeof(iot_data_t)), mag_dat_drp_idx_iot,  mag_dat_drp_ack_iot, "%u %u %u %u %u %s", "sat_index timestamp module temp1 temp2 iot_data"},
+        {"mag_aoa_data_2",     (uint16_t) (sizeof(aoa_data_t)), mag_dat_drp_idx_aoa, mag_dat_drp_ack_aoa,   "%u %u %u %u %u %u", "sat_index timestamp vmag1 vphase1 vmag2 vphase2"},
+        {"mag_temp_data_3",    (uint16_t) (sizeof(mag_temp_data_t)), mag_dat_drp_idx_temp, mag_dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
+        {"mag_fod_data_3",     (uint16_t) (sizeof(fod_data_t)), mag_dat_drp_idx_fod,  mag_dat_drp_ack_fod,  "%u %u %u %u %u %u %d %d %d %u %u %u %d %d %d", "sat_index timestamp node1 fe_index1 date time latitude longitude altitude num_sats node2 fe_index2 fe_mag_x fe_mag_y fe_mag_z"},
+        {"mag_mag_data_3",     (uint16_t) (sizeof(mag_data_t)), mag_dat_drp_idx_mag,  mag_dat_drp_ack_mag,  "%u %u %d %d %d %d %d %d %d %d %f %f", "sat_index timestamp splf magxf magyf magzf spls magxs magys magzs tmpf tmps"},
+        {"mag_stt_data_3",     (uint16_t) (sizeof(mag_stt_data_t)), mag_dat_drp_stt, mag_dat_drp_ack_stt, "%u %u %f %f %f %d %f", "sat_index timestamp ra dec roll time exec_time"},
+        {"mag_stt_exp_time_3", (uint16_t) (sizeof(mag_stt_exp_time_data_t)), mag_dat_drp_stt_exp_time, mag_dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"},
+        {"mag_stt_gyro_data_3",(uint16_t) (sizeof(mag_stt_gyro_data_t)), mag_dat_drp_stt_gyro, mag_dat_drp_ack_stt_gyro, "%u %u %f %f %f", "sat_index, timestamp gx gy gz"},
+        {"mag_iot_data_3",     (uint16_t) (sizeof(iot_data_t)), mag_dat_drp_idx_iot,  mag_dat_drp_ack_iot, "%u %u %u %u %u %s", "sat_index timestamp module temp1 temp2 iot_data"},
+        {"mag_aoa_data_3",     (uint16_t) (sizeof(aoa_data_t)), mag_dat_drp_idx_aoa, mag_dat_drp_ack_aoa,   "%u %u %u %u %u %u", "sat_index timestamp vmag1 vphase1 vmag2 vphase2"},
+        {"mag_temp_data_P",    (uint16_t) (sizeof(mag_temp_data_t)), mag_dat_drp_idx_temp, mag_dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
+        {"mag_fod_data_P",     (uint16_t) (sizeof(fod_data_t)), mag_dat_drp_idx_fod,  mag_dat_drp_ack_fod,  "%u %u %u %u %u %u %d %d %d %u %u %u %d %d %d", "sat_index timestamp node1 fe_index1 date time latitude longitude altitude num_sats node2 fe_index2 fe_mag_x fe_mag_y fe_mag_z"},
+        {"mag_mag_data_P",     (uint16_t) (sizeof(mag_data_t)), mag_dat_drp_idx_mag,  mag_dat_drp_ack_mag,  "%u %u %d %d %d %d %d %d %d %d %f %f", "sat_index timestamp splf magxf magyf magzf spls magxs magys magzs tmpf tmps"},
+        {"mag_stt_data_P",     (uint16_t) (sizeof(mag_stt_data_t)), mag_dat_drp_stt, mag_dat_drp_ack_stt, "%u %u %f %f %f %d %f", "sat_index timestamp ra dec roll time exec_time"},
+        {"mag_stt_exp_time_P", (uint16_t) (sizeof(mag_stt_exp_time_data_t)), mag_dat_drp_stt_exp_time, mag_dat_drp_ack_stt_exp_time, "%u %u %d %d", "sat_index timestamp exp_time n_stars"},
+        {"mag_stt_gyro_data_P",(uint16_t) (sizeof(mag_stt_gyro_data_t)), mag_dat_drp_stt_gyro, mag_dat_drp_ack_stt_gyro, "%u %u %f %f %f", "sat_index, timestamp gx gy gz"},
+        {"mag_iot_data_P",     (uint16_t) (sizeof(iot_data_t)), mag_dat_drp_idx_iot,  mag_dat_drp_ack_iot, "%u %u %u %u %u %s", "sat_index timestamp module temp1 temp2 iot_data"},
+        {"mag_aoa_data_P",     (uint16_t) (sizeof(aoa_data_t)), mag_dat_drp_idx_aoa, mag_dat_drp_ack_aoa,   "%u %u %u %u %u %u", "sat_index timestamp vmag1 vphase1 vmag2 vphase2"},
+        ///< GRA DATA
+        {"gra_temp_data_P",    (uint16_t) (sizeof(gra_temp_data_t)),gra_dat_drp_temp,gra_dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
+        ///< GPS DATA
+        {"gps_temp_data_2",    (uint16_t) (sizeof(gps_temp_data_t)), gps_dat_drp_idx_temp, gps_dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
+        {"gps_temp_data_3",    (uint16_t) (sizeof(gps_temp_data_t)), gps_dat_drp_idx_temp, gps_dat_drp_ack_temp, "%u %u %f", "sat_index timestamp obc_temp_1"},
 };
 
 /** The repository's name */

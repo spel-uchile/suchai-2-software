@@ -67,12 +67,12 @@ int eps_get_hk(char *fmt, char *params, int nparams)
     int32_t teps =  (hk.temp[0]+hk.temp[1]+hk.temp[2]+hk.temp[3])*10/4;
     int32_t tbat = (hk.temp[4]+hk.temp[5])*10/2;
 
-    int index_eps = dat_get_system_var(data_map[eps_sensors].sys_index);
+    int index_eps = dat_get_system_var(data_map[eps_sensors_2].sys_index);
     eps_data_t data_eps = {index_eps, curr_time, cursun, cursys, vbatt, teps, tbat};
-    rc = dat_add_payload_sample(&data_eps, eps_sensors);
+    rc = dat_add_payload_sample(&data_eps, eps_sensors_2);
 
     LOGI(tag, "Saving payload %d: EPS (%d). Index: %d, time %d, cursun: %d, cursys: %d, vbatt: %d, teps: %d, tbat: %d ",
-         eps_sensors, rc, index_eps, curr_time, cursun, cursys, vbatt, teps, tbat);
+         eps_sensors_2, rc, index_eps, curr_time, cursun, cursys, vbatt, teps, tbat);
 
     return rc == -1 ? CMD_ERROR : CMD_OK;
 }
