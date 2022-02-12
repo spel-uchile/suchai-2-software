@@ -209,13 +209,6 @@ void initAppHook(void *params)
 {
     int rc;
 
-#if !SCH_EPS_OUT_ENABLED
-    LOGI(tag, "POWERING OFF ALL EPS OUTPUT")
-    cmd_t *cmd_eps_set_output_all;
-    cmd_eps_set_output_all = cmd_build_from_str("eps_set_output_all 0");
-    cmd_send(cmd_eps_set_output_all);
-#endif
-
     /** Include app commands */
     cmd_adcs_init();
     cmd_ax100_init();
@@ -224,6 +217,13 @@ void initAppHook(void *params)
     cmd_rw_init();
     cmd_sensors_init();
     cmd_cdh_init();
+
+#if !SCH_EPS_OUT_ENABLED
+    LOGI(tag, "POWERING OFF ALL EPS OUTPUT")
+    cmd_t *cmd_eps_set_output_all;
+    cmd_eps_set_output_all = cmd_build_from_str("eps_set_output_all 0");
+    cmd_send(cmd_eps_set_output_all);
+#endif
 
     /** Finish CSP setup */
     init_setup_libcsp_2();
