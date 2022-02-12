@@ -26,7 +26,7 @@ void cmd_cdh_init(void)
     /** OBC COMMANDS **/
     cmd_add("obc_set_mode", obc_set_mode, "%s", 1);
     cmd_add("obc_cancel_deploy", obc_cancel_deploy, "", 0);
-    cmd_add("tm_send_msg", tm_send_msg, "%d %s",  2);
+    cmd_add("tm_send_msg", tm_send_msg, "%d %n",  2);
     cmd_add("tm_parse_msg", tm_parse_msg, "", 0);
     cmd_add("tm_send_beacon", tm_send_beacon, "%d", 1);
     cmd_add("tm_parse_beacon", tm_parse_beacon, "", 0);
@@ -87,13 +87,14 @@ int obc_cancel_deploy(char *fmt, char *params, int nparams)
 
 int tm_send_msg(char *fmt, char *params, int nparams) {
     int node;
+    int next;
     char msg[SCH_ST_STR_SIZE];
 
-    if(params == NULL || sscanf(params, fmt, &node, msg) != nparams)
+    if(params == NULL || sscanf(params, fmt, &node, &next) != nparams-1)
     {
         return CMD_SYNTAX_ERROR;
     }
-
+    strncpy(msg, params+next, SCH_ST_STR_SIZE);
     LOGI(tag, "Message string is: %s", msg);
     return com_send_telemetry(node, SCH_TRX_PORT_CDH, TM_TYPE_STRING, msg, sizeof(msg), 1, 0);
 }

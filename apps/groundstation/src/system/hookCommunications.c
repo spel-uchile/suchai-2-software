@@ -90,7 +90,10 @@ void pay_parse_frame(csp_packet_t *packet, int app_id)
     LOGI(tag, "Frame   : %d", frame->nframe);
     LOGI(tag, "Samples : %d", frame->ndata);
 
-//    _ntoh32_buff(frame->data.data32, sizeof(frame->data.data32)/ sizeof(uint32_t));
+    // Fix message payload endianness
+    int pay_id = frame->type-TM_TYPE_PAYLOAD;
+    if(pay_id == msg_sensors_2 || pay_id == msg_sensors_3 || pay_id == msg_sensors_P)
+        _ntoh32_buff(frame->data.data32, sizeof(frame->data.data32)/ sizeof(uint32_t));
 
     cmd_t *cmd_parse_tm = cmd_get_str("tm_parse_payload");
     cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
