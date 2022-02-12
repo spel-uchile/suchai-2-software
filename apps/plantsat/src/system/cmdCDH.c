@@ -36,10 +36,10 @@ void cmd_cdh_init(void)
 
 int obc_set_mode(char *fmt, char *params, int nparams)
 {
-    int opmode;
-    if(params == NULL || sscanf(params, fmt, &opmode) != nparams) {
+    int opmode = DAT_OBC_OPMODE_NORMAL;
+    if(params == NULL)
         return CMD_SYNTAX_ERROR;
-    }
+
 
     if(strncmp(params, "normal", 6) == 0)
         opmode = DAT_OBC_OPMODE_NORMAL;
@@ -55,7 +55,7 @@ int obc_set_mode(char *fmt, char *params, int nparams)
         opmode = DAT_OBC_OPMODE_DETUMB_MAG;
     else
     {
-        LOGE(tag, "Invalid mode %d. Select from normal, deploy, safe, point, nadir, detumb", params)
+        LOGE(tag, "Invalid mode %s. Select from normal, deploy, safe, point, nadir, detumb", params)
         return CMD_SYNTAX_ERROR;
     }
 
