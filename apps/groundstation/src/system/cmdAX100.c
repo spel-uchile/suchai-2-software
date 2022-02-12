@@ -497,6 +497,9 @@ int com_set_satellite(char *fmt, char *params, int nparams) {
         strncpy(prompt, "PLANTSAT", 12);
     }
 
+    char trx_node_tmp = trx_node;
+    trx_node = 29;  // TNC node
+
     char config[32];
     memset(config, 0, 32);
     snprintf(config, 32, "1 freq %d", freq); // TABLE 1 -> RX
@@ -504,6 +507,7 @@ int com_set_satellite(char *fmt, char *params, int nparams) {
     LOGI(tag, "Setting TRX with: %s (%d)", config, ok);
     if(ok != CMD_OK) {
         LOGE(tag, "Error setting RX Freq %d", freq);
+        trx_node = trx_node_tmp;
         return CMD_ERROR;
     }
 
@@ -513,9 +517,11 @@ int com_set_satellite(char *fmt, char *params, int nparams) {
     LOGI(tag, "Setting TRX with: %s (%d)", config, ok);
     if(ok != CMD_OK) {
         LOGE(tag, "Error setting TX Freq %d", freq);
+        trx_node = trx_node_tmp;
         return CMD_ERROR;
     }
 
+    trx_node = trx_node_tmp;
     console_set_prompt(prompt);
 
     return CMD_OK;
