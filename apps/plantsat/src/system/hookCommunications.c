@@ -23,7 +23,7 @@ void taskCommunicationsHook(csp_conn_t *conn, csp_packet_t *packet)
 {
     switch (csp_conn_dport(conn))
     {
-        case SCH_TRX_PORT_CDH:
+//        case SCH_TRX_PORT_CDH:
         case SCH_2_COM_PORT_CDH:
         case SCH_3_COM_PORT_CDH:
         case SCH_P_COM_PORT_CDH:

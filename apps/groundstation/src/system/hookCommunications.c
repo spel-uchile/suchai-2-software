@@ -35,18 +35,18 @@ int PAYLOAD_ID_MAP[28] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 int pay_parse_tm(char *data, int n_structs, int payload, data_map_t *pay_data_map);
 void pay_parse_frame(csp_packet_t *packet, int app_id);
-void com_receive_cmdh_tm(csp_packet_t *packet);
+void com_receive_cmdh_tm(csp_packet_t *packet, int app_id);
 
 void taskCommunicationsHook(csp_conn_t *conn, csp_packet_t *packet)
 {
     switch (csp_conn_dport(conn))
     {
-        case SCH_TRX_PORT_CDH:
+//        case SCH_TRX_PORT_CDH:
         case SCH_2_COM_PORT_CDH:
         case SCH_3_COM_PORT_CDH:
         case SCH_P_COM_PORT_CDH:
             // Process TM packet
-            com_receive_cmdh_tm(packet);
+            com_receive_cmdh_tm(packet, csp_conn_dport(conn));
             break;
         case SCH_2_COM_PORT_GPS:
         case SCH_3_COM_PORT_GPS:
@@ -102,9 +102,15 @@ void pay_parse_frame(csp_packet_t *packet, int app_id)
  * Process a TM frame, determine TM type and call corresponding parsing command
  * @param packet a csp buffer containing a com_frame_t structure.
  */
-void com_receive_cmdh_tm(csp_packet_t *packet) {
+void com_receive_cmdh_tm(csp_packet_t *packet, int app_id) {
     cmd_t *cmd_parse_tm;
     com_frame_t *frame = (com_frame_t *) packet->data;
+
+    if(frame->type >= TM_TYPE_PAYLOAD && frame->type < TM_TYPE_PAYLOAD+last_sensor)
+    {
+        pay_parse_frame(packet, app_id);
+        return;
+    }
 
     frame->nframe = csp_ntoh16(frame->nframe);
     frame->ndata = csp_ntoh32(frame->ndata);
@@ -121,10 +127,40 @@ void com_receive_cmdh_tm(csp_packet_t *packet) {
         cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
         cmd_send(cmd_parse_tm);
     }
-    if(frame->type == TM_TYPE_PAYLOAD_STA)
+    else if(frame->type == TM_TYPE_PAYLOAD_STA)
     {
         cmd_parse_tm = cmd_get_str("tm_parse_beacon");
         cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
         cmd_send(cmd_parse_tm);
     }
+    else if(frame->type == TM_TYPE_STATUS)
+    {
+        cmd_parse_tm = cmd_get_str("tm_parse_status");
+        cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
+        cmd_send(cmd_parse_tm);
+    }
+    else if(frame->type == TM_TYPE_HELP)
+    {
+        cmd_parse_tm = cmd_get_str("tm_parse_string");
+        cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
+        cmd_send(cmd_parse_tm);
+    }
+    else if(frame->type == TM_TYPE_FP)
+    {
+        cmd_parse_tm = cmd_get_str("tm_print_fp");
+        cmd_add_params_raw(cmd_parse_tm, frame, sizeof(com_frame_t));
+        cmd_send(cmd_parse_tm);
+    }
+    else
+    {
+        LOGW(tag, "Undefined telemetry type %d!", frame->type);
+        //Print raw data as bytes, int16, and ascii.
+        //Do not use LOG functions after this line
+        osSemaphoreTake(&log_mutex, portMAX_DELAY);
+        print_buff(packet->data, packet->length);
+        print_buff_fmt(packet->data32, packet->length/sizeof(uint32_t), "%d, ");
+        print_buff_ascii(packet->data, packet->length);
+        osSemaphoreGiven(&log_mutex);
+    }
+
 }
