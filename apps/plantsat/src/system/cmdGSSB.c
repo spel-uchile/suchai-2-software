@@ -120,7 +120,7 @@ int gssb_bus_scan(char *fmt, char *params, int nparams)
     }
 
     LOGR(tag, "Scanning I2C bus from %d to %d...", start, end);
-    if(start > 128 || end > 128)
+    if(start < 0 || start > 128 || end < start || end > 128)
         return CMD_ERROR_SYNTAX;
 
     gs_gssb_bus_scan((uint8_t)start, (uint8_t)end, 100, devices);
