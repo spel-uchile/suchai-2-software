@@ -29,9 +29,9 @@ void taskSensors(void *param)
     int i;
     cmd_t *cmd_init;
     cmd_t *cmd_get;
-    int nsensors = 4;
-    char *init_cmds[] = {"sen_init_dummy", "sen_init_dummy", "sen_init_dummy", "sen_init_dummy"};
-    char *get_cmds[] = {"sen_get_temp", "sen_get_adcs", "sen_get_eps", "sen_get_status"};
+    int nsensors = 5;
+    char *init_cmds[] = {"sen_init_dummy", "sen_init_dummy", "sen_init_dummy", "sen_init_dummy", "sen_init_dummy"};
+    char *get_cmds[] = {"sen_get_temp", "sen_get_adcs", "sen_get_eps", "sen_get_status", "sen_get_adcs_fss"};
 
 
     int action = dat_get_system_var(dat_drp_mach_action);

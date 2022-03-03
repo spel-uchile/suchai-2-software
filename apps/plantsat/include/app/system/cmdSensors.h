@@ -79,11 +79,12 @@ int sensors_take_sample(char *fmt, char *params, int nparams);
  * @return CMD_OK if executed correctly
  */
 int sensors_init(char *fmt, char *params, int nparams);
-
+int sensors_get_adcs_fss(char *fmt, char *params, int nparams);
 int sensors_get_adcs_basic(char *fmt, char *params, int nparams);
 int sensors_get_adcs_full(char *fmt, char *params, int nparams);
 int sensors_get_eps(char *fmt, char *params, int nparams);
 int sensors_get_temperatures(char *fmt, char *params, int nparams);
 int sensors_get_status_basic(char *fmt, char *params, int nparams);
+
 
 #endif /* _CMD_SENS_H */

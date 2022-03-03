@@ -34,6 +34,7 @@ void cmd_sensors_init(void)
     cmd_add("sen_get_adcs", sensors_get_adcs_basic, "", 0);
     cmd_add("sen_get_eps", sensors_get_eps, "", 0);
     cmd_add("sen_get_status", sensors_get_status_basic, "", 0);
+    cmd_add("sen_get_adcs_fss", sensors_get_adcs_fss, "", 0);
 }
 
 int sensors_set_state(char *fmt, char *params, int nparams)
@@ -130,13 +131,13 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
     gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB2);
 
     uint16_t sun1, sun2, sun3, sun4 = 0;
-    int rc3 = gs_gssb_istage_get_sun_voltage(0x10, 500, &sun1);
+    //int rc3 = gs_gssb_istage_get_sun_voltage(0x10, 500, &sun1);
     int rc4 = gs_gssb_istage_get_sun_voltage(0x11, 500, &sun2);
     int rc5 = gs_gssb_istage_get_sun_voltage(0x12, 500, &sun3);
     int rc6 = gs_gssb_istage_get_sun_voltage(0x13, 500, &sun4);
-    if(rc3 != 0 || rc4 != 0 || rc5 != 0 || rc6 != 0)
+    if(rc4 != 0 || rc5 != 0 || rc6 != 0)
     {
-        LOGE(tag, "Error reading coarse sun sensors (%d, %d, %d, %d)", rc3, rc4, rc5, rc6);
+        LOGE(tag, "Error reading coarse sun sensors (%d, %d, %d)", rc4, rc5, rc6);
         //return CMD_ERROR;
     }
 
@@ -145,13 +146,96 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
     ads_data_t data_ads = {index_ads, curr_time,
                            gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z,
                            hmc_reading.x, hmc_reading.y, hmc_reading.z,
-                           sun1, sun2, sun3, sun4};
+                           sun2, sun3, sun4};
     int ret = dat_add_payload_sample(&data_ads, ads_sensors);
 
-    LOGI(tag, "Saving payload %d: ADS (%d). Index: %d, time %d, gyro_x: %.04f, gyro_y: %.04f, gyro_z: %.04f, mag_x: %.04f, mag_y: %.04f, mag_z: %.04f, sun1: %d, sun2, %d, sun3: %d, sun4, %d",
+    LOGI(tag, "Saving payload %d: ADS (%d). Index: %d, time %d, gyro_x: %.04f, gyro_y: %.04f, gyro_z: %.04f, mag_x: %.04f, mag_y: %.04f, mag_z: %.04f, sun2: %d, sun3, %d, sun4: %d",
          ads_sensors, ret, index_ads, curr_time, gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z,
          hmc_reading.x, hmc_reading.y, hmc_reading.z,
-         sun1, sun2, sun3, sun4);
+         sun2, sun3, sun4);
+
+    return ret == -1 ? CMD_ERROR : CMD_OK;
+}
+
+int sensors_get_adcs_fss(char *fmt, char *params, int nparams)
+{
+    gs_mpu3300_gyro_t gyro_reading;
+    int rc1 = gs_mpu3300_read_gyro(&gyro_reading);
+    int curr_time = dat_get_time();
+    // FSS
+    uint16_t sun_fss1[4] = {0,0,0,0};
+    uint16_t sun_fss2[4] = {0,0,0,0};
+    uint16_t sun_fss3[4] = {0,0,0,0};
+    uint16_t sun_fss4[4] = {0,0,0,0};
+    uint16_t sun_fss5[4] = {0,0,0,0};
+
+    if(rc1 != 0)
+    {
+        LOGE(tag, "Error reading adcs sensors (%d)", rc1);
+        return CMD_ERROR;
+    }
+
+    gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
+    gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB2);
+
+    if (SCH_DEVICE_ID == 2) {
+        osDelay(50);
+        int timei2c = 1000;
+
+        if (gs_gssb_sun_sample_sensor(0x20, timei2c) != GS_OK)
+            return CMD_ERROR;
+        osDelay(30);
+        int rf1 = gs_gssb_sun_read_sensor_samples(0x20, timei2c, sun_fss1);
+        osDelay(30);
+
+        if (gs_gssb_sun_sample_sensor(0x21, timei2c) != GS_OK)
+            return CMD_ERROR;
+        osDelay(30);
+        int rf2 = gs_gssb_sun_read_sensor_samples(0x21, timei2c, sun_fss2);
+        osDelay(30);
+
+        if (gs_gssb_sun_sample_sensor(0x22, timei2c) != GS_OK)
+            return CMD_ERROR;
+        osDelay(30);
+        int rf3 = gs_gssb_sun_read_sensor_samples(0x22, timei2c, sun_fss3);
+        osDelay(30);
+
+        if (gs_gssb_sun_sample_sensor(0x23, timei2c) != GS_OK)
+            return CMD_ERROR;
+        osDelay(30);
+        int rf4 = gs_gssb_sun_read_sensor_samples(0x23, timei2c, sun_fss4);
+        osDelay(30);
+
+        if (gs_gssb_sun_sample_sensor(0x24, timei2c) != GS_OK)
+            return CMD_ERROR;
+        osDelay(30);
+        int rf5 = gs_gssb_sun_read_sensor_samples(0x24, timei2c, sun_fss5);
+        osDelay(200);
+    }
+
+    /* Save ADCS data */
+    int index_ads = dat_get_system_var(data_map[fss_sensors].sys_index);
+    fss_data_t data_ads_fss = {index_ads, curr_time,
+                               gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z,
+                               sun_fss1[0], sun_fss1[1], sun_fss1[2], sun_fss1[3],
+                               sun_fss2[0], sun_fss2[1], sun_fss2[2], sun_fss2[3],
+                               sun_fss3[0], sun_fss3[1], sun_fss3[2], sun_fss3[3],
+                               sun_fss4[0], sun_fss4[1], sun_fss4[2], sun_fss4[3],
+                               sun_fss5[0], sun_fss5[1], sun_fss5[2], sun_fss5[3]};
+    int ret = dat_add_payload_sample(&data_ads_fss, fss_sensors);
+
+    LOGI(tag, "Saving payload %d: ADS FSS (%d). Index: %d, time %d, gyro_x: %.04f, gyro_y: %.04f, gyro_z: %.04f,"
+              " FSS_0x20_A: %d, FSS_0x20_B: %d, FSS_0x20_C: %d, FSS_0x20_D: %d,"
+              " FSS_0x21_A: %d, FSS_0x21_B: %d, FSS_0x21_C: %d, FSS_0x21_D: %d,"
+              " FSS_0x22_A: %d, FSS_0x22_B: %d, FSS_0x22_C: %d, FSS_0x22_D: %d,"
+              " FSS_0x23_A: %d, FSS_0x23_B: %d, FSS_0x23_C: %d, FSS_0x23_D: %d,"
+              " FSS_0x24_A: %d, FSS_0x24_B: %d, FSS_0x24_C: %d, FSS_0x24_D: %d",
+         fss_sensors, ret, index_ads, curr_time, gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z,
+         sun_fss1[0], sun_fss1[1], sun_fss1[2], sun_fss1[3],
+         sun_fss2[0], sun_fss2[1], sun_fss2[2], sun_fss2[3],
+         sun_fss3[0], sun_fss3[1], sun_fss3[2], sun_fss3[3],
+         sun_fss4[0], sun_fss4[1], sun_fss4[2], sun_fss4[3],
+         sun_fss5[0], sun_fss5[1], sun_fss5[2], sun_fss5[3]);
 
     return ret == -1 ? CMD_ERROR : CMD_OK;
 }
