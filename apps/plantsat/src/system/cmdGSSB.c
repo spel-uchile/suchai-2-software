@@ -1068,31 +1068,38 @@ int gssb_antenna_release(char *fmt, char *params, int nparams)
         if (gs_gssb_istage_settings_unlock(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
         // Set parameters
+        LOGI(tag, "gs_gssb_istage_set_burn_settings");
         if (gs_gssb_istage_set_burn_settings(addr, i2c_timeout_ms, &settings) != GS_OK)
             return CMD_ERROR_FAIL;
         /* We need to have a delay as we write the settings to EEPROM which takes some time */
         osDelay(500);
         // "Setting burn cnt...
+        LOGI(tag, "gs_gssb_istage_set_burn_settings_cnt");
         if (gs_gssb_istage_set_burn_settings_cnt(addr, i2c_timeout_ms, &settings) != GS_OK)
             return CMD_ERROR_FAIL;
         /* We need to have a delay as we write the settings to EEPROM which takes some time */
         osDelay(100);
+        LOGI(tag, "gs_gssb_istage_settings_lock");
         if (gs_gssb_istage_settings_lock(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
-
+        LOGI(tag, "gs_gssb_soft_reset");
         gs_gssb_soft_reset(addr, i2c_timeout_ms);
-        osDelay(100);
+        osDelay(500);
 
         // Deploy manual
+        LOGI(tag, "gs_gssb_istage_settings_unlock");
         if (gs_gssb_istage_settings_unlock(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
         //if (gs_gssb_istage_set_arm(addr, i2c_timeout_ms, 0x08) != GS_OK)
+        LOGI(tag, "gs_gssb_istage_set_state");
         if (gs_gssb_istage_set_state(addr, i2c_timeout_ms, 1) != GS_OK)
                 return CMD_ERROR_FAIL;
+        LOGI(tag, "gs_gssb_istage_settings_lock")
         if (gs_gssb_istage_settings_lock(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
         osDelay(100);
         // Burn
+        LOGI(tag, "gs_gssb_istage_burn");
         if (gs_gssb_istage_burn(addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
         LOGR(tag, "GSSB istage %d deploying! (rc: %d)", addr, rc);

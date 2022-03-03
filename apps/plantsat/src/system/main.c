@@ -137,6 +137,7 @@ int init_antenna_deploy(void)
         cmd_t *cmd_dep;
         cmd_dep = cmd_build_from_str(cmds_str[i]);
         cmd_send(cmd_dep);
+        osDelay(2000);
     }
 
     return 0;
@@ -244,7 +245,7 @@ void initAppHook(void *params)
 #endif
 #if SCH_ADCS_ENABLED
     t_ok = osCreateTask(taskADCS,"adcs", 2*SCH_TASK_DEF_STACK, NULL, 2, NULL);
-    if(t_ok != 0) LOGE(tag, "Task sensors not created!");
+    if(t_ok != 0) LOGE(tag, "Task ADCS not created!");
 #endif
 
     /** DEPLOYMENT */
