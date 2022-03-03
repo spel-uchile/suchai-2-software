@@ -103,13 +103,13 @@ int tm_parse_msg(char *fmt, char *params, int nparams) {
     strncpy(msg, (char *)frame->data.data8, SCH_ST_STR_SIZE);
 
     string_data_t message;
-    message.index = dat_get_system_var(data_map[received_msgs].sys_index);
+    message.index = dat_get_system_var(data_map[msg_sensors].sys_index);
     //message.index = dat_get_system_var(dat_drp_idx_str);
     message.timestamp = dat_get_time();
     memset(message.msg, 0, SCH_ST_STR_SIZE);
     strcpy(message.msg, (char *)frame->data.data8);
 
-    int rc = dat_add_payload_sample(&message, received_msgs);
+    int rc = dat_add_payload_sample(&message, msg_sensors);
     LOGI(tag, "String message is %s", message.msg);
     return rc != -1 ? CMD_OK : CMD_ERROR;
 }
