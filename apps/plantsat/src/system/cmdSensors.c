@@ -360,6 +360,6 @@ int sensors_get_status_basic(char *fmt, char *params, int nparams)
     obc_read_status_basic(&status);
     int rc = dat_add_payload_sample(&status, status_sensors);
 
-    LOGI(tag, "Saving payload %d: STATUS (%d). Index: %d, time %d", status_sensors, rc, index, status.timestamp);
+    LOGI(tag, "Saving payload %d: STATUS (%d). Index: %d, time %d", status_sensors, rc, status.index, status.timestamp);
     return rc != 0 ? CMD_ERROR : CMD_OK;
 }
