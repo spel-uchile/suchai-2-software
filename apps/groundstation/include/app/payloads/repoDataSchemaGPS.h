@@ -53,6 +53,18 @@ typedef struct __attribute__((__packed__)) gps_temp_data {
 //    gps_last_sensor             ///< Dummy element, the amount of payload variables
 //} gps_payload_id_t;
 
+typedef struct __attribute__((__packed__)) lp_data {
+    uint32_t lp_index;
+    uint32_t lp_timestamp;
+    uint32_t lp_unit;
+    uint32_t lp_hk_idx;
+    uint32_t lp_hk;
+    uint32_t lp_hgch;
+    uint32_t lp_lgch;
+    uint32_t crc;
+    uint32_t chk;
+} lp_data_t;
+
 typedef enum GPS_STATUS{
     GPS_OFF = 0,
     GPS_ON, // 1
