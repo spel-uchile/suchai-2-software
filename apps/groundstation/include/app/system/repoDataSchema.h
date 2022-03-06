@@ -75,10 +75,16 @@ typedef enum dat_status_address_enum {
     dat_fpl_last,                 ///< Last executed flight plan (unix time)
     dat_fpl_queue,                ///< Flight plan queue length
 
-    /// ADS: Altitude determination system
+    /// ADS: Attitude determination system
     dat_ads_omega_x,              ///< Gyroscope acceleration value along the x axis
     dat_ads_omega_y,              ///< Gyroscope acceleration value along the y axis
     dat_ads_omega_z,              ///< Gyroscope acceleration value along the z axis
+    dat_ads_ekf_omega_x,              ///< Gyroscope acceleration value along the x axis
+    dat_ads_ekf_omega_y,              ///< Gyroscope acceleration value along the y axis
+    dat_ads_ekf_omega_z,              ///< Gyroscope acceleration value along the z axis
+    dat_ads_ekf_bias_x,              ///< bias Gyroscope acceleration value along the x axis
+    dat_ads_ekf_bias_y,              ///< bias Gyroscope acceleration value along the y axis
+    dat_ads_ekf_bias_z,              ///< bias Gyroscope acceleration value along the z axis
     dat_tgt_omega_x,              ///< Target acceleration value along the x axis
     dat_tgt_omega_y,              ///< Target acceleration value along the y axis
     dat_tgt_omega_z,              ///< Target acceleration value along the z axis
@@ -94,10 +100,44 @@ typedef enum dat_status_address_enum {
     dat_ads_q1,                   ///< Attitude quaternion (Inertial to body)
     dat_ads_q2,                   ///< Attitude quaternion (Inertial to body)
     dat_ads_q3,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_ekf_q0,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_ekf_q1,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_ekf_q2,                   ///< Attitude quaternion (Inertial to body)
+    dat_ads_ekf_q3,                   ///< Attitude quaternion (Inertial to body)
     dat_tgt_q0,                   ///< Target quaternion (Inertial to body)
     dat_tgt_q1,                   ///< Target quaternion (Inertial to body)
     dat_tgt_q2,                   ///< Target quaternion (Inertial to body)
     dat_tgt_q3,                   ///< Target quaternion (Inertial to body)
+    //dat_css_1,                ///< Coarse sun sensor value
+    dat_css_2,                ///< Coarse sun sensor value
+    dat_css_3,                ///< Coarse sun sensor value
+    dat_css_4,                ///< Coarse sun sensor value
+    //dat_css_5,                ///< Coarse sun sensor value
+    dat_sun_vec_b_x,
+    dat_sun_vec_b_y,
+    dat_sun_vec_b_z,
+    dat_calc_attitude,
+    dat_activate_ekf,
+    dat_activate_ctrl,
+    dat_time_to_attitude,
+    dat_inertia_xx,         ///< Inertia matrix xx
+    dat_inertia_yy,         ///< Inertia matrix yy
+    dat_inertia_zz,         ///< Inertia matrix zz
+    dat_inertia_xy,         ///< Inertia matrix xy
+    dat_inertia_xz,         ///< Inertia matrix xz
+    dat_inertia_yz,         ///< Inertia matrix yz
+    dat_inv_inertia_xx,         ///< Inertia matrix xx
+    dat_inv_inertia_yy,         ///< Inertia matrix yy
+    dat_inv_inertia_zz,         ///< Inertia matrix zz
+    dat_inv_inertia_xy,         ///< Inertia matrix xy
+    dat_inv_inertia_xz,         ///< Inertia matrix xz
+    dat_inv_inertia_yz,         ///< Inertia matrix yz
+    dat_inertia_rw,
+    dat_time_delay_gyro,
+    dat_time_delay_quat,
+    dat_mtq_x_axis,
+    dat_mtq_y_axis,
+    dat_mtq_z_axis,
 
     /// EPS: Energy power system
     dat_eps_vbatt,                ///< Voltage of the battery [mV]
@@ -119,6 +159,9 @@ typedef enum dat_status_address_enum {
     dat_drp_idx_sta_2,              ///< Status data index
     dat_drp_idx_stt_2,              ///< Data from STT index
     dat_drp_idx_rw_2,               ///< Temperature data index
+    dat_drp_idx_ads_fss_2,          ///< FSS ads data index
+    dat_drp_idx_ekf_2,
+    dat_drp_idx_ctrl_2,
     dat_drp_idx_str_2,              ///< String data index
 
     dat_drp_idx_temp_3,             ///< Temperature data index
@@ -127,6 +170,9 @@ typedef enum dat_status_address_enum {
     dat_drp_idx_sta_3,              ///< Status data index
     dat_drp_idx_stt_3,              ///< Data from STT index
     dat_drp_idx_rw_3,               ///< Temperature data index
+    dat_drp_idx_ads_fss_3,          ///< FSS ads data index
+    dat_drp_idx_ekf_3,
+    dat_drp_idx_ctrl_3,
     dat_drp_idx_str_3,              ///< String data index
 
     dat_drp_idx_temp_P,             ///< Temperature data index
@@ -135,6 +181,9 @@ typedef enum dat_status_address_enum {
     dat_drp_idx_sta_P,              ///< Status data index
     dat_drp_idx_stt_P,              ///< Data from STT index
     dat_drp_idx_rw_P,               ///< Temperature data index
+    dat_drp_idx_ads_fss_P,          ///< FSS ads data index
+    dat_drp_idx_ekf_P,
+    dat_drp_idx_ctrl_P,
     dat_drp_idx_str_P,              ///< String data index
 
     /// Memory: Current send acknowledge data
@@ -144,6 +193,9 @@ typedef enum dat_status_address_enum {
     dat_drp_ack_sta_2,              ///< Status data index acknowledge
     dat_drp_ack_stt_2,              ///< Data from STT index acknowledge
     dat_drp_ack_rw_2,               ///< Temperature data acknowledge
+    dat_drp_ack_ads_fss_2,          ///< FSS ads acknowledge
+    dat_drp_ack_ekf_2,              ///< ADS EKF data acknowledge
+    dat_drp_ack_ctrl_2,             ///< ADS CTRL data acknowledge
     dat_drp_ack_str_2,              ///< String data acknowledge
 
     dat_drp_ack_temp_3,             ///< Temperature data acknowledge
@@ -152,6 +204,9 @@ typedef enum dat_status_address_enum {
     dat_drp_ack_sta_3,              ///< Status data index acknowledge
     dat_drp_ack_stt_3,              ///< Data from STT index acknowledge
     dat_drp_ack_rw_3,               ///< Temperature data acknowledge
+    dat_drp_ack_ads_fss_3,          ///< FSS ads acknowledge
+    dat_drp_ack_ekf_3,              ///< ADS EKF data acknowledge
+    dat_drp_ack_ctrl_3,             ///< ADS CTRL data acknowledge
     dat_drp_ack_str_3,              ///< String data acknowledge
 
     dat_drp_ack_temp_P,             ///< Temperature data acknowledge
@@ -160,6 +215,9 @@ typedef enum dat_status_address_enum {
     dat_drp_ack_sta_P,              ///< Status data index acknowledge
     dat_drp_ack_stt_P,              ///< Data from STT index acknowledge
     dat_drp_ack_rw_P,               ///< Temperature data acknowledge
+    dat_drp_ack_ads_fss_P,          ///< FSS ads acknowledge
+    dat_drp_ack_ekf_P,              ///< ADS EKF data acknowledge
+    dat_drp_ack_ctrl_P,             ///< ADS CTRL data acknowledge
     dat_drp_ack_str_P,              ///< String data acknowledge
 
     /// Payloads
@@ -355,13 +413,15 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_idx_sta_2,       "drp_sta_2",           'u', DAT_IS_STATUS, 0},          ///< Status data index
         {dat_drp_idx_stt_2,       "drp_stt_2",           'u', DAT_IS_STATUS, 0},          ///< STT data index
         {dat_drp_idx_rw_2,        "drp_idx_rw_2",        'u', DAT_IS_STATUS, 0},          ///< RW data index
+        {dat_drp_idx_ads_fss_2,   "drp_ads_fss_2",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
+        {dat_drp_idx_str_2,       "drp_idx_str_2",       'u', DAT_IS_STATUS, 0},          ///< String data index
         {dat_drp_ack_temp_2,      "drp_ack_temp_2",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads_2,       "drp_ack_ads_2",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
         {dat_drp_ack_eps_2,       "drp_ack_eps_2",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
         {dat_drp_ack_sta_2,       "drp_ack_sta_2",       'u', DAT_IS_CONFIG, 0},          ///< Status data index acknowledge
         {dat_drp_ack_stt_2,       "drp_ack_stt_2",       'u', DAT_IS_CONFIG, 0},          ///< Stt data index acknowledge
         {dat_drp_ack_rw_2,        "drp_ack_rw_2",        'u', DAT_IS_CONFIG, 0},          ///< RW data acknowledge
-        {dat_drp_idx_str_2,       "drp_idx_str_2",       'u', DAT_IS_STATUS, 0},          ///< String data index
+        {dat_drp_ack_ads_fss_2,   "drp_ack_ads_fss_2",   'u', DAT_IS_CONFIG, 0},          ///< ADS FSS data index acknowledge
         {dat_drp_ack_str_2,       "drp_ack_str_2",       'u', DAT_IS_CONFIG, 0},          ///< String data acknowledge
 
         {dat_drp_idx_temp_3,      "drp_temp_3",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
@@ -370,13 +430,15 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_idx_sta_3,       "drp_sta_3",           'u', DAT_IS_STATUS, 0},          ///< Status data index
         {dat_drp_idx_stt_3,       "drp_stt_3",           'u', DAT_IS_STATUS, 0},          ///< STT data index
         {dat_drp_idx_rw_3,        "drp_idx_rw_3",        'u', DAT_IS_STATUS, 0},          ///< RW data index
+        {dat_drp_idx_ads_fss_3,   "drp_ads_fss_3",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
+        {dat_drp_idx_str_3,       "drp_idx_str_3",       'u', DAT_IS_STATUS, 0},          ///< String data index
         {dat_drp_ack_temp_3,      "drp_ack_temp_3",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads_3,       "drp_ack_ads_3",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
         {dat_drp_ack_eps_3,       "drp_ack_eps_3",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
         {dat_drp_ack_sta_3,       "drp_ack_sta_3",       'u', DAT_IS_CONFIG, 0},          ///< Status data index acknowledge
         {dat_drp_ack_stt_3,       "drp_ack_stt_3",       'u', DAT_IS_CONFIG, 0},          ///< Stt data index acknowledge
         {dat_drp_ack_rw_3,        "drp_ack_rw_3",        'u', DAT_IS_CONFIG, 0},          ///< RW data acknowledge
-        {dat_drp_idx_str_3,       "drp_idx_str_3",       'u', DAT_IS_STATUS, 0},          ///< String data index
+        {dat_drp_ack_ads_fss_3,   "drp_ack_ads_fss_3",   'u', DAT_IS_CONFIG, 0},          ///< ADS FSS data index acknowledge
         {dat_drp_ack_str_3,       "drp_ack_str_3",       'u', DAT_IS_CONFIG, 0},          ///< String data acknowledge
 
         {dat_drp_idx_temp_P,      "drp_temp_P",          'u', DAT_IS_STATUS, 0},          ///< Temperature data index
@@ -385,13 +447,15 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_idx_sta_P,       "drp_sta_P",           'u', DAT_IS_STATUS, 0},          ///< Status data index
         {dat_drp_idx_stt_P,       "drp_stt_P",           'u', DAT_IS_STATUS, 0},          ///< STT data index
         {dat_drp_idx_rw_P,        "drp_idx_rw_P",        'u', DAT_IS_STATUS, 0},          ///< RW data index
+        {dat_drp_idx_ads_fss_P,   "drp_ads_fss_P",           'u', DAT_IS_STATUS, 0},          ///< ADS data index
+        {dat_drp_idx_str_P,       "drp_idx_str_P",       'u', DAT_IS_STATUS, 0},          ///< String data index
         {dat_drp_ack_temp_P,      "drp_ack_temp_P",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads_P,       "drp_ack_ads_P",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
         {dat_drp_ack_eps_P,       "drp_ack_eps_P",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
         {dat_drp_ack_sta_P,       "drp_ack_sta_P",       'u', DAT_IS_CONFIG, 0},          ///< Status data index acknowledge
         {dat_drp_ack_stt_P,       "drp_ack_stt_P",       'u', DAT_IS_CONFIG, 0},          ///< Stt data index acknowledge
         {dat_drp_ack_rw_P,        "drp_ack_rw_P",        'u', DAT_IS_CONFIG, 0},          ///< RW data acknowledge
-        {dat_drp_idx_str_P,       "drp_idx_str_P",       'u', DAT_IS_STATUS, 0},          ///< String data index
+        {dat_drp_ack_ads_fss_P,   "drp_ack_ads_fss_P",   'u', DAT_IS_CONFIG, 0},          ///< ADS FSS data index acknowledge
         {dat_drp_ack_str_P,       "drp_ack_str_P",       'u', DAT_IS_CONFIG, 0},          ///< String data acknowledge
 
         {stt_dat_drp_idx_temp_2, "stt_dat_drp_idx_temp_2", 'u', DAT_IS_STATUS, 0},
@@ -499,36 +563,45 @@ typedef enum payload_id {
     status_sensors_2,           ///< Status Variables
     stt_sensors_2,              ///< STT sensors
     rw_sensors_2,               ///< RW Speed and current sensor
+    fss_sensors_2,              ///< Ads sensors fss
+    ekf_sensors_2,
+    ctrl_sensors_2,
     msg_sensors_2,              ///< Store and forward messages payloads
-    temp_sensors_3,             ///< 7: Temperature sensors
+    temp_sensors_3,             ///< 10: Temperature sensors
     ads_sensors_3,              ///< Ads sensors
     eps_sensors_3,              ///< Eps sensors
     status_sensors_3,           ///< Status Variables
     stt_sensors_3,              ///< STT sensors
     rw_sensors_3,               ///< RW Speed and current sensor
+    fss_sensors_3,              ///< Ads sensors fss
+    ekf_sensors_3,
+    ctrl_sensors_3,
     msg_sensors_3,              ///< Store and forward messages payloads
-    temp_sensors_P,             ///< 14: Temperature sensors
+    temp_sensors_P,             ///< 20: Temperature sensors
     ads_sensors_P,              ///< Ads sensors
     eps_sensors_P,              ///< Eps sensors
     status_sensors_P,           ///< Status Variables
     stt_sensors_P,              ///< STT sensors
     rw_sensors_P,               ///< RW Speed and current sensor
+    fss_sensors_P,              ///< Ads sensors fss
+    ekf_sensors_P,
+    ctrl_sensors_P,
     msg_sensors_P,              ///< Store and forward messages payloads
     ///< STT sensors
-    stt_temp_sensors_2,         ///< 21: STT Temperature sensors
+    stt_temp_sensors_2,         ///< 30: STT Temperature sensors
     stt_stt_sensors_2,
     stt_exp_time_sensors_2,
     stt_gyro_sensors_2,
-    stt_temp_sensors_3,         ///< 25: STT Temperature sensors
+    stt_temp_sensors_3,         ///< 34: STT Temperature sensors
     stt_stt_sensors_3,
     stt_exp_time_sensors_3,
     stt_gyro_sensors_3,
-    stt_temp_sensors_P,         ///< 29: STT Temperature sensors
+    stt_temp_sensors_P,         ///< 38: STT Temperature sensors
     stt_stt_sensors_P,
     stt_exp_time_sensors_P,
     stt_gyro_sensors_P,
     ///< MAG sensors
-    mag_temp_sensors_2,         ///< 33: Temperature sensors
+    mag_temp_sensors_2,         ///< 42: Temperature sensors
     mag_fod_sensors_2,          ///< Data of the femto-satellites received at the FOD.
     mag_mag_sensor_2,           ///< New mag sensor
     mag_stt_sensors_2,          ///< STT sensors
@@ -536,7 +609,7 @@ typedef enum payload_id {
     mag_stt_gyro_sensors_2,     ///< STT gyro sensor
     mag_iot_sensor_2,           ///< Data received by the IoT transceiver.
     mag_aoa_sensors_2,          ///< Phase and magnitude difference in voltage of the antenna array.
-    mag_temp_sensors_3,         ///< 41: Temperature sensors
+    mag_temp_sensors_3,         ///< 50: Temperature sensors
     mag_fod_sensors_3,          ///< Data of the femto-satellites received at the FOD.
     mag_mag_sensor_3,           ///< New mag sensor
     mag_stt_sensors_3,          ///< STT sensors
@@ -544,7 +617,7 @@ typedef enum payload_id {
     mag_stt_gyro_sensors_3,     ///< STT gyro sensor
     mag_iot_sensor_3,           ///< Data received by the IoT transceiver.
     mag_aoa_sensors_3,          ///< Phase and magnitude difference in voltage of the antenna array.
-    mag_temp_sensors_P,         ///< 49: Temperature sensors
+    mag_temp_sensors_P,         ///< 58: Temperature sensors
     mag_fod_sensors_P,          ///< Data of the femto-satellites received at the FOD.
     mag_mag_sensor_P,           ///< New mag sensor
     mag_stt_sensors_P,          ///< STT sensors
@@ -553,10 +626,10 @@ typedef enum payload_id {
     mag_iot_sensor_P,           ///< Data received by the IoT transceiver.
     mag_aoa_sensors_P,          ///< Phase and magnitude difference in voltage of the antenna array.
     ///< GRA sensors
-    gra_temp_sensors_P,         ///< 57: Temperature sensors
+    gra_temp_sensors_P,         ///< 66: Temperature sensors
     ///< GPS sensors
-    gps_temp_sensors_2,         ///< 58: Temperature sensors
-    gps_temp_sensors_3,         ///< 59: Temperature sensors
+    gps_temp_sensors_2,         ///< 67: Temperature sensors
+    gps_temp_sensors_3,         ///< 68: Temperature sensors
     ///< Last
     last_sensor               ///< Dummy element, the amount of payload variables
 } payload_id_t;
@@ -584,23 +657,22 @@ typedef struct __attribute__((__packed__)) temp_data {
     int16_t spanel_temp2;
     int16_t spanel_temp3;
     int16_t spanel_temp4;
-    int16_t is2_int_temp1;
+    /**int16_t is2_int_temp1;
     int16_t is2_int_temp2;
     int16_t is2_int_temp3;
     int16_t is2_int_temp4;
     int16_t is2_ext_temp1;
     int16_t is2_ext_temp2;
     int16_t is2_ext_temp3;
-    int16_t is2_ext_temp4;
+    int16_t is2_ext_temp4;**/
     int16_t dummy;
 } temp_data_t; //2*4+26*2 bytes = 60
 
 static char temp_var_string[] = "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3 eps_temp1 eps_temp2 eps_temp3 "
                                   "eps_temp4 bat_temp1 bat_temp2 istage_temp1 istage_temp2 istage_temp3 istage_temp4 "
-                                  "spanel_temp1 spanel_temp2 spanel_temp3 spanel_temp4 is2_int_temp1 is2_int_temp2 "
-                                  "is2_int_temp3 is2_int_temp4 is2_ext_temp1 is2_ext_temp2 is2_ext_temp3 is2_ext_temp4 dummy";
+                                  "spanel_temp1 spanel_temp2 spanel_temp3 spanel_temp4 dummy";
 
-static char temp_var_types[] = "%u %u %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h";
+static char temp_var_types[] = "%u %u %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h";
 
 /**
  * Struct for storing data collected by ads sensors.
@@ -614,13 +686,83 @@ typedef struct __attribute__((__packed__)) ads_data {
     float mag_x;            ///< Magnetometer x axis
     float mag_y;            ///< Magnetometer y axis
     float mag_z;            ///< Magnetometer z axis
-    int32_t sun1;           ///< Coarse sun sensor 1
+    //int32_t sun1;           ///< Coarse sun sensor 1
     int32_t sun2;           ///< Coarse sun sensor 2
     int32_t sun3;           ///< Coarse sun sensor 3
     int32_t sun4;           ///< Coarse sun sensor 4
-    int32_t sun5;           ///< Coarse sun sensor 5
-    int32_t sun6;           ///< Coarse sun sensor 6
-} ads_data_t;
+    //int32_t sun5;           ///< Coarse sun sensor 5
+    //int32_t sun6;           ///< Coarse sun sensor 6
+} ads_data_t; //2*4 + 6*4 + 3*4 = 44 bytes
+
+/**
+ * Struct for storing data collected by ads ekf sensors.
+ */
+typedef struct __attribute__((__packed__)) ads_ekf_data {
+    uint32_t index;
+    uint32_t timestamp;
+    float gyro_x;            ///< Gyroscope acceleration value along the x axis
+    float gyro_y;            ///< Gyroscope acceleration value along the y axis
+    float gyro_z;            ///< Gyroscope acceleration value along the z axis
+    float mag_x;            ///< Magnetometer x axis
+    float mag_y;            ///< Magnetometer y axis
+    float mag_z;            ///< Magnetometer z axis
+    int16_t q0_det;
+    int16_t q1_det;
+    int16_t q2_det;
+    int16_t q3_det;
+    int16_t q0_ekf;
+    int16_t q1_ekf;
+    int16_t q2_ekf;
+    int16_t q3_ekf;
+    float gyro_x_ekf;            ///< Gyroscope acceleration value along the x axis
+    float gyro_y_ekf;            ///< Gyroscope acceleration value along the y axis
+    float gyro_z_ekf;            ///< Gyroscope acceleration value along the z axis
+} ekf_data_t; //2*4 + 6*4 + 4*2 +3*4= 52
+
+/**
+ * Struct for storing data collected by ads ekf sensors.
+ */
+typedef struct __attribute__((__packed__)) ads_ctrl_data {
+    uint32_t index;
+    uint32_t timestamp;
+    float ctrl_torque_x;
+    float ctrl_torque_y;
+    float ctrl_torque_z;
+    float ctrl_hardware_x;
+    float ctrl_hardware_y;
+    float ctrl_hardware_z;
+} ctrl_data_t; //2*4 + 6*4 + 4*2 +3*4= 52
+
+/**
+ * Struct for storing data collected by ads fss sensors.
+ */
+typedef struct __attribute__((__packed__)) ads_data_fss {
+    uint32_t index;
+    uint32_t timestamp;
+    float acc_x;            ///< Gyroscope acceleration value along the x axis
+    float acc_y;            ///< Gyroscope acceleration value along the y axis
+    float acc_z;            ///< Gyroscope acceleration value along the z axis
+    uint16_t fss1_a;
+    uint16_t fss1_b;
+    uint16_t fss1_c;
+    uint16_t fss1_d;
+    uint16_t fss2_a;
+    uint16_t fss2_b;
+    uint16_t fss2_c;
+    uint16_t fss2_d;
+    uint16_t fss3_a;
+    uint16_t fss3_b;
+    uint16_t fss3_c;
+    uint16_t fss3_d;
+    uint16_t fss4_a;
+    uint16_t fss4_b;
+    uint16_t fss4_c;
+    uint16_t fss4_d;
+    uint16_t fss5_a;
+    uint16_t fss5_b;
+    uint16_t fss5_c;
+    uint16_t fss5_d;
+} fss_data_t; // 2*4 + 3*4 + 20*2 = 60 bytes
 
 /**
  * Struct for storing data collected by eps housekeeping.
@@ -713,26 +855,47 @@ typedef struct __attribute__((__packed__)) string_data {
 static data_map_t data_map[last_sensor] = {
         ///< CDH data
         {"dat_temp_data_2",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp_2, dat_drp_ack_temp_2, temp_var_types, temp_var_string},
-        {"dat_ads_data_2",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads_2,  dat_drp_ack_ads_2,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
+        {"dat_ads_data_2",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads_2,  dat_drp_ack_ads_2,  "%u %u %f %f %f %f %f %f %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun2 sun3 sun4"},
         {"dat_eps_data_2",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps_2,  dat_drp_ack_eps_2,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
         {"dat_sta_data_2",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta_2,  dat_drp_ack_sta_2,  status_var_types, status_var_string},
         {"dat_stt_data_2",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt_2,  dat_drp_ack_stt_2,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
         {"dat_rw_data_2",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw_2,   dat_drp_ack_rw_2,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
-        {"dat_str_data_2",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str_2, dat_drp_ack_str_2,   "%u %u %s",                "sat_index timestamp string_data"},
+        {"dat_fss_data_2", (uint16_t) (sizeof(fss_data_t)),dat_drp_idx_ads_fss_2,  dat_drp_ack_ads_fss_2,
+                "%u %u %f %f %f %f %f %f %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h",
+                "sat_index timestamp acc_x acc_y acc_z fss1_a fss1_b fss1_c fss1_d fss2_a fss2_b fss2_c fss2_d fss3_a fss3_b fss3_c fss3_d fss4_a fss4_b fss4_c fss4_d fss5_a fss5_b fss5_c fss5_d"},
+        {"dat_ekf_data_2",     (uint16_t) (sizeof(ekf_data_t)),     dat_drp_idx_ekf_2,  dat_drp_ack_ekf_2,  "%u %u %f %f %f %f %f %f %u %u %u %u %u %u %u %u %f %f %f",
+                "sat_index timestamp gyro_x gyro_y gyro_z mag_x mag_y mag_z q0 q1 q2 q3 q0_ekf q1_ekf q2_ekf q3_ekf gyro_x_ekf gyro_y_ekf gyro_z_ekf"},
+        {"dat_ctrl_data_2", (uint16_t) (sizeof(ctrl_data_t)), dat_drp_idx_ctrl_2, dat_drp_ack_ctrl_2, "%u %u %f %f %f %f %f %f",
+                "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x, ctrl_hw_y, ctrl_hw_z"},
+        {"dat_msg_data_2",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str_2, dat_drp_ack_str_2,   "%u %u %s",                "sat_index timestamp string_data"},
         {"dat_temp_data_3",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp_3, dat_drp_ack_temp_3, temp_var_types, temp_var_string},
-        {"dat_ads_data_3",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads_3,  dat_drp_ack_ads_3,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
+        {"dat_ads_data_3",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads_3,  dat_drp_ack_ads_3,  "%u %u %f %f %f %f %f %f %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3"},
         {"dat_eps_data_3",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps_3,  dat_drp_ack_eps_3,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
         {"dat_sta_data_3",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta_3,  dat_drp_ack_sta_3,  status_var_types, status_var_string},
         {"dat_stt_data_3",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt_3,  dat_drp_ack_stt_3,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
         {"dat_rw_data_3",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw_3,   dat_drp_ack_rw_3,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
-        {"dat_str_data_3",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str_3, dat_drp_ack_str_3,   "%u %u %s",                "sat_index timestamp string_data"},
+        {"dat_fss_data_3", (uint16_t) (sizeof(fss_data_t)),dat_drp_idx_ads_fss_3,  dat_drp_ack_ads_fss_3,
+                "%u %u %f %f %f %f %f %f %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h",
+                "sat_index timestamp acc_x acc_y acc_z fss1_a fss1_b fss1_c fss1_d fss2_a fss2_b fss2_c fss2_d fss3_a fss3_b fss3_c fss3_d fss4_a fss4_b fss4_c fss4_d fss5_a fss5_b fss5_c fss5_d"},
+        {"dat_ekf_data_3",     (uint16_t) (sizeof(ekf_data_t)),     dat_drp_idx_ekf_3,  dat_drp_ack_ekf_3,  "%u %u %f %f %f %f %f %f %u %u %u %u %u %u %u %u %f %f %f",
+                "sat_index timestamp gyro_x gyro_y gyro_z mag_x mag_y mag_z q0 q1 q2 q3 q0_ekf q1_ekf q2_ekf q3_ekf gyro_x_ekf gyro_y_ekf gyro_z_ekf"},
+        {"dat_ctrl_data_3", (uint16_t) (sizeof(ctrl_data_t)), dat_drp_idx_ctrl_3, dat_drp_ack_ctrl_3, "%u %u %f %f %f %f %f %f",
+                "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x, ctrl_hw_y, ctrl_hw_z"},
+        {"dat_msg_data_3",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str_3, dat_drp_ack_str_3,   "%u %u %s",                "sat_index timestamp string_data"},
         {"dat_temp_data_P",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp_P, dat_drp_ack_temp_P, temp_var_types, temp_var_string},
-        {"dat_ads_data_P",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads_P,  dat_drp_ack_ads_P,  "%u %u %f %f %f %f %f %f %d %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3 sun4"},
+        {"dat_ads_data_P",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads_P,  dat_drp_ack_ads_P,  "%u %u %f %f %f %f %f %f %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3"},
         {"dat_eps_data_P",     (uint16_t) (sizeof(eps_data_t)),    dat_drp_idx_eps_P,  dat_drp_ack_eps_P,  "%u %u %u %u %u %d %d",                "sat_index timestamp cursun cursys vbatt temp_eps temp_bat"},
         {"dat_sta_data_P",     (uint16_t) (sizeof(status_data_t)), dat_drp_idx_sta_P,  dat_drp_ack_sta_P,  status_var_types, status_var_string},
         {"dat_stt_data_P",     (uint16_t) (sizeof(stt_data_t)),    dat_drp_idx_stt_P,  dat_drp_ack_stt_P,  "%u %u %f %f %f %d %f",    "sat_index timestamp ra dec roll time exec_time"},
         {"dat_rw_data_P",      (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_rw_P,   dat_drp_ack_rw_P,   "%u %u %f %f %f %d %d %d", "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
-        {"dat_str_data_P",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str_P, dat_drp_ack_str_P,   "%u %u %s",                "sat_index timestamp string_data"},
+        {"dat_fss_data_P", (uint16_t) (sizeof(fss_data_t)),dat_drp_idx_ads_fss_P,  dat_drp_ack_ads_fss_P,
+                "%u %u %f %f %f %f %f %f %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h",
+                "sat_index timestamp acc_x acc_y acc_z fss1_a fss1_b fss1_c fss1_d fss2_a fss2_b fss2_c fss2_d fss3_a fss3_b fss3_c fss3_d fss4_a fss4_b fss4_c fss4_d fss5_a fss5_b fss5_c fss5_d"},
+        {"dat_ekf_data_P",     (uint16_t) (sizeof(ekf_data_t)),     dat_drp_idx_ekf_P,  dat_drp_ack_ekf_P,  "%u %u %f %f %f %f %f %f %u %u %u %u %u %u %u %u %f %f %f",
+                "sat_index timestamp gyro_x gyro_y gyro_z mag_x mag_y mag_z q0 q1 q2 q3 q0_ekf q1_ekf q2_ekf q3_ekf gyro_x_ekf gyro_y_ekf gyro_z_ekf"},
+        {"dat_ctrl_data_P", (uint16_t) (sizeof(ctrl_data_t)), dat_drp_idx_ctrl_P, dat_drp_ack_ctrl_P, "%u %u %f %f %f %f %f %f",
+                "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x, ctrl_hw_y, ctrl_hw_z"},
+        {"dat_msg_data_P",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str_P, dat_drp_ack_str_P,   "%u %u %s",                "sat_index timestamp string_data"},
         ///< STT data
         {"stt_temp_data_2",    (uint16_t) (sizeof(stt_temp_data_t)),     stt_dat_drp_idx_temp_2,     stt_dat_drp_ack_temp_2,         "%u %u %f",             "sat_index timestamp obc_temp_1"},
         {"stt_data_2",         (uint16_t) (sizeof(stt_stt_data_t)),      stt_dat_drp_idx_stt_2,          stt_dat_drp_ack_stt_2,          "%u %u %f %f %f %d %f", "sat_index timestamp ra dec roll time exec_time"},
