@@ -17,14 +17,14 @@
 
 #include <math.h>
 
-#include "drivers.h"
-#include "csp/csp.h"
+//#include "drivers.h"
+//#include "csp/csp.h"
 #include "suchai/math_utils.h"
 
 #include "suchai/repoData.h"
 #include "suchai/repoCommand.h"
 #include "suchai/cmdCOM.h"
-#include "suchai/math_utils.h"
+//#include "suchai/math_utils.h"
 #include "suchai/log_utils.h"
 
 /**
@@ -275,5 +275,14 @@ int adcs_detumbling_mag(char* fmt, char* params, int nparams);
  * @return CMD_OK | CMD_ERROR | CMD_ERROR_SYNTAX
  */
 int adcs_send_attitude(char* fmt, char* params, int nparams);
-
+int calc_shadow_zone(vector3_t sun_pos_i, vector3_t sc_pos_i);
+int get_obc_sun_vec(char* fmt, char* params, int nparams);
+int start_attitude(char *fmt, char *params, int nparams);
+int set_sc_inertia_matrix(char *fmt, char *params, int nparams);
+int set_rw_inertia_matrix(char *fmt, char *params, int nparams);
+int set_time_delay_gyro(char *fmt, char *params, int nparams);
+int set_time_delay_quat(char *fmt, char *params, int nparams);
+int set_mtq_axis(char *fmt, char *params, int nparams);
+int set_quat_fss(char *fmt, char *params, int nparams);
+int set_bias_omega(char *fmt, char *params, int nparams);
 #endif //_CMDADCS_H

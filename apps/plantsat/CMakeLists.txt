@@ -35,6 +35,7 @@ set(SOURCE_FILES
         src/system/taskSensors.c
         src/system/taskADCS.c
         src/drivers/rwdrv10987_2.c
+        src/system/TRIADEKF.c
 )
 
 set(GS_INCLUDE_PATH
