@@ -74,6 +74,9 @@ typedef enum dat_status_address_enum {
     dat_ads_omega_x,              ///< Gyroscope acceleration value along the x axis
     dat_ads_omega_y,              ///< Gyroscope acceleration value along the y axis
     dat_ads_omega_z,              ///< Gyroscope acceleration value along the z axis
+    dat_ads_bias_x,
+    dat_ads_bias_y,
+    dat_ads_bias_z,
     dat_ads_ekf_omega_x,              ///< Gyroscope acceleration value along the x axis
     dat_ads_ekf_omega_y,              ///< Gyroscope acceleration value along the y axis
     dat_ads_ekf_omega_z,              ///< Gyroscope acceleration value along the z axis
@@ -89,6 +92,9 @@ typedef enum dat_status_address_enum {
     dat_ads_pos_x,                ///< Satellite orbit position x (ECI)
     dat_ads_pos_y,                ///< Satellite orbit position y (ECI)
     dat_ads_pos_z,                ///< Satellite orbit position z (ECI)
+    dat_ads_vel_x,                ///< Satellite orbit velocity x (ECI)
+    dat_ads_vel_y,                ///< Satellite orbit velocity y (ECI)
+    dat_ads_vel_z,                ///< Satellite orbit velocity z (ECI)
     dat_ads_tle_epoch,            ///< Current TLE epoch, 0 if TLE is invalid
     dat_ads_tle_last,             ///< Las time position was propagated
     dat_ads_q0,                   ///< Attitude quaternion (Inertial to body)
@@ -140,6 +146,13 @@ typedef enum dat_status_address_enum {
     dat_eps_cur_sys,              ///< Current from the battery [mA]
     dat_eps_temp_bat0,            ///< Battery temperature sensor
 
+    /// Sample Machine: Current state of sample status_machine
+    dat_drp_mach_action,          ///< Current action of sampling state machine
+    dat_drp_mach_state,           ///< Current state of sampling state machine
+    dat_drp_mach_step,            ///< Step in seconds of sampling state machine
+    dat_drp_mach_payloads,        ///< Binary data storing active payload being sampled
+    dat_drp_mach_left,            ///< Samples left for sampling state machine
+
     /// Memory: Current payload memory addresses
     dat_drp_idx_temp,             ///< Temperature data index
     dat_drp_idx_ads,              ///< ADS data index
@@ -147,8 +160,9 @@ typedef enum dat_status_address_enum {
     dat_drp_idx_sta,              ///< Status data index
     dat_drp_idx_stt,              ///< Data from STT index
     dat_drp_idx_rw,               ///< Temperature data index
-    dat_drp_idx_fss,          ///< ADS FSS data index
-    dat_drp_idx_ekf,          ///< ADS EKF data index
+    dat_drp_idx_fss,              ///< ADS FSS data index
+    dat_drp_idx_ekf,              ///< ADS EKF data index
+    dat_drp_idx_ctrl,             ///< ADS CTRL data index
     dat_drp_idx_str,              ///< String data index
 
     /// Memory: Current send acknowledge data
@@ -160,14 +174,8 @@ typedef enum dat_status_address_enum {
     dat_drp_ack_rw,               ///< Temperature data acknowledge
     dat_drp_ack_fss,              ///< ADS FSS data index acknowledge
     dat_drp_ack_ekf,              ///< ADS EKF data index acknowledge
+    dat_drp_ack_ctrl,             ///< ADS CTRL data index
     dat_drp_ack_str,              ///< String data acknowledge
-
-    /// Sample Machine: Current state of sample status_machine
-    dat_drp_mach_action,          ///< Current action of sampling state machine
-    dat_drp_mach_state,           ///< Current state of sampling state machine
-    dat_drp_mach_step,            ///< Step in seconds of sampling state machine
-    dat_drp_mach_payloads,        ///< Binary data storing active payload being sampled
-    dat_drp_mach_left,            ///< Samples left for sampling state machine
 
     /// Add a new status variables address here
     //dat_custom,                 ///< Variable description
@@ -243,12 +251,18 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_ads_omega_x,       "ads_omega_x",       'f', DAT_IS_STATUS, 0.0},         ///< Gyroscope acceleration value along the x axis
         {dat_ads_omega_y,       "ads_omega_y",       'f', DAT_IS_STATUS, 0.0},         ///< Gyroscope acceleration value along the y axis
         {dat_ads_omega_z,       "ads_omega_z",       'f', DAT_IS_STATUS, 0.0},         ///< Gyroscope acceleration value along the z axis
+        {dat_ads_bias_x,       "ads_bias_x",       'f', DAT_IS_STATUS, 0.0},         ///< Gyroscope bias value along the x axis
+        {dat_ads_bias_y,       "ads_bias_y",       'f', DAT_IS_STATUS, 0.0},         ///< Gyroscope bias value along the y axis
+        {dat_ads_bias_z,       "ads_bias_z",       'f', DAT_IS_STATUS, 0.0},         ///< Gyroscope bias value along the z axis
         {dat_ads_mag_x,         "ads_mag_x",         'f', DAT_IS_STATUS, 0.0},         ///< Magnetometer value along the x axis
         {dat_ads_mag_y,         "ads_mag_y",         'f', DAT_IS_STATUS, 0.0},         ///< Magnetometer value along the y axis
         {dat_ads_mag_z,         "ads_mag_z",         'f', DAT_IS_STATUS, 0.0},         ///< Magnetometer value along the z axis
         {dat_ads_pos_x,         "ads_pos_x",         'f', DAT_IS_STATUS, 0.0},         ///< Satellite orbit position x (ECI)
         {dat_ads_pos_y,         "ads_pos_y",         'f', DAT_IS_STATUS, 0.0},         ///< Satellite orbit position y (ECI)
         {dat_ads_pos_z,         "ads_pos_z",         'f', DAT_IS_STATUS, 0.0},         ///< Satellite orbit position z (ECI)
+        {dat_ads_vel_x,         "ads_pos_x",         'f', DAT_IS_STATUS, 0.0},         ///< Satellite orbit Velocity x (ECI)
+        {dat_ads_vel_y,         "ads_pos_y",         'f', DAT_IS_STATUS, 0.0},         ///< Satellite orbit Velocity y (ECI)
+        {dat_ads_vel_z,         "ads_pos_z",         'f', DAT_IS_STATUS, 0.0},         ///< Satellite orbit Velocity z (ECI)
         {dat_ads_tle_epoch,     "ads_tle_epoch",     'd', DAT_IS_STATUS, 0},          ///< Current TLE epoch, 0 if TLE is invalid
         {dat_ads_tle_last,      "ads_tle_last",      'u', DAT_IS_STATUS, 0},          ///< Last time position was propagated
         {dat_ads_q0,            "ads_q0",            'f', DAT_IS_STATUS, 0.0},          ///< Attitude quaternion (Inertial to body)
@@ -274,6 +288,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_idx_rw,        "drp_idx_rw",        'u', DAT_IS_STATUS, 0},          ///< RW data index
         {dat_drp_idx_fss,       "drp_idx_fss",       'u', DAT_IS_STATUS, 0},          ///< ADS fss data index
         {dat_drp_idx_ekf,       "drp_idx_ekf",       'u', DAT_IS_STATUS, 0},          ///< ADS ekf data index
+        {dat_drp_idx_ctrl, "drp_idx_ctrl", 'u', DAT_IS_STATUS, 0},
         {dat_drp_ack_temp,      "drp_ack_temp",      'u', DAT_IS_CONFIG, 0},          ///< Temperature data acknowledge
         {dat_drp_ack_ads,       "drp_ack_ads",       'u', DAT_IS_CONFIG, 0},          ///< ADS data index acknowledge
         {dat_drp_ack_eps,       "drp_ack_eps",       'u', DAT_IS_CONFIG, 0},          ///< EPS data index acknowledge
@@ -282,6 +297,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_drp_ack_rw,        "drp_ack_rw",        'u', DAT_IS_CONFIG, 0},          ///< RW data acknowledge
         {dat_drp_ack_fss,       "drp_ack_fss",   'u', DAT_IS_CONFIG, 0},          ///< ADS FSS data index acknowledge
         {dat_drp_ack_ekf,       "drp_ack_ekf",   'u', DAT_IS_CONFIG, 0},          ///< ADS EKF data index acknowledge
+        {dat_drp_ack_ctrl, "drp_ack_ctrl", 'u', DAT_IS_CONFIG, 0},
         {dat_drp_mach_action,   "drp_mach_action",   'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_state,    "drp_mach_state",    'u', DAT_IS_STATUS, 0},          ///<
         {dat_drp_mach_left,     "drp_mach_left",     'u', DAT_IS_STATUS, 0},          ///<
@@ -358,7 +374,8 @@ typedef enum payload_id {
     rw_sensors,             ///< 5: RW Speed and current sensor
     fss_sensors,            ///< 6: Ads sensors fss
     ekf_sensors,            ///< 7: Ads quat, omega
-    msg_sensors,          ///< 8: Store and forward msg
+    ctrl_data,
+    msg_sensors,          ///< 9: Store and forward msg
     last_sensor             ///< Dummy element, the amount of payload variables
 } payload_id_t;
 
@@ -385,23 +402,22 @@ typedef struct __attribute__((__packed__)) temp_data {
     int16_t spanel_temp2;
     int16_t spanel_temp3;
     int16_t spanel_temp4;
-    int16_t is2_int_temp1;
+    /**int16_t is2_int_temp1;
     int16_t is2_int_temp2;
     int16_t is2_int_temp3;
     int16_t is2_int_temp4;
     int16_t is2_ext_temp1;
     int16_t is2_ext_temp2;
     int16_t is2_ext_temp3;
-    int16_t is2_ext_temp4;
+    int16_t is2_ext_temp4;**/
     int16_t dummy;
 } temp_data_t; //2*4+26*2 bytes = 60
 
 static char temp_var_string[] = "sat_index timestamp obc_temp_1 obc_temp_2 obc_temp_3 eps_temp1 eps_temp2 eps_temp3 "
                                   "eps_temp4 bat_temp1 bat_temp2 istage_temp1 istage_temp2 istage_temp3 istage_temp4 "
-                                  "spanel_temp1 spanel_temp2 spanel_temp3 spanel_temp4 is2_int_temp1 is2_int_temp2 "
-                                  "is2_int_temp3 is2_int_temp4 is2_ext_temp1 is2_ext_temp2 is2_ext_temp3 is2_ext_temp4 dummy";
+                                  "spanel_temp1 spanel_temp2 spanel_temp3 spanel_temp4 dummy";
 
-static char temp_var_types[] = "%u %u %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h";
+static char temp_var_types[] = "%u %u %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h";
 
 /**
  * Struct for storing data collected by ads sensors.
@@ -435,14 +451,25 @@ typedef struct __attribute__((__packed__)) ads_ekf_data {
     float mag_x;            ///< Magnetometer x axis
     float mag_y;            ///< Magnetometer y axis
     float mag_z;            ///< Magnetometer z axis
-    int16_t q0_ekf;
-    int16_t q1_ekf;
-    int16_t q2_ekf;
-    int16_t q3_ekf;
-    float gyro_x_ekf;            ///< Gyroscope acceleration value along the x axis
-    float gyro_y_ekf;            ///< Gyroscope acceleration value along the y axis
-    float gyro_z_ekf;            ///< Gyroscope acceleration value along the z axis
+    float q0_det;
+    float q1_det;
+    float q2_det;
+    float q3_det;
 } ekf_data_t; //2*4 + 6*4 + 4*2 +3*4= 52
+
+/**
+ * Struct for storing data collected by ads ekf sensors.
+ */
+typedef struct __attribute__((__packed__)) ads_ctrl_data {
+    uint32_t index;
+    uint32_t timestamp;
+    float ctrl_torque_x;
+    float ctrl_torque_y;
+    float ctrl_torque_z;
+    float ctrl_hardware_x;
+    float ctrl_hardware_y;
+    float ctrl_hardware_z;
+} ctrl_data_t; //2*4 + 6*4 + 4*2 +3*4= 52
 
 /**
  * Struct for storing data collected by ads fss sensors.
@@ -571,10 +598,14 @@ static data_map_t data_map[last_sensor] = {
         {"dat_stt_data",     (uint16_t) (sizeof(stt_data_t)),     dat_drp_idx_stt,  dat_drp_ack_stt,  "%u %u %f %f %f %d %f",             "sat_index timestamp ra dec roll time exec_time"},
         {"dat_rw_data",      (uint16_t) (sizeof(temp_data_t)),    dat_drp_idx_rw,   dat_drp_ack_rw,   "%u %u %f %f %f %d %d %d",          "sat_index timestamp current1 current2 current3 speed1 speed2 speed3"},
         {"dat_fss_data", (uint16_t) (sizeof(fss_data_t)), dat_drp_idx_fss, dat_drp_ack_fss,
-                                                                                                      "%u %u %f %f %f %f %f %f %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h",
-                                                                                                                                          "sat_index timestamp acc_x acc_y acc_z fss1_a fss1_b fss1_c fss1_d fss2_a fss2_b fss2_c fss2_d fss3_a fss3_b fss3_c fss3_d fss4_a fss4_b fss4_c fss4_d fss5_a fss5_b fss5_c fss5_d"},
-        {"dat_ekf_data",     (uint16_t) (sizeof(ekf_data_t)),     dat_drp_idx_ekf,  dat_drp_ack_ekf,  "%u %u %f %f %f %f %f %f %d %d %d %d %f %f %f", "sat_index timestamp gyro_x gyro_y gyro_z mag_x mag_y mag_z q0 q1 q2 q3 gyro_x_ekf gyro_y_ekf gyro_z_ekf"},
-        {"dat_msg_data",      (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str,  dat_drp_ack_str,  "%u %u %s",                         "sat_index timestamp string_data"}
+         "%u %u %f %f %f %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h %h",
+         "sat_index timestamp acc_x acc_y acc_z fss1_a fss1_b fss1_c fss1_d fss2_a fss2_b fss2_c fss2_d fss3_a fss3_b fss3_c fss3_d fss4_a fss4_b fss4_c fss4_d fss5_a fss5_b fss5_c fss5_d"},
+        {"dat_ekf_data",     (uint16_t) (sizeof(ekf_data_t)),     dat_drp_idx_ekf,  dat_drp_ack_ekf,
+         "%u %u %f %f %f %f %f %f %f %f %f %f",
+         "sat_index timestamp gyro_x gyro_y gyro_z mag_x mag_y mag_z q0 q1 q2 q3"},
+        {"dat_ctrl_data", (uint16_t) (sizeof(ctrl_data_t)), dat_drp_idx_ctrl, dat_drp_ack_ctrl, "%u %u %f %f %f %f %f %f",
+         "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x, ctrl_hw_y, ctrl_hw_z"},
+         {"dat_msg_data",      (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str,  dat_drp_ack_str,  "%u %u %s",                         "sat_index timestamp string_data"}
 };
 
 /** The repository's name */

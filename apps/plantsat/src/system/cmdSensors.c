@@ -148,7 +148,6 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
                            hmc_reading.x, hmc_reading.y, hmc_reading.z,
                            sun2, sun3, sun4};
     int ret = dat_add_payload_sample(&data_ads, ads_sensors);
-
     LOGI(tag, "Saving payload %d: ADS (%d). Index: %d, time %d, gyro_x: %.04f, gyro_y: %.04f, gyro_z: %.04f, mag_x: %.04f, mag_y: %.04f, mag_z: %.04f, sun2: %d, sun3, %d, sun4: %d",
          ads_sensors, ret, index_ads, curr_time, gyro_reading.gyro_x, gyro_reading.gyro_y, gyro_reading.gyro_z,
          hmc_reading.x, hmc_reading.y, hmc_reading.z,
@@ -333,7 +332,7 @@ int sensors_get_temperatures(char *fmt, char *params, int nparams)
 
     /** UPPER INTER STAGE TEMPERATURES */
     LOGD(tag, "IS2 Temperatures");
-    int16_t is2_int_temp1, is2_int_temp2, is2_int_temp3, is2_int_temp4, is2_ext_temp1, is2_ext_temp2, is2_ext_temp3, is2_ext_temp4 = 0;
+    //int16_t is2_int_temp1, is2_int_temp2, is2_int_temp3, is2_int_temp4, is2_ext_temp1, is2_ext_temp2, is2_ext_temp3, is2_ext_temp4 = 0;
     //TODO: READ UPPER INTER STAGE PANELS TEMPERATURES
 
     /* Save temperature data */
@@ -343,14 +342,14 @@ int sensors_get_temperatures(char *fmt, char *params, int nparams)
             index_temp, curr_time,
             tobc1, tobc3, tobc3,
             hk.temp[0], hk.temp[1], hk.temp[2], hk.temp[3], hk.temp[4], hk.temp[5],
-            gtemp1, gtemp2, gtemp3, gtemp4, stemp1, stemp2, stemp3, stemp4,
-            is2_int_temp1, is2_int_temp2, is2_int_temp3, is2_int_temp4, is2_ext_temp1, is2_ext_temp2, is2_ext_temp3, is2_ext_temp4
-    };
+            gtemp1, gtemp2, gtemp3, gtemp4, stemp1, stemp2, stemp3, stemp4};
+            //is2_int_temp1, is2_int_temp2, is2_int_temp3, is2_int_temp4, is2_ext_temp1, is2_ext_temp2, is2_ext_temp3, is2_ext_temp4
+
     LOGD(tag, "Save Temperatures");
     rc = dat_add_payload_sample(&data_temp, temp_sensors);
 
-    LOGI(tag, "Saving payload %d: TEMP (%d). Index: %d, time %d, tobc1: %d, teps1: %d, istage1: %d, panel1: %d, istage1: %d, istageext1: %d",
-         temp_sensors, rc, index_temp, curr_time, tobc1, hk.temp[0], gtemp1, stemp1, is2_int_temp1, is2_ext_temp1);
+    LOGI(tag, "Saving payload %d: TEMP (%d). Index: %d, time %d, tobc1: %d, teps1: %d, istage1: %d, panel1: %d",
+         temp_sensors, rc, index_temp, curr_time, tobc1, hk.temp[0], gtemp1, stemp1);
     return rc != 0 ? CMD_ERROR : CMD_OK;
 }
 

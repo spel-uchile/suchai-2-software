@@ -244,7 +244,7 @@ void initAppHook(void *params)
     if(t_ok != 0) LOGE(tag, "Task sensors not created!");
 #endif
 #if SCH_ADCS_ENABLED
-    t_ok = osCreateTask(taskADCS,"adcs", 2*SCH_TASK_DEF_STACK, NULL, 2, NULL);
+    t_ok = osCreateTask(taskADCS,"adcs", 3*SCH_TASK_DEF_STACK, NULL, 2, NULL);
     if(t_ok != 0) LOGE(tag, "Task ADCS not created!");
 #endif
 
