@@ -25,7 +25,7 @@
 #endif
 
 static const char *tag = "cmdAX100";
-static char trx_node = SCH_TRX_ADDRESS;
+static char trx_node = 29; //GS100 default 29
 
 static int sat_freqs[3] = {437230000, 437250000, 437240000};  // SCH2, SCH3, PS
 
