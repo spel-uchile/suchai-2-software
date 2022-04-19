@@ -82,12 +82,12 @@ typedef enum dat_status_address_enum {
     dat_ads_bias_x,
     dat_ads_bias_y,
     dat_ads_bias_z,
-    dat_ads_ekf_omega_x,              ///< Gyroscope acceleration value along the x axis
-    dat_ads_ekf_omega_y,              ///< Gyroscope acceleration value along the y axis
-    dat_ads_ekf_omega_z,              ///< Gyroscope acceleration value along the z axis
-    dat_ads_ekf_bias_x,              ///< bias Gyroscope acceleration value along the x axis
-    dat_ads_ekf_bias_y,              ///< bias Gyroscope acceleration value along the y axis
-    dat_ads_ekf_bias_z,              ///< bias Gyroscope acceleration value along the z axis
+//    dat_ads_ekf_omega_x,              ///< Gyroscope acceleration value along the x axis
+//    dat_ads_ekf_omega_y,              ///< Gyroscope acceleration value along the y axis
+//    dat_ads_ekf_omega_z,              ///< Gyroscope acceleration value along the z axis
+//    dat_ads_ekf_bias_x,              ///< bias Gyroscope acceleration value along the x axis
+//    dat_ads_ekf_bias_y,              ///< bias Gyroscope acceleration value along the y axis
+//    dat_ads_ekf_bias_z,              ///< bias Gyroscope acceleration value along the z axis
     dat_tgt_omega_x,              ///< Target acceleration value along the x axis
     dat_tgt_omega_y,              ///< Target acceleration value along the y axis
     dat_tgt_omega_z,              ///< Target acceleration value along the z axis
@@ -106,44 +106,44 @@ typedef enum dat_status_address_enum {
     dat_ads_q1,                   ///< Attitude quaternion (Inertial to body)
     dat_ads_q2,                   ///< Attitude quaternion (Inertial to body)
     dat_ads_q3,                   ///< Attitude quaternion (Inertial to body)
-    dat_ads_ekf_q0,                   ///< Attitude quaternion (Inertial to body)
-    dat_ads_ekf_q1,                   ///< Attitude quaternion (Inertial to body)
-    dat_ads_ekf_q2,                   ///< Attitude quaternion (Inertial to body)
-    dat_ads_ekf_q3,                   ///< Attitude quaternion (Inertial to body)
+//    dat_ads_ekf_q0,                   ///< Attitude quaternion (Inertial to body)
+//    dat_ads_ekf_q1,                   ///< Attitude quaternion (Inertial to body)
+//    dat_ads_ekf_q2,                   ///< Attitude quaternion (Inertial to body)
+//    dat_ads_ekf_q3,                   ///< Attitude quaternion (Inertial to body)
     dat_tgt_q0,                   ///< Target quaternion (Inertial to body)
     dat_tgt_q1,                   ///< Target quaternion (Inertial to body)
     dat_tgt_q2,                   ///< Target quaternion (Inertial to body)
     dat_tgt_q3,                   ///< Target quaternion (Inertial to body)
-    //dat_css_1,                ///< Coarse sun sensor value
-    dat_css_2,                ///< Coarse sun sensor value
-    dat_css_3,                ///< Coarse sun sensor value
-    dat_css_4,                ///< Coarse sun sensor value
-    //dat_css_5,                ///< Coarse sun sensor value
-    dat_sun_vec_b_x,
-    dat_sun_vec_b_y,
-    dat_sun_vec_b_z,
-    dat_calc_attitude,
-    dat_activate_ekf,
-    dat_activate_ctrl,
-    dat_time_to_attitude,
-    dat_inertia_xx,         ///< Inertia matrix xx
-    dat_inertia_yy,         ///< Inertia matrix yy
-    dat_inertia_zz,         ///< Inertia matrix zz
-    dat_inertia_xy,         ///< Inertia matrix xy
-    dat_inertia_xz,         ///< Inertia matrix xz
-    dat_inertia_yz,         ///< Inertia matrix yz
-    dat_inv_inertia_xx,         ///< Inertia matrix xx
-    dat_inv_inertia_yy,         ///< Inertia matrix yy
-    dat_inv_inertia_zz,         ///< Inertia matrix zz
-    dat_inv_inertia_xy,         ///< Inertia matrix xy
-    dat_inv_inertia_xz,         ///< Inertia matrix xz
-    dat_inv_inertia_yz,         ///< Inertia matrix yz
-    dat_inertia_rw,
-    dat_time_delay_gyro,
-    dat_time_delay_quat,
-    dat_mtq_x_axis,
-    dat_mtq_y_axis,
-    dat_mtq_z_axis,
+//    //dat_css_1,                ///< Coarse sun sensor value
+//    dat_css_2,                ///< Coarse sun sensor value
+//    dat_css_3,                ///< Coarse sun sensor value
+//    dat_css_4,                ///< Coarse sun sensor value
+//    //dat_css_5,                ///< Coarse sun sensor value
+//    dat_sun_vec_b_x,
+//    dat_sun_vec_b_y,
+//    dat_sun_vec_b_z,
+//    dat_calc_attitude,
+//    dat_activate_ekf,
+//    dat_activate_ctrl,
+//    dat_time_to_attitude,
+//    dat_inertia_xx,         ///< Inertia matrix xx
+//    dat_inertia_yy,         ///< Inertia matrix yy
+//    dat_inertia_zz,         ///< Inertia matrix zz
+//    dat_inertia_xy,         ///< Inertia matrix xy
+//    dat_inertia_xz,         ///< Inertia matrix xz
+//    dat_inertia_yz,         ///< Inertia matrix yz
+//    dat_inv_inertia_xx,         ///< Inertia matrix xx
+//    dat_inv_inertia_yy,         ///< Inertia matrix yy
+//    dat_inv_inertia_zz,         ///< Inertia matrix zz
+//    dat_inv_inertia_xy,         ///< Inertia matrix xy
+//    dat_inv_inertia_xz,         ///< Inertia matrix xz
+//    dat_inv_inertia_yz,         ///< Inertia matrix yz
+//    dat_inertia_rw,
+//    dat_time_delay_gyro,
+//    dat_time_delay_quat,
+//    dat_mtq_x_axis,
+//    dat_mtq_y_axis,
+//    dat_mtq_z_axis,
 
     /// EPS: Energy power system
     dat_eps_vbatt,                ///< Voltage of the battery [mV]
@@ -899,7 +899,7 @@ static data_map_t data_map[last_sensor] = {
         {"dat_ekf_data_2",     (uint16_t) (sizeof(ekf_data_t)),     dat_drp_idx_ekf_2,  dat_drp_ack_ekf_2,  "%u %u %f %f %f %f %f %f %f %f %f %f",
                 "sat_index timestamp gyro_x gyro_y gyro_z mag_x mag_y mag_z q0 q1 q2 q3"},
         {"dat_ctrl_data_2", (uint16_t) (sizeof(ctrl_data_t)), dat_drp_idx_ctrl_2, dat_drp_ack_ctrl_2, "%u %u %f %f %f %f %f %f",
-                "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x, ctrl_hw_y, ctrl_hw_z"},
+                "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x ctrl_hw_y ctrl_hw_z"},
         {"dat_msg_data_2",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str_2, dat_drp_ack_str_2,   "%u %u %s",                "sat_index timestamp string_data"},
         {"dat_temp_data_3",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp_3, dat_drp_ack_temp_3, temp_var_types, temp_var_string},
         {"dat_ads_data_3",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads_3,  dat_drp_ack_ads_3,  "%u %u %f %f %f %f %f %f %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3"},
@@ -913,7 +913,7 @@ static data_map_t data_map[last_sensor] = {
         {"dat_ekf_data_3",     (uint16_t) (sizeof(ekf_data_t)),     dat_drp_idx_ekf_3,  dat_drp_ack_ekf_3,  "%u %u %f %f %f %f %f %f %f %f %f %f",
                 "sat_index timestamp gyro_x gyro_y gyro_z mag_x mag_y mag_z q0 q1 q2 q3"},
         {"dat_ctrl_data_3", (uint16_t) (sizeof(ctrl_data_t)), dat_drp_idx_ctrl_3, dat_drp_ack_ctrl_3, "%u %u %f %f %f %f %f %f",
-                "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x, ctrl_hw_y, ctrl_hw_z"},
+                "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x ctrl_hw_y ctrl_hw_z"},
         {"dat_msg_data_3",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str_3, dat_drp_ack_str_3,   "%u %u %s",                "sat_index timestamp string_data"},
         {"dat_temp_data_P",    (uint16_t) (sizeof(temp_data_t)),   dat_drp_idx_temp_P, dat_drp_ack_temp_P, temp_var_types, temp_var_string},
         {"dat_ads_data_P",     (uint16_t) (sizeof(ads_data_t)),    dat_drp_idx_ads_P,  dat_drp_ack_ads_P,  "%u %u %f %f %f %f %f %f %d %d %d", "sat_index timestamp acc_x acc_y acc_z mag_x mag_y mag_z sun1 sun2 sun3"},
@@ -927,7 +927,7 @@ static data_map_t data_map[last_sensor] = {
         {"dat_ekf_data_P",     (uint16_t) (sizeof(ekf_data_t)),     dat_drp_idx_ekf_P,  dat_drp_ack_ekf_P,  "%u %u %f %f %f %f %f %f %f %f %f %f",
                 "sat_index timestamp gyro_x gyro_y gyro_z mag_x mag_y mag_z q0 q1 q2 q3"},
         {"dat_ctrl_data_P", (uint16_t) (sizeof(ctrl_data_t)), dat_drp_idx_ctrl_P, dat_drp_ack_ctrl_P, "%u %u %f %f %f %f %f %f",
-                "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x, ctrl_hw_y, ctrl_hw_z"},
+                "sat_index timestamp ctrl_x ctrl_y ctrl_z ctrl_hw_x ctrl_hw_y ctrl_hw_z"},
         {"dat_msg_data_P",     (uint16_t) (sizeof(string_data_t)), dat_drp_idx_str_P, dat_drp_ack_str_P,   "%u %u %s",                "sat_index timestamp string_data"},
         ///< STT data
         {"stt_temp_data_2",    (uint16_t) (sizeof(stt_temp_data_t)),     stt_dat_drp_idx_temp_2,     stt_dat_drp_ack_temp_2,         "%u %u %f",             "sat_index timestamp obc_temp_1"},
