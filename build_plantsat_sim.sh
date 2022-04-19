@@ -17,5 +17,8 @@ OPTIONS="-DAPP=plantsat
 -DSCH_TX_FREQ=437230000
 -DSCH_TRX_PORT_APP=16"
 
+cd apps/plantsat/src/drivers
+[ ! -d "suchai-drivers-bus" ] && sh install.sh
+cd -
 rm -rf build-suchai-sim
 cmake -B build-suchai-sim -G Ninja $OPTIONS && cmake --build build-suchai-sim -j4
