@@ -116,11 +116,12 @@ int sensors_init(char *fmt, char *params, int nparams)
 
 int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
 {
+    int curr_time = dat_get_time();
+#ifdef NANOMIND
     gs_mpu3300_gyro_t gyro_reading;
     gs_hmc5843_data_t hmc_reading;
     int rc1 = gs_mpu3300_read_gyro(&gyro_reading);
     int rc2 = gs_hmc5843_read_single(&hmc_reading);
-    int curr_time = dat_get_time();
     if(rc1 != 0 || rc2 != 0)
     {
         LOGE(tag, "Error reading adcs sensors (%d, %d)", rc1, rc2);
@@ -129,8 +130,25 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
 
     gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
     gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB2);
+#else
+    typedef struct {
+        float gyro_x;
+        float gyro_y;
+        float gyro_z;
+    } gs_mpu3300_gyro_t;
+
+    typedef struct {
+        float x; //!< X (milli Gauss)
+        float y; //!< Y (milli Gauss)
+        float z; //!< Z (milli Gauss)
+    } gs_hmc5843_data_t;
+
+    gs_mpu3300_gyro_t gyro_reading = {0.1F, 0.2F, 0.3F};
+    gs_hmc5843_data_t hmc_reading = {0.01F, 0.02F, 0.03F};
+#endif
 
     uint16_t sun1, sun2, sun3, sun4 = 0;
+#ifdef NANOMIND
     //int rc3 = gs_gssb_istage_get_sun_voltage(0x10, 500, &sun1);
     int rc4 = gs_gssb_istage_get_sun_voltage(0x11, 500, &sun2);
     int rc5 = gs_gssb_istage_get_sun_voltage(0x12, 500, &sun3);
@@ -140,6 +158,7 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
         LOGE(tag, "Error reading coarse sun sensors (%d, %d, %d)", rc4, rc5, rc6);
         //return CMD_ERROR;
     }
+#endif
 
     /* Save ADCS data */
     int index_ads = dat_get_system_var(data_map[ads_sensors].sys_index);
@@ -158,9 +177,21 @@ int sensors_get_adcs_basic(char *fmt, char *params, int nparams)
 
 int sensors_get_adcs_fss(char *fmt, char *params, int nparams)
 {
-    gs_mpu3300_gyro_t gyro_reading;
-    int rc1 = gs_mpu3300_read_gyro(&gyro_reading);
+    int rc1 = 0;
     int curr_time = dat_get_time();
+#ifdef NANOMIND
+    gs_mpu3300_gyro_t gyro_reading;
+    rc1 = gs_mpu3300_read_gyro(&gyro_reading);
+#else
+    typedef struct {
+        float gyro_x;
+        float gyro_y;
+        float gyro_z;
+    } gs_mpu3300_gyro_t;
+
+    gs_mpu3300_gyro_t gyro_reading = {0.1F, 0.2F, 0.3F};
+#endif
+
     // FSS
     uint16_t sun_fss1[4] = {0,0,0,0};
     uint16_t sun_fss2[4] = {0,0,0,0};
@@ -174,6 +205,7 @@ int sensors_get_adcs_fss(char *fmt, char *params, int nparams)
         return CMD_ERROR;
     }
 
+#ifdef NANOMIND
     gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
     gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB2);
 
@@ -211,6 +243,7 @@ int sensors_get_adcs_fss(char *fmt, char *params, int nparams)
         int rf5 = gs_gssb_sun_read_sensor_samples(0x24, timei2c, sun_fss5);
         osDelay(200);
     }
+#endif
 
     /* Save ADCS data */
     int index_ads = dat_get_system_var(data_map[fss_sensors].sys_index);
@@ -246,9 +279,12 @@ int sensors_get_adcs_full(char *fmt, char *params, int nparams)
 
 int sensors_get_eps(char *fmt, char *params, int nparams)
 {
-    eps_hk_t hk = {};
-    int rc = eps_hk_get(&hk);
+    int rc = 0;
+    eps_hk_t hk = {0};
+#ifdef NANOMIND
+    rc = eps_hk_get(&hk);
     if(rc == 0) return CMD_ERROR;
+#endif
 
     int32_t curr_time = dat_get_time();
     uint32_t cursun = hk.cursun;
@@ -277,9 +313,11 @@ int sensors_get_temperatures(char *fmt, char *params, int nparams)
 
     /* Read board temperature sensors */
     LOGD(tag, "OBC Temperatures");
+#ifdef NANOMIND
     rc += gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_0, 100, &tobc1); //sensor1 = lm70_read_temp(1);
     rc += gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_1, 100, &tobc2); //sensor2 = lm70_read_temp(2);
     rc += gs_mpu3300_read_temp(&tgyro);
+#endif
     tobc3 = (uint16_t)tgyro;
     if(rc != 0)
     {
@@ -290,23 +328,29 @@ int sensors_get_temperatures(char *fmt, char *params, int nparams)
     /** EPS TEMPERATURES */
     LOGD(tag, "EPS Temperatures");
     eps_hk_t hk = {0};
+#ifdef NANOMIND
     rc = eps_hk_get(&hk);
     if(rc == 0)
     {
         LOGE(tag, "Error reading eps temperatures");
         return CMD_ERROR;
     }
+#endif
 
+#ifdef NANOMIND
     gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
     gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB2);
+#endif
 
     /** GSSB TEMPERATURES */
     LOGD(tag, "GSSB Temperatures");
     int16_t gtemp1, gtemp2, gtemp3, gtemp4 = 0;
+#ifdef NANOMIND
     rc = gs_gssb_istage_get_internal_temp(0x10, 500, &gtemp1);
     rc += gs_gssb_istage_get_internal_temp(0x11, 500, &gtemp2);
     rc += gs_gssb_istage_get_internal_temp(0x12, 500, &gtemp3);
     rc += gs_gssb_istage_get_internal_temp(0x13, 500, &gtemp4);
+#endif
     if(rc != 0)
     {
         LOGW(tag, "Error reading GSSB temperatures (%d)", rc);
@@ -316,10 +360,12 @@ int sensors_get_temperatures(char *fmt, char *params, int nparams)
     /** SOLAR PANELS TEMPERATURES */
     LOGD(tag, "SP Temperatures");
     float stempf1, stempf2, stempf3, stempf4 = 0;
+#ifdef NANOMIND
     rc = gs_gssb_istage_get_temp(0x10, 500, &stempf1);
     rc += gs_gssb_istage_get_temp(0x11, 500, &stempf2);
     rc += gs_gssb_istage_get_temp(0x12, 500, &stempf3);
     rc += gs_gssb_istage_get_temp(0x13, 500, &stempf4);
+#endif
     if(rc != 0)
     {
         LOGW(tag, "Error reading SOLAR PANELS temperatures (%d)", rc);

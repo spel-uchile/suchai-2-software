@@ -12,6 +12,7 @@
 //SPEL
 #include "TLE.h"
 
+#ifdef NANOMIND
 // MCU Drivers
 #include <board.h>
 #include <wdt.h>
@@ -42,6 +43,8 @@
 #include <gs/embed/asf/drivers/spi/master.h>
 #include <gs/embed/asf/drivers/i2c/i2c.h>
 #include <gs/embed/asf/avr32/drivers/sys/avr32_reset_all_interrupt_settings.h>
+#endif
+
 // Util
 #include <gs/util/rtc.h>
 #include <gs/util/time.h>

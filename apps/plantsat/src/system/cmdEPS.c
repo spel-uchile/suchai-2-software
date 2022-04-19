@@ -29,8 +29,10 @@ static const char *tag = "cmdEPS";
 void cmd_eps_init(void)
 {
     //EPS io driver requires some initialization
+#ifdef NANOMIND
     eps_set_node(SCH_EPS_ADDRESS);
     eps_set_timeout(1000);
+#endif
 
     // Register commands
     cmd_add("eps_set_node", eps_node_set, "%d", 1);
@@ -53,32 +55,39 @@ int eps_node_set(char *fmt, char *params, int nparams)
         LOGE(tag, "Error parsing parameters!");
         return CMD_SYNTAX_ERROR;
     }
-
+#ifdef NANOMIND
     eps_set_node(node);
+#endif
     return CMD_OK;
 }
 
 int eps_hard_reset(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     if(eps_hardreset() > 0)
         return CMD_OK;
-
+#endif
     LOGE(tag, "Unable to reset the EPS!");
     return CMD_ERROR;
 }
 
 int eps_get_hk(char *fmt, char *params, int nparams)
 {
-    eps_hk_t hk = {};
-    int rc = eps_hk_get(&hk);
+    eps_hk_t hk = {0};
+    int rc = 0;
+#ifdef NANOMIND
+    rc = eps_hk_get(&hk);
     if(rc == 0) return CMD_ERROR;
 
     eps_hk_print(&hk);
+#endif
+
     return CMD_OK;
 }
 
 int eps_get_config(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     eps_config_t nanopower_config;
 
     if(eps_config_get(&nanopower_config) > 0)
@@ -89,6 +98,7 @@ int eps_get_config(char *fmt, char *params, int nparams)
     {
         return CMD_ERROR;
     }
+#endif
     return CMD_OK;
 }
 
@@ -106,7 +116,9 @@ int eps_set_heater(char *fmt, char *params, int nparams)
     if(sscanf(params, fmt, &heater, &on_off) == nparams)
     {
         LOGI(tag, "Setting heater %d to state %d", heater, on_off);
+#ifdef NANOMIND
         eps_heater((uint8_t) heater, (uint8_t) on_off, state);
+#endif
         LOGI(tag, "Heater state is %u %u",(unsigned int) state[0],(unsigned int) state[1]);
         return CMD_OK;
     }
@@ -132,7 +144,10 @@ int eps_set_output(char *fmt, char *params, int nparams)
     }
     mode = mode == 0 ? 0 : 1; // Mode is 0 -> OFF or > 0 = 1 -> ON
 
-    int rc = eps_output_set_single((uint8_t)channel, (uint8_t)mode, 0);
+    int rc = 0;
+#ifdef NANOMIND
+    rc = eps_output_set_single((uint8_t)channel, (uint8_t)mode, 0);
+#endif
     if(rc > 0)
         return CMD_OK;
     else
@@ -153,7 +168,10 @@ int eps_set_output_all(char *fmt, char *params, int nparams)
     mode = mode == 0 ? 0 : 1; // Mode is 0 -> OFF or > 0 = 1 -> ON
     mask = mode ? 0xFF : 0x00; // Mode 1 -> All outputs on, else all outputs off
 
-    int rc = eps_output_set(mask);
+    int rc = 0;
+#ifdef NANOMIND
+    eps_output_set(mask);
+#endif
     if(rc > 0)
         return CMD_OK;
     else
@@ -169,7 +187,10 @@ int eps_set_vboost(char *fmt, char *params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    int rc = eps_vboost_set(vboost, vboost, vboost);
+    int rc = 0;
+#ifdef NANOMIND
+    rc = eps_vboost_set(vboost, vboost, vboost);
+#endif
     return rc > 0 ? CMD_OK : CMD_ERROR;
 }
 
@@ -182,20 +203,30 @@ int eps_set_pptmode(char *fmt, char *params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    int rc = eps_pptmode_set((char)pptmode);
+    int rc = 0;
+#ifdef NANOMIND
+    rc = eps_pptmode_set((char)pptmode);
+#endif
     return rc > 0 ? CMD_OK : CMD_ERROR;
 }
 
 int eps_reset_wdt(char *fmt, char *params, int nparams)
 {
-    int rc = eps_wdt_gnd_reset();
+    int rc = 0;
+#ifdef NANOMIND
+    rc = eps_wdt_gnd_reset();
+#endif
     return rc > 0 ? CMD_OK : CMD_ERROR;
 }
 
 int eps_update_status_vars(char *fmt, char *params, int nparams)
 {
-    eps_hk_t hk = {};
-    if(eps_hk_get(&hk) > 0)
+    int rc = 0;
+    eps_hk_t hk = {0};
+#ifdef NANOMIND
+    rc = eps_hk_get(&hk);
+#endif
+    if(rc > 0)
     {
         dat_set_system_var(dat_eps_vbatt, hk.vbatt);
         dat_set_system_var(dat_eps_cur_sun, hk.cursun);

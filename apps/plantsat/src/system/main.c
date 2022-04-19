@@ -48,6 +48,7 @@ int init_setup_libcsp_2(void)
      * Set interfaces and routes
      *  Platform dependent
      */
+#ifdef NANOMIND
     /* Init csp i2c interface with address 1 and 400 kHz clock */
     LOGI(tag, "csp_i2c_init...");
     sch_a3200_init_twi0(GS_AVR_I2C_MULTIMASTER, SCH_COMM_NODE, 400000);
@@ -62,6 +63,9 @@ int init_setup_libcsp_2(void)
      */
     csp_rtable_set(8, 2, &csp_if_i2c, SCH_TRX_ADDRESS); // Traffic to GND (8-15) via I2C node TRX
     csp_route_set(CSP_DEFAULT_ROUTE, &csp_if_i2c, CSP_NODE_MAC); // All traffic to I2C using node as i2c address
+#else
+    csp_add_zmq_iface(SCH_COMM_NODE);
+#endif
 
     LOGI(tag, "Route table");
     csp_route_print_table();

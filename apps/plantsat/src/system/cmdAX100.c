@@ -131,14 +131,18 @@ int com_get_config(char *fmt, char *params, int nparams)
 
         // Actually get the parameter value
         void *out = malloc(param_i->size);
+#ifdef NANOMIND
         rc = rparam_get_single(out, param_i->addr, param_i->type, param_i->size,
                 table, trx_node, AX100_PORT_RPARAM, 1000);
+#endif
 
         // Process the answer
         if(rc > 0)
         {
             char param_str[SCH_CMD_MAX_STR_PARAMS];
+#ifdef NANOMIND
             param_to_string(param_i, param_str, 0, out, 1, SCH_CMD_MAX_STR_PARAMS) ;
+#endif
             LOGR(tag, "Param %s (table %d): %s", param_i->name, table, param_str);
             free(out);
             return CMD_OK;
@@ -194,15 +198,19 @@ int com_set_config(char *fmt, char *params, int nparams)
 
         // Actually get the parameter value
         void *out = malloc(param_i->size);
+#ifdef NANOMIND
         param_from_string(param_i, value, out);
         rc = rparam_set_single(out, param_i->addr, param_i->type, param_i->size,
                                table, trx_node, AX100_PORT_RPARAM, 1000);
+#endif
 
         // Process the answer
         if(rc > 0)
         {
             char param_str[SCH_CMD_MAX_STR_PARAMS];
+#ifdef NANOMIND
             param_to_string(param_i, param_str, 0, out, 1, SCH_CMD_MAX_STR_PARAMS);
+#endif
             LOGR(tag, "Param %s (table %d) set to: %s", param_i->name, table, param_str);
             free(out);
             return CMD_OK;

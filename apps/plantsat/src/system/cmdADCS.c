@@ -425,8 +425,10 @@ int mtt_set_pwm_duty(char* fmt, char* params, int nparams)
     }
 
     LOGR(tag, "Setting duty %d to Channel %d", duty, channel);
+#ifdef NANOMIND
     gs_a3200_pwm_enable(channel);
     gs_a3200_pwm_set_duty(channel, duty);
+#endif
     return CMD_OK;
 }
 
@@ -445,7 +447,10 @@ int mtt_set_pwm_freq(char* fmt, char* params, int nparams)
         return CMD_SYNTAX_ERROR;
     }
 
-    float actual_freq = gs_a3200_pwm_set_freq(channel, freq);
+    float actual_freq = 0.0F;
+#ifdef NANOMIND
+    actual_freq = gs_a3200_pwm_set_freq(channel, freq);
+#endif
     LOGR(tag, "PWM %d Freq set to: %.4f", channel, actual_freq);
     return CMD_OK;
 }
@@ -458,10 +463,12 @@ int mtt_set_pwm_pwr(char *fmt, char *params, int nparams)
 
     /* Turn on/off power channel */
     LOGR(tag, "PWM enabled: %d", enable>0 ? 1:0);
-    if(enable > 0)
+#ifdef NANOMIND
+        if(enable > 0)
         gs_a3200_pwr_switch_enable(GS_A3200_PWR_PWM);
     else
         gs_a3200_pwr_switch_disable(GS_A3200_PWR_PWM);
+#endif
     return CMD_OK;
 }
 
@@ -921,8 +928,10 @@ int adcs_mag_moment(char* fmt, char* params, int nparams)
 
     //Enable MTQ's through PWM commands
     //Check when the power on cmd should be call
+#ifdef NANOMIND
     gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
     gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB2);
+#endif
     osDelay(20);
     cmd_t *cmd_set_on_mtt = cmd_get_str("mtt_set_pwr");
     cmd_add_params_var(cmd_set_on_mtt, 1);

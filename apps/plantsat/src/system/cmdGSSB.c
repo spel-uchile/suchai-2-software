@@ -70,6 +70,7 @@ int gssb_pwr(char *fmt, char *params, int nparams)
     if(sscanf(params, fmt, &vcc_on, &vcc2_on) != nparams)
         return CMD_ERROR_SYNTAX;
 
+#ifdef NANOMIND
     if (vcc_on > 0)
         gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB);
     else
@@ -79,7 +80,7 @@ int gssb_pwr(char *fmt, char *params, int nparams)
         gs_a3200_pwr_switch_enable(GS_A3200_PWR_GSSB2);
     else
         gs_a3200_pwr_switch_disable(GS_A3200_PWR_GSSB2);
-
+#endif
     osDelay(100);
 
     LOGR(tag, "Set GSSB switch state to: %d %d", vcc_on, vcc2_on);
@@ -123,7 +124,9 @@ int gssb_bus_scan(char *fmt, char *params, int nparams)
     if(start < 0 || start > 128 || end < start || end > 128)
         return CMD_ERROR_SYNTAX;
 
+#ifdef NANOMIND
     gs_gssb_bus_scan((uint8_t)start, (uint8_t)end, 100, devices);
+#endif
 
     for (addr = (uint8_t)start; addr < (uint8_t)end; addr++) {
         if (devices[addr] == GS_OK) {
@@ -139,6 +142,7 @@ int gssb_read_sunsensor(char *fmt, char *params, int nparams)
     uint16_t sun[4];
     int i;
 
+#ifdef NANOMIND
     /* Start sampling */
     if (gs_gssb_sun_sample_sensor(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
@@ -147,6 +151,7 @@ int gssb_read_sunsensor(char *fmt, char *params, int nparams)
     osDelay(30);
     if (gs_gssb_sun_read_sensor_samples(i2c_addr, i2c_timeout_ms, sun) != GS_OK)
         return CMD_ERROR_FAIL;
+#endif
 
     for (i = 0; i < 4; i++) {
         LOGR(tag, "GSSB %d sun sensor %d: %d", i2c_addr, i, sun[i]);
@@ -157,8 +162,9 @@ int gssb_read_sunsensor(char *fmt, char *params, int nparams)
 
 int gssb_get_temp(char *fmt, char *params, int nparams)
 {
-    float temp;
+    float temp = 0.0;
 
+#ifdef NANOMIND
     /* Command ADC to sample temp */
     if (gs_gssb_sun_sample_temp(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
@@ -167,7 +173,7 @@ int gssb_get_temp(char *fmt, char *params, int nparams)
     osDelay(20);
     if (gs_gssb_sun_get_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     LOGR(tag, "GSSB %d temp: %.4f °C", i2c_addr, temp);
 
     return CMD_ERROR_NONE;
@@ -182,8 +188,10 @@ int gssb_sunsensor_conf(char *fmt, char *params, int nparams)
 
     //conf = atoi(ctx->argv[1]);
     if(sscanf(params, fmt, &conf) == nparams) {
+#ifdef NANOMIND
         if (gs_gssb_sun_sensor_conf(i2c_addr, i2c_timeout_ms, (uint16_t)conf) != GS_OK)
             return CMD_ERROR_FAIL;
+#endif
         return CMD_ERROR_NONE;
     }
     return  CMD_ERROR_SYNTAX;
@@ -191,8 +199,10 @@ int gssb_sunsensor_conf(char *fmt, char *params, int nparams)
 
 int gssb_sunsensor_conf_save(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     if (gs_gssb_sun_sensor_conf_save(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
+#endif
 
     return CMD_ERROR_NONE;
 }
@@ -211,12 +221,14 @@ int gssb_set_i2c_addr(char *fmt, char *params, int nparams)
 
     // Set new i2c address
     LOGR(tag, "Setting address to %#X...", (uint8_t)new_i2c_addr);
+#ifdef NANOMIND
     gs_gssb_set_i2c_addr(i2c_addr, i2c_timeout_ms, (uint8_t)new_i2c_addr);
 
     // Check if the new i2c address works
     if (gs_gssb_get_uuid(new_i2c_addr, i2c_timeout_ms, &uuid) != GS_OK) {
         return CMD_ERROR_FAIL;
     }
+#endif
     LOGD(tag, "Changed address from %hhu to %hhu\ron dev: %" PRIu32 "\rWorking address is %hhu\r", i2c_addr,
             new_i2c_addr, uuid, new_i2c_addr);
     i2c_addr = new_i2c_addr;
@@ -226,10 +238,10 @@ int gssb_set_i2c_addr(char *fmt, char *params, int nparams)
 
 int gssb_commit_i2c_addr(char *fmt, char *params, int nparams)
 {
-
+#ifdef NANOMIND
     if (gs_gssb_commit_i2c_addr(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     return CMD_ERROR_NONE;
 }
 
@@ -237,10 +249,10 @@ int gssb_get_version(char *fmt, char *params, int nparams)
 {
 
     uint8_t rx_buff[20];
-
+#ifdef NANOMIND
     if (gs_gssb_get_version(i2c_addr, i2c_timeout_ms, rx_buff, 20) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     rx_buff[19] = '\0';
     LOGR(tag, "Git version: %s", (char *) rx_buff);
 
@@ -250,9 +262,10 @@ int gssb_get_version(char *fmt, char *params, int nparams)
 int gssb_get_uuid(char *fmt, char *params, int nparams)
 {
     uint32_t uuid;
-
+#ifdef NANOMIND
     if (gs_gssb_get_uuid(i2c_addr, i2c_timeout_ms, &uuid) != GS_OK)
         return CMD_ERROR_FAIL;
+#endif
     LOGR(tag, "Device UUID: %"PRIu32"", uuid);
 
     return CMD_ERROR_NONE;
@@ -260,10 +273,12 @@ int gssb_get_uuid(char *fmt, char *params, int nparams)
 
 int gssb_get_model(char *fmt, char *params, int nparams)
 {
-    gs_gssb_model_t model;
+    gs_gssb_model_t model = 0;
 
+#ifdef NANOMIND
     if (gs_gssb_get_model(i2c_addr, i2c_timeout_ms, &model) != GS_OK)
         return CMD_ERROR_FAIL;
+#endif
     switch(model){
         case GS_GSSB_MODEL_MSP:
             LOGR(tag, "Model: MSP");
@@ -288,11 +303,11 @@ int gssb_get_model(char *fmt, char *params, int nparams)
 
 int gssb_interstage_temp(char *fmt, char *params, int nparams)
 {
-    float temp;
-
+    float temp = 0.0F;
+#ifdef NANOMIND
     if (gs_gssb_istage_get_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     LOGR(tag, "Temp: %f", temp);
 
     return CMD_ERROR_NONE;
@@ -300,11 +315,11 @@ int gssb_interstage_temp(char *fmt, char *params, int nparams)
 
 int gssb_msp_outside_temp(char *fmt, char *params, int nparams)
 {
-    int16_t temp;
-
+    int16_t temp = 0;
+#ifdef NANOMIND
     if (gs_gssb_msp_get_outside_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     LOGR(tag, "Outside temp: %i", temp);
 
     return CMD_ERROR_NONE;
@@ -338,20 +353,21 @@ int gssb_msp_outside_temp_calibrate(char *fmt, char *params, int nparams)
         resistor = (uint16_t) (res / 10);
     }
 
+#ifdef NANOMIND
     if (gs_gssb_msp_calibrate_outside_temp(i2c_addr, i2c_timeout_ms, current, resistor) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     return CMD_ERROR_NONE;
 }
 
 
 int gssb_internal_temp(char *fmt, char *params, int nparams)
 {
-    int16_t temp;
-
+    int16_t temp = 0;
+#ifdef NANOMIND
     if (gs_gssb_istage_get_internal_temp(i2c_addr, i2c_timeout_ms, &temp) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     LOGR(tag, "Internal temp: %i", temp);
 
     return CMD_ERROR_NONE;
@@ -360,9 +376,10 @@ int gssb_internal_temp(char *fmt, char *params, int nparams)
 
 int gssb_interstage_burn(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     if (gs_gssb_istage_burn(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     LOGR(tag, "Istage burning...");
     return CMD_ERROR_NONE;
 }
@@ -370,11 +387,11 @@ int gssb_interstage_burn(char *fmt, char *params, int nparams)
 
 int gssb_common_sun_voltage(char *fmt, char *params, int nparams)
 {
-    uint16_t voltage;
-
+    uint16_t voltage = 0;
+#ifdef NANOMIND
     if (gs_gssb_istage_get_sun_voltage(i2c_addr, i2c_timeout_ms, &voltage) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     LOGR(tag, "Sun voltage: %i", voltage);
 
     return CMD_ERROR_NONE;
@@ -382,6 +399,7 @@ int gssb_common_sun_voltage(char *fmt, char *params, int nparams)
 
 int gssb_interstage_get_burn_settings(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     gs_gssb_istage_burn_settings_t settings;
 
     /* When the command is called with out arguments then print the settings */
@@ -409,13 +427,14 @@ int gssb_interstage_get_burn_settings(char *fmt, char *params, int nparams)
     }else {
         return CMD_ERROR_SYNTAX;
     }
-
+#endif
     return CMD_ERROR_NONE;
 }
 
 
 int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     gs_gssb_istage_burn_settings_t settings;
     int std_time, increment_ms, short_cnt_down, max_repeat, rep_time_s;
     int switch_polarity, reboot_deploy_cnt;
@@ -512,7 +531,7 @@ int gssb_interstage_set_burn_settings(char *fmt, char *params, int nparams)
     } else {
         return CMD_ERROR_SYNTAX;
     }
-
+#endif
     return CMD_ERROR_NONE;
 }
 
@@ -531,7 +550,7 @@ int gssb_interstage_arm(char *fmt, char *params, int nparams)
         data = 0x04;
     else
         data = 0x08;
-
+#ifdef NANOMIND
     if (gs_gssb_istage_settings_unlock(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
 
@@ -542,7 +561,7 @@ int gssb_interstage_arm(char *fmt, char *params, int nparams)
         LOGW(tag, " Warning could not lock settings after they was unlocked");
         return CMD_ERROR_FAIL;
     }
-
+#endif
     return CMD_ERROR_NONE;
 }
 
@@ -557,7 +576,7 @@ int gssb_interstage_state(char *fmt, char *params, int nparams)
     //armed_manual = atoi(ctx->argv[1]);
     if(sscanf(params, fmt, &armed_manual) != nparams)
         return CMD_ERROR_SYNTAX;
-
+#ifdef NANOMIND
     if (gs_gssb_istage_settings_unlock(i2c_addr, i2c_timeout_ms) != GS_OK) {
         LOGE(tag,"Error unlocking istage settings");
         return CMD_ERROR_FAIL;
@@ -572,7 +591,7 @@ int gssb_interstage_state(char *fmt, char *params, int nparams)
         LOGE(tag, "Warning could not lock settings after they was unlocked");
         return CMD_ERROR_FAIL;
     }
-
+#endif
     return CMD_ERROR_NONE;
 }
 
@@ -582,7 +601,7 @@ int gssb_interstage_settings_unlock(char *fmt, char *params, int nparams)
     int unlock;
     if (sscanf(params, fmt, &unlock) != nparams)
         return CMD_ERROR_SYNTAX;
-
+#ifdef NANOMIND
     if (unlock) {
         if (gs_gssb_istage_settings_unlock(i2c_addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
@@ -590,6 +609,7 @@ int gssb_interstage_settings_unlock(char *fmt, char *params, int nparams)
         if (gs_gssb_istage_settings_lock(i2c_addr, i2c_timeout_ms) != GS_OK)
             return CMD_ERROR_FAIL;
     }
+#endif
     LOGR(tag, "Parameters unlock: %d", unlock);
     return CMD_ERROR_NONE;
 }
@@ -598,15 +618,17 @@ int gssb_interstage_settings_unlock(char *fmt, char *params, int nparams)
 int gssb_soft_reset(char *fmt, char *params, int nparams)
 {
     LOGR(tag, "Resetting device %#X...", i2c_addr);
+#ifdef NANOMIND
     if (gs_gssb_soft_reset(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
-
+#endif
     return CMD_ERROR_NONE;
 }
 
 
 int gssb_interstage_get_status(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     gs_gssb_istage_status_t status;
     const char *state_str;
 
@@ -645,7 +667,7 @@ int gssb_interstage_get_status(char *fmt, char *params, int nparams)
     LOGR(tag, "Knife that will be used in next deploy:\t %"PRIu8"", status.active_knife);
     LOGR(tag, "Total deploy attempts:\t\t\t %"PRIu16"", status.total_number_of_deploys);
     LOGR(tag, "Reboot deploy cnt:\t\t\t %"PRIu8"", status.reboot_deploy_cnt);
-
+#endif
     return CMD_ERROR_NONE;
 }
 
@@ -662,16 +684,18 @@ int gssb_ar6_burn(char *fmt, char *params, int nparams)
         LOGE(tag, "Duration out of range [0 - 20]");
         return CMD_ERROR_SYNTAX;
     }
-
+#ifdef NANOMIND
     if (gs_gssb_ar6_burn(i2c_addr, i2c_timeout_ms, (uint8_t)duration) != GS_OK)
         return CMD_ERROR_FAIL;
     else
+#endif
         return CMD_ERROR_NONE;
 }
 
 // FIXME: Remove?
 int gssb_ar6_get_status(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     gs_gssb_ar6_status_t status;
 
     if (gs_gssb_ar6_get_release_status(i2c_addr, i2c_timeout_ms, &status.release) != GS_OK)
@@ -720,7 +744,7 @@ int gssb_ar6_get_status(char *fmt, char *params, int nparams)
     LOGR(tag, "Board\r");
     LOGR(tag, "\tSeconds since boot:\t\t\t %"PRIu32"", status.board.seconds_since_boot);
     LOGR(tag, "\tNumber of reboots:\t\t\t %hhu", status.board.reboot_count);
-
+#endif
     return CMD_ERROR_NONE;
 }
 
@@ -743,13 +767,14 @@ int gssb_common_burn_channel(char *fmt, char *params, int nparams)
         LOGW(tag, "Duration out of range [0 - 60]");
         return CMD_ERROR_SYNTAX;
     }
-
+#ifdef NANOMIND
     //Can be ant6 or i4... but we do not want to use the internal API, implement the
     //specific device commands instead
     if (gs_gssb_ant6_burn_channel(i2c_addr, i2c_timeout_ms, (uint8_t)channel, (uint8_t)duration) != GS_OK)
     //if (gs_gssb_i4_burn_channel(i2c_addr, i2c_timeout_ms, channel, duration) != GS_OK)
         return CMD_ERROR_FAIL;
     else
+#endif
         return CMD_ERROR_NONE;
 }
 
@@ -758,19 +783,21 @@ int gssb_common_stop_burn(char *fmt, char *params, int nparams)
 {
     if (params == NULL)
         return CMD_ERROR_SYNTAX;
-
+#ifdef NANOMIND
     //Can be ant6 or i4... but we do not want to use the internal API, implement the
     //specific device commands instead
     if (gs_gssb_ant6_stop_burn_all_channels(i2c_addr, i2c_timeout_ms) != GS_OK)
     //if (gs_gssb_i4_stop_burn_all_channels(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
     else
+#endif
         return CMD_ERROR_NONE;
 }
 
 
 int gssb_ant6_get_status_all_channels(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     gs_gssb_ant6_status_t status;
 
     if (gs_gssb_ant6_get_release_status(i2c_addr, i2c_timeout_ms, &status.release) != GS_OK)
@@ -838,13 +865,14 @@ int gssb_ant6_get_status_all_channels(char *fmt, char *params, int nparams)
     LOGR(tag, "Board\r");
     LOGR(tag, "\tSeconds since boot:\t\t\t %"PRIu32"", status.board.seconds_since_boot);
     LOGR(tag, "\tNumber of reboots:\t\t\t %hhu", status.board.reboot_count);
-
+#endif
     return CMD_ERROR_NONE;
 }
 
 
 int gssb_i4_get_status_all_channels(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     gs_gssb_i4_status_t status;
 
     if (gs_gssb_i4_get_release_status(i2c_addr, i2c_timeout_ms, &status.release) != GS_OK)
@@ -926,7 +954,7 @@ int gssb_i4_get_status_all_channels(char *fmt, char *params, int nparams)
     LOGR(tag, "Board\r");
     LOGR(tag, "\tSeconds since boot:\t\t\t %"PRIu32"", status.board.seconds_since_boot);
     LOGR(tag, "\tNumber of reboots:\t\t\t %hhu", status.board.reboot_count);
-
+#endif
     return CMD_ERROR_NONE;
 }
 
@@ -935,6 +963,7 @@ int gssb_common_reset_count(char *fmt, char *params, int nparams)
 {
     if (params == NULL)
         return CMD_ERROR_SYNTAX;
+#ifdef NANOMIND
     //Can be ant6 or i4... but we do not want to use the internal API, implement the
     //specific device commands instead
     if (gs_gssb_ant6_reset_count(i2c_addr, i2c_timeout_ms) != GS_OK)
@@ -942,12 +971,14 @@ int gssb_common_reset_count(char *fmt, char *params, int nparams)
     //if (gs_gssb_i4_reset_count(i2c_addr, i2c_timeout_ms) != GS_OK)
         return CMD_ERROR_FAIL;
     else
+#endif
         return CMD_ERROR_NONE;
 }
 
 
 int gssb_common_backup_settings(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     gs_gssb_backup_settings_t settings;
     int minutes, backup_active, max_burn_duration;
 
@@ -993,25 +1024,27 @@ int gssb_common_backup_settings(char *fmt, char *params, int nparams)
         LOGR(tag, "Not active\r");
     }
     LOGR(tag, "\tMax burn duration:\t\t\t %hhu\r", settings.max_burn_duration);
-
+#endif
     return CMD_ERROR_NONE;
 }
 
 int gssb_update_status(char *fmt, char *params, int nparams)
 {
     char istage_addr[4] = {0x10, 0x11, 0x12, 0x13};
-    gs_gssb_istage_status_t status;
+    gs_gssb_istage_status_t status = {0};
     int deploy_status = 0;
     int rel_status = 0;
     int i = 0;
 
     for(i=0; i < 4; i++)
     {
+#ifdef NANOMIND
         if(gs_gssb_istage_status(istage_addr[i], i2c_timeout_ms, &status) != GS_OK)
         {
             LOGE(tag, "Error reading status from %d", istage_addr[i])
             return CMD_ERROR_FAIL;
         }
+#endif
         rel_status = status.release_status;
         deploy_status += rel_status;
         LOGR(tag, "Interstage selected: %#x. Released: %d", istage_addr[i], rel_status);
@@ -1029,6 +1062,7 @@ int gssb_update_status(char *fmt, char *params, int nparams)
 
 int gssb_antenna_release(char *fmt, char *params, int nparams)
 {
+#ifdef NANOMIND
     int iaddr, knife_on, knife_off, repeats = 0;
     uint8_t addr = 0;
 
@@ -1110,4 +1144,6 @@ int gssb_antenna_release(char *fmt, char *params, int nparams)
         LOGE(tag, "Error parsing params");
         return CMD_ERROR;
     }
+#endif
+    return CMD_OK;
 }
