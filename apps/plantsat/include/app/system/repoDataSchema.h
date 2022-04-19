@@ -231,7 +231,7 @@ static const dat_sys_var_t dat_status_list[] = {
         {dat_obc_hrs_wo_reset,  "obc_hrs_wo_reset",  'u', DAT_IS_STATUS, 0},          ///< Hours since last reset
         {dat_obc_reset_counter, "obc_reset_counter", 'u', DAT_IS_STATUS, 0},          ///< Number of reset since first boot
         {dat_obc_sw_wdt,        "obc_sw_wdt",        'u', DAT_IS_STATUS, 0},          ///< Software watchdog timer counter
-        {dat_obc_temp_1,        "obc_temp_1",        'f', DAT_IS_STATUS, -1},         ///< Temperature value of the first sensor
+        {dat_obc_temp_1,        "obc_temp_1",        'f', DAT_IS_STATUS, 0.0},         ///< Temperature value of the first sensor
         {dat_obc_executed_cmds, "obc_executed_cmds", 'u', DAT_IS_STATUS, 0},          ///< Execute commands counter
         {dat_obc_failed_cmds,   "obc_failed_cmds",   'u', DAT_IS_STATUS, 0},          ///< Commands execute with errors counter
         {dat_dep_deployed,      "dep_deployed",      'u', DAT_IS_STATUS, 0},          ///< Was the satellite deployed?
