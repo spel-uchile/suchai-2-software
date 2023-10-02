@@ -64,11 +64,11 @@ void initAppHook(void *params)
     struct usart_conf conf;
     conf.device = SCH_KISS_DEVICE;
     conf.baudrate = SCH_KISS_UART_BAUDRATE;
-    usart_init(&conf);
-    csp_kiss_init(&csp_if_kiss, &csp_kiss_driver, usart_putc, usart_insert, "KISS");
-    usart_set_callback(my_usart_rx); // Setup callback from USART RX to KISS RS
-    csp_route_set(SCH_TNC_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
-    csp_rtable_set(0, 2, &csp_if_kiss, SCH_TNC_ADDRESS); // Traffic to GND (0-7) via KISS node TNC
+    // usart_init(&conf);
+    // csp_kiss_init(&csp_if_kiss, &csp_kiss_driver, usart_putc, usart_insert, "KISS");
+    // usart_set_callback(my_usart_rx); // Setup callback from USART RX to KISS RS
+    // csp_route_set(SCH_TNC_ADDRESS, &csp_if_kiss, CSP_NODE_MAC);
+    // csp_rtable_set(0, 2, &csp_if_kiss, SCH_TNC_ADDRESS); // Traffic to GND (0-7) via KISS node TNC
 
     /* ANOTHER KISS INTERFACE ? */
 //    struct usart_conf conf;
@@ -89,7 +89,7 @@ void initAppHook(void *params)
                                               SCH_COMM_ZMQ_OUT, SCH_COMM_ZMQ_IN, &csp_if_zmqhub);
     csp_route_set(CSP_DEFAULT_ROUTE, csp_if_zmqhub, CSP_NODE_MAC);
     // Add route to TNC (default node is 29)
-    csp_route_set(29, &csp_if_kiss, 255);
+    // csp_route_set(29, &csp_if_kiss, 255);
 
     /** Init app tasks */
 }
