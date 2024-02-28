@@ -93,8 +93,9 @@ void taskHousekeeping(void *param)
             cmd_t *cmd_update;
             cmd_update = cmd_get_str("eps_update_status");
             cmd_send(cmd_update);
-            //cmd_update = cmd_get_str("obc_update_status");
-            //cmd_send(cmd_update);
+            cmd_t *cmd_update_obc;
+            cmd_update_obc = cmd_get_str("obc_update_status");
+            cmd_send(cmd_update_obc);
         }
 
         /* 5 minutes actions */

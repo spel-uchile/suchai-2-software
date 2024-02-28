@@ -28,6 +28,7 @@ void cmd_cdh_init(void)
     /** OBC COMMANDS **/
     cmd_add("obc_set_mode", obc_set_mode, "%s", 1);
     cmd_add("obc_cancel_deploy", obc_cancel_deploy, "", 0);
+    cmd_add("obc_update_status", obc_update_status, "", 0);
     cmd_add("tm_send_msg", tm_send_msg, "%d %s",  2);
     cmd_add("tm_parse_msg", tm_parse_msg, "", 0);
     cmd_add("tm_send_beacon", tm_send_beacon, "%d", 1);
@@ -79,6 +80,23 @@ int obc_cancel_deploy(char *fmt, char *params, int nparams)
         LOGW(tag, "Opmode not changed because was not deploying (%d)", current_opmode)
         return CMD_ERROR;
     }
+}
+
+int obc_update_status(char *fmt, char *params, int nparams)
+{
+    int rc = 0;
+    int16_t t_obc1 = 0, t_obc2 = 0;
+
+    rc += gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_0, 100, &t_obc1);
+    rc += gs_lm71_read_temp(GS_A3200_SPI_SLAVE_LM71_1, 100, &t_obc2);
+    if(rc != 0)
+    {
+        LOGE(tag, "Error reading OBC temperatures");
+        return CMD_ERROR;
+    }
+
+    rc = dat_set_system_var(dat_obc_temp_1, (t_obc1 + t_obc2) * 10 / 2);
+    return rc == 0 ? CMD_OK : CMD_ERROR;
 }
 
 int tm_send_msg(char *fmt, char *params, int nparams) {
@@ -167,4 +185,5 @@ int obc_read_status_basic(status_data_t *status)
     status->dat_drp_mach_state = dat_get_system_var(dat_drp_mach_state);
     status->dat_drp_mach_payloads = dat_get_system_var(dat_drp_mach_payloads);
     status->dat_drp_mach_step = dat_get_system_var(dat_drp_mach_step);
+    return CMD_OK;
 }
