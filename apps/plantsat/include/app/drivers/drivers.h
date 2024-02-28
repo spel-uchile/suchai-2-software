@@ -7,8 +7,8 @@
  * Include all platform specific drivers.
  */
 
-#ifndef _DRIVERS_H
-#define _DRIVERS_H
+#ifndef _APP_DRIVERS_H
+#define _APP_DRIVERS_H
 //SPEL
 #include "TLE.h"
 
@@ -72,4 +72,4 @@
 #include <gs/gssb/gssb_all_devices.h>
 #include <gs/gssb/gssb_autodeploy.h>
 
-#endif
+#endif //_APP_DRIVERS_H

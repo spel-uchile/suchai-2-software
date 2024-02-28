@@ -61,8 +61,8 @@ We have to build two apps: the `plantsat` (space segment) and the `groundstation
 For this, we provide convenient scripts that set up the required CMAKE variable and build:
 
 ```shell
-sh build-plantsat_sim.sh
-sh build-groundstation.sh
+sh build_plantsat_sim.sh
+sh build_groundstation.sh
 ```
 
 The results are two executables located at:
