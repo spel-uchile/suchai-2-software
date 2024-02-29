@@ -23,6 +23,10 @@
 
 #include "suchai/repoCommand.h"
 
+#ifdef SIM
+#include "drivers-sim/cdh.h"
+#endif
+
 /**
  * Register command and data handling (C&DH) commands
  */
@@ -47,6 +51,20 @@ int obc_set_mode(char *fmt, char *params, int nparams);
  */
 int obc_cancel_deploy(char *fmt, char *params, int nparams);
 
+/**
+ * Update OBC related system variables, e.g.: OBC temperatures.
+ * @param fmt ""
+ * @param params ""
+ * @param nparams 0
+ * @return CMD_OK, CMD_ERROR
+ */
+int obc_update_status(char *fmt, char *params, int nparams);
+
+/**
+ * Helper function to read the basic status variables (E.g. to send as a beacon)
+ * @param status_data Structure to fill with data.
+ * @return CMD_OK (1)
+ */
 int obc_read_status_basic(status_data_t *status_data);
 
 /**

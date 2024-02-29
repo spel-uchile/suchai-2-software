@@ -33,6 +33,7 @@
 #include "app/system/taskHousekeeping.h"
 #include "app/system/taskADCS.h"
 #include "app/system/taskSensors.h"
+#include "drivers-sim/interface.h"
 
 static char *tag = "app_main";
 
@@ -225,6 +226,10 @@ void initAppHook(void *params)
 
     /** Finish CSP setup */
     init_setup_libcsp_2();
+
+    /** Finish drivers setup*/
+    iface_open();
+
 
 #if !SCH_EPS_OUT_ENABLED
     LOGI(tag, "POWERING OFF ALL EPS OUTPUT")
