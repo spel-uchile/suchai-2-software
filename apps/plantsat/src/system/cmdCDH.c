@@ -98,7 +98,12 @@ int obc_update_status(char *fmt, char *params, int nparams)
     }
     t_obc = (t_obc1 + t_obc2) * 10 / 2;
 #elif defined(SIM)
-    t_obc = get_obc_tem();
+    rc = sim_obc_get_temp(&t_obc);
+    if(rc != 0)
+    {
+        LOGE(tag, "Error reading OBC temperatures");
+        return CMD_ERROR;
+    }
 #endif
     LOGI(tag, "OBC TEMP: %d ºC", t_obc);
     rc = dat_set_system_var(dat_obc_temp_1, t_obc);
