@@ -14,7 +14,7 @@
  * Initializes I2C driver
  * @return 0 if success, -1 otherwise
  */
-int8_t iface_open();
+int iface_open();
 
 /**
  * De-Initializes I2C driver
@@ -29,6 +29,6 @@ void iface_close();
  * @param recv_len Receive buffer length
  * @return 0 if Ok, -1 otherwise
  */
-int8_t iface_transaction(uint8_t *send, size_t send_len, uint8_t *recv, size_t recv_len);
+int iface_transaction(uint8_t *send, size_t send_len, uint8_t *recv, size_t recv_len);
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_INTERFACE_H

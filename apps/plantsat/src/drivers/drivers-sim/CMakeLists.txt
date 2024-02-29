@@ -1,6 +1,8 @@
 set(SOURCE_FILES
         interface.c
+        adcs.c
         cdh.c
+        eps.c
 )
 
 add_library(drivers-sim ${SOURCE_FILES})
