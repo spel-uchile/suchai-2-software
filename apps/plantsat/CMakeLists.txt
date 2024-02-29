@@ -71,3 +71,7 @@ add_executable(suchai-app ${SOURCE_FILES})
 target_include_directories(suchai-app PUBLIC ${GS_INCLUDE_PATH})
 target_include_directories(suchai-app PUBLIC include)
 target_link_libraries(suchai-app PUBLIC suchai-fs-core)
+
+add_subdirectory(src/drivers/drivers-sim)
+target_include_directories(suchai-app PUBLIC src/drivers/drivers-sim/include)
+target_link_libraries(suchai-app PUBLIC drivers-sim)
