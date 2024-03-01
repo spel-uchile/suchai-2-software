@@ -62,7 +62,7 @@ int iface_transaction(uint8_t *send, size_t send_len, uint8_t *recv, size_t recv
     printf("Sending "); iface_buff_debug(send, send_len); printf("\n");
     zmq_send(driver.socket, send, send_len, 0);
     zmq_recv(driver.socket, recv, recv_len, 0);
-    printf("Received "); iface_buff_debug(recv, send_len); printf("\n");
+    printf("Received "); iface_buff_debug(recv, recv_len); printf("\n");
     sem_post(&driver.sem);
     return 0;
 }
