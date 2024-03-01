@@ -8,8 +8,8 @@
 #include "drivers-sim/interface.h"
 
 #define SIM_EPS_ID 0X02
-#define SIM_OBC_ADDR_HKP 0X00
-#define SIM_OBC_ADDR_SET 0X01
+#define SIM_EPS_ADDR_HKP 0X00
+#define SIM_EPS_ADDR_SET 0X01
 
 typedef struct eps_hk_read{
     int vbat;

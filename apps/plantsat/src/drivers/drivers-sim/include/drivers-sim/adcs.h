@@ -15,9 +15,9 @@
 #define SIM_ADCS_ADDR_MTT 0X03
 
 typedef struct mag_read{
-    float mag_x;
-    float mag_y;
-    float mag_z;
+    float x;
+    float y;
+    float z;
 } mag_read_t;
 
 typedef struct gyro_read{
