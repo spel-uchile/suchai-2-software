@@ -18,3 +18,11 @@ int sim_eps_set_output(uint8_t channel, uint8_t mode)
     int rc = iface_transaction(send, 4, (uint8_t*)&status, sizeof(int));
     return rc;
 }
+
+int sim_eps_set_heater(uint8_t mode)
+{
+    uint8_t send[3] = {SIM_EPS_ID, SIM_EPS_ADDR_HEATER, mode};
+    int status = -1;
+    int rc = iface_transaction(send, 3, (uint8_t*)&status, sizeof(int));
+    return rc;
+}

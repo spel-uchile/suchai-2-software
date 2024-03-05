@@ -73,13 +73,23 @@ int eps_hard_reset(char *fmt, char *params, int nparams)
 
 int eps_get_hk(char *fmt, char *params, int nparams)
 {
-    eps_hk_t hk = {0};
     int rc = 0;
-#ifdef NANOMIND
+#if defined(NANOMIND)
+    eps_hk_t hk = {0};
     rc = eps_hk_get(&hk);
     if(rc == 0) return CMD_ERROR;
 
     eps_hk_print(&hk);
+#elif defined(SIM)
+    eps_hk_read_t eps_hk_reading;
+    rc = sim_eps_get_hk(&eps_hk_reading);
+    if(rc != 0)
+    {
+        LOGE(tag, "Error reading EPS HK data");
+        return CMD_ERROR;
+    }
+    printf("Voltage: %d mV; Input: %d mA; Output: %d mA; Temp: %d ºC\n",
+           eps_hk_reading.vbat, eps_hk_reading.current_in, eps_hk_reading.current_out, eps_hk_reading.temp);
 #endif
 
     return CMD_OK;
@@ -116,10 +126,12 @@ int eps_set_heater(char *fmt, char *params, int nparams)
     if(sscanf(params, fmt, &heater, &on_off) == nparams)
     {
         LOGI(tag, "Setting heater %d to state %d", heater, on_off);
-#ifdef NANOMIND
+#if defined(NANOMIND)
         eps_heater((uint8_t) heater, (uint8_t) on_off, state);
+#elif defined(SIM)
+        sim_eps_set_heater((uint8_t)on_off);
 #endif
-        LOGI(tag, "Heater state is %u %u",(unsigned int) state[0],(unsigned int) state[1]);
+        LOGI(tag, "Heater state is %u %u", (unsigned int)state[0], (unsigned int)state[1]);
         return CMD_OK;
     }
     else
@@ -145,8 +157,10 @@ int eps_set_output(char *fmt, char *params, int nparams)
     mode = mode == 0 ? 0 : 1; // Mode is 0 -> OFF or > 0 = 1 -> ON
 
     int rc = 0;
-#ifdef NANOMIND
+#if defined(NANOMIND)
     rc = eps_output_set_single((uint8_t)channel, (uint8_t)mode, 0);
+#elif defined(SIM)
+    rc = sim_eps_set_output((uint8_t)channel, (uint8_t)mode);
 #endif
     if(rc > 0)
         return CMD_OK;
@@ -169,8 +183,13 @@ int eps_set_output_all(char *fmt, char *params, int nparams)
     mask = mode ? 0xFF : 0x00; // Mode 1 -> All outputs on, else all outputs off
 
     int rc = 0;
-#ifdef NANOMIND
+#if defined(NANOMIND)
     eps_output_set(mask);
+#elif defined(SIM)
+    for(uint8_t i=0; i<7; i++)
+    {
+        rc += sim_eps_set_output(i, (uint8_t)mode);
+    }
 #endif
     if(rc > 0)
         return CMD_OK;
@@ -222,16 +241,32 @@ int eps_reset_wdt(char *fmt, char *params, int nparams)
 int eps_update_status_vars(char *fmt, char *params, int nparams)
 {
     int rc = 0;
+    uint32_t cursun = 0;
+    uint32_t cursys = 0;
+    uint32_t vbatt = 0;
+    int32_t tbat = 0;
+
+#if defined(NANOMIND)
     eps_hk_t hk = {0};
-#ifdef NANOMIND
     rc = eps_hk_get(&hk);
+    cursun = hk.cursun;
+    cursys = hk.cursys;
+    vbatt = hk.vbatt;
+    tbat = (hk.temp[4]+hk.temp[5])*10/2;
+#elif defined(SIM)
+    eps_hk_read_t eps_hk_reading;
+    rc = sim_eps_get_hk(&eps_hk_reading);
+    cursun = eps_hk_reading.current_in;
+    cursys = eps_hk_reading.current_out;
+    vbatt = eps_hk_reading.vbat;
+    tbat = eps_hk_reading.temp;
 #endif
     if(rc > 0)
     {
-        dat_set_system_var(dat_eps_vbatt, hk.vbatt);
-        dat_set_system_var(dat_eps_cur_sun, hk.cursun);
-        dat_set_system_var(dat_eps_cur_sys, hk.cursys);
-        dat_set_system_var(dat_eps_temp_bat0, (hk.temp[4]+hk.temp[5])*10/2);
+        dat_set_system_var(dat_eps_vbatt, vbatt);
+        dat_set_system_var(dat_eps_cur_sun, cursun);
+        dat_set_system_var(dat_eps_cur_sys, cursys);
+        dat_set_system_var(dat_eps_temp_bat0, tbat);
     }
     else
     {
