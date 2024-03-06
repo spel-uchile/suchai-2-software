@@ -119,13 +119,11 @@ void taskADCS(void *param)
                 // 10 Hz for gyro update
                 // Update gyro sensor
 
-#ifdef NANOMIND
                 cmd_t *cmd_get_omega = cmd_get_str("get_obc_omega");
                 cmd_add_params_str(cmd_get_omega, NULL);
                 cmd_send(cmd_get_omega);
-                osDelay(30);
+                osDelay(30);  // TODO sync. command execution.
                 _get_sat_vector(&current_omega_b, dat_ads_omega_x);
-#endif
                 LOGI(tag, "Angular velocity: (%f, %f, %f) [@bodyframe]", current_omega_b.v0, current_omega_b.v1,
                      current_omega_b.v2)
                 double dt = (double) elapsed_msec * 0.001;
@@ -143,13 +141,11 @@ void taskADCS(void *param)
                     //current_mag_b = test_transform_ypr(current_mag_i, yaw_rate * elapsed_msec * 0.001,
                     //                                             pitch_rate * elapsed_msec * 0.001,
                     //                                             roll_rate * elapsed_msec * 0.001);
-#ifdef NANOMIND
                     cmd_t *cmd_get_mag = cmd_get_str("get_obc_mag");
                     cmd_add_params_str(cmd_get_mag, NULL);
                     cmd_send(cmd_get_mag);
-                    osDelay(50);
+                    osDelay(50);  // TODO sync. command execution
                     _get_sat_vector(&current_mag_b, dat_ads_mag_x);
-#endif
                     LOGI(tag, "Magnetic field: (%f, %f, %f) [@bodyframe]", current_mag_b.v0, current_mag_b.v1,
                          current_mag_b.v2);
 
@@ -171,9 +167,9 @@ void taskADCS(void *param)
                     double sun_norm = vec_norm(sun_pos_from_sc_i);
                     double sun_norm_sensor = vec_norm(sun_dir_b);
                     if_sun_info = isDark == 0 && sun_norm != 0.0 && sun_norm_sensor != 0.0;
-                    printf("Vale: %d \n", if_sun_info);
+                    LOGI(tag, "if_sun_info: %d \n", if_sun_info);
                     if (if_sun_info) {
-                        printf("Calculating quaternion ...");
+                        LOGI(tag, "Calculating quaternion ...");
                         determine_quaternion_triadekf(isDark, current_mag_b, current_mag_i, sun_dir_b,
                                                       sun_pos_from_sc_i, &current_q_det);
                         LOGI(tag, "Quaternion i2b determined: (%f, %f, %f, %f)", current_q_det.q0, current_q_det.q1,
@@ -183,7 +179,7 @@ void taskADCS(void *param)
                         osDelay(30);
                     }
                     else{
-                        printf("Calculating quaternion ...");
+                        LOGI(tag, "Calculating quaternion ...");
                         determine_quaternion_by_mtt(current_mag_b, current_mag_i, &current_q_det);
                         LOGI(tag, "Quaternion i2b determined: (%f, %f, %f, %f)", current_q_det.q0, current_q_det.q1,
                             current_q_det.q2, current_q_det.q3);
@@ -270,11 +266,11 @@ void taskADCS(void *param)
                 cmd_add_params_var(cmd_1h, 1); // Add 1hr
                 cmd_send(cmd_1h);
             }
-            printf("Condition for save: %u, time: %d \n", if_sun_info, elapsed_msec);
+            LOGI(tag, "Condition for save: %u, time: %d \n", if_sun_info, elapsed_msec);
             // Update step of time
             portTick last_ticks = xLastWakeTime;
             osTaskDelayUntil(&xLastWakeTime, delay_ms); //Suspend task
-            //printf("Delta time: %lu \n", xLastWakeTime - last_ticks);
+            //LOGI(tag, "Delta time: %lu \n", xLastWakeTime - last_ticks);
             elapsed_msec += delay_ms;
             value32_t lapse_attitude;
             lapse_attitude.i = dat_get_system_var(dat_time_to_attitude);

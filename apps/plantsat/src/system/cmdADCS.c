@@ -425,9 +425,11 @@ int mtt_set_pwm_duty(char* fmt, char* params, int nparams)
     }
 
     LOGR(tag, "Setting duty %d to Channel %d", duty, channel);
-#ifdef NANOMIND
+#if defined(NANOMIND)
     gs_a3200_pwm_enable(channel);
     gs_a3200_pwm_set_duty(channel, duty);
+#elif defined(SIM)
+    sim_adcs_set_magnetorquer((uint8_t)channel, (uint8_t)duty);
 #endif
     return CMD_OK;
 }
@@ -450,6 +452,8 @@ int mtt_set_pwm_freq(char* fmt, char* params, int nparams)
     float actual_freq = 0.0F;
 #ifdef NANOMIND
     actual_freq = gs_a3200_pwm_set_freq(channel, freq);
+#else
+    return CMD_ERROR;
 #endif
     LOGR(tag, "PWM %d Freq set to: %.4f", channel, actual_freq);
     return CMD_OK;
@@ -474,45 +478,89 @@ int mtt_set_pwm_pwr(char *fmt, char *params, int nparams)
 
 int adcs_get_mag(char* fmt, char* params, int nparams)
 {
-#ifdef NANOMIND
+    vector3_t mag = {0};
+#if defined(NANOMIND)
     gs_error_t result;
     gs_hmc5843_data_t hmc_reading;
     result = gs_hmc5843_read_single(&hmc_reading);
 
-    if(result == GS_OK)
+    if (result == GS_OK)
     {
-        vector3_t mag;
         mag.v0 = hmc_reading.x; // nano Tesla
         mag.v1 = hmc_reading.y; // nT
         mag.v2 = hmc_reading.z; // nT
-        _set_sat_vector(&mag, dat_ads_mag_x);
-        return CMD_OK;
     }
+    else
+    {
+        return CMD_ERROR;
+    }
+#elif defined(SIM)
+    mag_read_t hmc_reading;
+    int rc = sim_adcs_get_magnetometer(&hmc_reading);
+
+    if (rc == 0)
+    {
+        mag.v0 = (double)hmc_reading.x;
+        mag.v1 = (double)hmc_reading.y;
+        mag.v2 = (double)hmc_reading.z;
+    }
+    else
+    {
+        return CMD_ERROR;
+    }
+#else
     return CMD_ERROR;
 #endif
+
+    _set_sat_vector(&mag, dat_ads_mag_x);
     return CMD_OK;
 }
 
 int adcs_get_omega(char* fmt, char* params, int nparams)
 {
-#ifdef NANOMIND
+    vector3_t omega = {0};
+    vector3_t bias_sensor_omega_b = {0};
+
+#if defined(NANOMIND)
     int result;
     gs_mpu3300_gyro_t gyro_reading;
     result = gs_mpu3300_read_gyro(&gyro_reading);
 
     if(result == 0)
     {
-        vector3_t bias_sensor_omega_b;
-        _get_sat_vector(&bias_sensor_omega_b, dat_ads_bias_x);
-        vector3_t omega;
-        omega.v0 = gyro_reading.gyro_x + bias_sensor_omega_b.v[0];
-        omega.v1 = gyro_reading.gyro_y + bias_sensor_omega_b.v[0];
-        omega.v2 = gyro_reading.gyro_z + bias_sensor_omega_b.v[0];
-        _set_sat_vector(&omega, dat_ads_omega_x);
-        return CMD_OK;
+        omega.v0 = gyro_reading.gyro_x;
+        omega.v1 = gyro_reading.gyro_y;
+        omega.v2 = gyro_reading.gyro_z;
     }
+    else
+    {
+        return CMD_ERROR;
+    }
+#elif defined(SIM)
+    gyro_read_t gyro_reading;
+    int result = sim_adcs_get_gyroscope(&gyro_reading);
+
+    if(result == 0)
+    {
+        omega.v0 = gyro_reading.gyro_x;
+        omega.v1 = gyro_reading.gyro_y;
+        omega.v2 = gyro_reading.gyro_z;
+    }
+    else
+    {
+        return CMD_ERROR;
+    }
+#else
     return CMD_ERROR;
 #endif
+
+    // Add bias and save readings
+    _get_sat_vector(&bias_sensor_omega_b, dat_ads_bias_x);
+    omega.v0 += bias_sensor_omega_b.v0;
+    omega.v1 += bias_sensor_omega_b.v1;
+    omega.v2 += bias_sensor_omega_b.v2;
+    _set_sat_vector(&omega, dat_ads_omega_x);
+
     return CMD_OK;
 }
 
@@ -765,7 +813,7 @@ int adcs_detumbling_mag(char* fmt, char* params, int nparams)
 int adcs_set_target(char* fmt, char* params, int nparams)
 {
     double rot;
-    vector3_t i_tar;  // Target vector, intertial frame, read as parameter
+    vector3_t i_tar;  // Target vector, inertial frame, read as parameter
     vector3_t b_tar;
     vector3_t b_dir;  // Face to point to, body frame
     vector3_t b_lambda;
