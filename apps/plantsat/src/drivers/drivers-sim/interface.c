@@ -19,8 +19,11 @@ int iface_open()
     sem_init(&driver.sem, 0, 1);
     sem_wait(&driver.sem);
 
+    int timeout_ms = 1000;
     driver.context = zmq_ctx_new();
     driver.socket = zmq_socket(driver.context, ZMQ_REQ);
+    zmq_setsockopt(driver.socket, ZMQ_RCVTIMEO, &timeout_ms, sizeof(timeout_ms));
+    zmq_setsockopt(driver.socket, ZMQ_SNDTIMEO, &timeout_ms, sizeof(timeout_ms));
     const char *endpoint = "tcp://localhost:5555";
     zmq_connect(driver.socket, endpoint);
     driver.open = true;
@@ -60,8 +63,18 @@ int iface_transaction(uint8_t *send, size_t send_len, uint8_t *recv, size_t recv
     assert(driver.open);
     sem_wait(&driver.sem);
     printf("Sending "); iface_buff_debug(send, send_len); printf("\n");
-    zmq_send(driver.socket, send, send_len, 0);
-    zmq_recv(driver.socket, recv, recv_len, 0);
+    if(zmq_send(driver.socket, send, send_len, 0) != send_len)
+    {
+        printf("Error sending!\n");
+        sem_post(&driver.sem);
+        return -1;
+    }
+    if(zmq_recv(driver.socket, recv, recv_len, 0) != recv_len)
+    {
+        printf("Error receiving!\n");
+        sem_post(&driver.sem);
+        return -1;
+    }
     printf("Received "); iface_buff_debug(recv, recv_len); printf("\n");
     sem_post(&driver.sem);
     return 0;
