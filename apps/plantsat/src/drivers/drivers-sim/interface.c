@@ -19,7 +19,7 @@ int iface_open()
     sem_init(&driver.sem, 0, 1);
     sem_wait(&driver.sem);
 
-    int timeout_ms = 1000;
+    int timeout_ms = 2000;
     driver.context = zmq_ctx_new();
     driver.socket = zmq_socket(driver.context, ZMQ_REQ);
     zmq_setsockopt(driver.socket, ZMQ_RCVTIMEO, &timeout_ms, sizeof(timeout_ms));
