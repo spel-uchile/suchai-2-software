@@ -1,6 +1,7 @@
 set(SOURCE_FILES
         interface.c
         adcs.c
+        camera.c
         cdh.c
         eps.c
 )

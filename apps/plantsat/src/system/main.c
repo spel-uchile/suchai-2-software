@@ -30,6 +30,7 @@
 #include "app/system/cmdRW.h"
 #include "app/system/cmdSensors.h"
 #include "app/system/cmdCDH.h"
+#include "app/system/cmdCAM.h"
 #include "app/system/taskHousekeeping.h"
 #include "app/system/taskADCS.h"
 #include "app/system/taskSensors.h"
@@ -223,6 +224,7 @@ void initAppHook(void *params)
     cmd_rw_init();
     cmd_sensors_init();
     cmd_cdh_init();
+    cmd_cam_init();
 
     /** Finish CSP setup */
     init_setup_libcsp_2();

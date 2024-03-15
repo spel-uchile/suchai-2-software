@@ -1,6 +1,8 @@
+import time
 import zmq
 import random
 import struct
+from PIL import Image
 
 SIM_OBC_ID = 0X01
 SIM_OBC_ADDR_TEMP = 0X00
@@ -15,6 +17,14 @@ SIM_ADCS_ADDR_MAG = 0X00
 SIM_ADCS_ADDR_GYR = 0X01
 SIM_ADCS_ADDR_SUN = 0X02
 SIM_ADCS_ADDR_MTT = 0X03
+
+SIM_CAM_ID = 0x04
+SIM_CAM_ADDR_SIZE = 0x00
+SIM_CAM_ADDR_TAKE = 0x01
+SIM_CAM_PATH_LEN = 256
+
+cam_size_x = 1024
+cam_size_y = 1024
 
 def process_obc_request(message: bytes) -> bytes:
     if message[1] == SIM_OBC_ADDR_TEMP:
@@ -55,6 +65,24 @@ def process_adcs_request(message: bytes) -> bytes:
     return reply
 
 
+def process_cam_request(message: bytes) -> bytes:
+    if message[1] == SIM_CAM_ADDR_SIZE:
+        global cam_size_x, cam_size_y
+        cam_size_x, cam_size_y = struct.unpack("ii", message[2:])
+        reply = struct.pack("i", 1)
+    elif message[1] == SIM_CAM_ADDR_TAKE:
+        img = Image.new("RGB", (cam_size_x, cam_size_y))
+        img_path = "/tmp/img_{}.png".format(int(time.time()))
+        img.save(img_path)
+        img_path = img_path.encode('ascii')
+        img_path += b"\0"*(SIM_CAM_PATH_LEN-len(img_path))
+        reply = img_path
+    else:
+        reply = message
+
+    return reply
+
+
 def process_request(message: bytes) -> bytes:
     if message[0] == SIM_OBC_ID:
         reply = process_obc_request(message)
@@ -62,6 +90,8 @@ def process_request(message: bytes) -> bytes:
         reply = process_eps_request(message)
     elif message[0] == SIM_ADCS_ID:
         reply = process_adcs_request(message)
+    elif message[0] == SIM_CAM_ID:
+        reply = process_cam_request(message)
     else:
         reply = message
     return reply
