@@ -34,7 +34,9 @@
 #include "app/system/taskHousekeeping.h"
 #include "app/system/taskADCS.h"
 #include "app/system/taskSensors.h"
+#ifdef SIM
 #include "drivers-sim/interface.h"
+#endif
 
 static char *tag = "app_main";
 
@@ -230,7 +232,9 @@ void initAppHook(void *params)
     init_setup_libcsp_2();
 
     /** Finish drivers setup*/
+#ifdef SIM
     iface_open();
+#endif
 
 
 #if !SCH_EPS_OUT_ENABLED
