@@ -200,7 +200,7 @@ typedef enum dat_status_address_enum {
 /**
  * A system variable (status or config) with an address, name, type and value
  */
-#define MAX_VAR_NAME 24
+#define MAX_VAR_NAME 32
 
 typedef struct __attribute__((packed)) dat_sys_var {
     uint16_t address;   ///< Variable address or index (in the data storage)
