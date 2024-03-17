@@ -20,8 +20,14 @@ int iface_open()
     sem_wait(&driver.sem);
 
     int timeout_ms = 2000;
+    int zmq_correlate = 1;
+    int zmq_relaxed = 1;
+    int zmq_linger = 0;
     driver.context = zmq_ctx_new();
     driver.socket = zmq_socket(driver.context, ZMQ_REQ);
+    zmq_setsockopt(driver.socket, ZMQ_REQ_CORRELATE, &zmq_correlate, sizeof(zmq_correlate));
+    zmq_setsockopt(driver.socket, ZMQ_REQ_RELAXED, &zmq_relaxed, sizeof(zmq_relaxed));
+    zmq_setsockopt(driver.socket, ZMQ_LINGER, &zmq_linger, sizeof(zmq_linger));
     zmq_setsockopt(driver.socket, ZMQ_RCVTIMEO, &timeout_ms, sizeof(timeout_ms));
     zmq_setsockopt(driver.socket, ZMQ_SNDTIMEO, &timeout_ms, sizeof(timeout_ms));
     const char *endpoint = "tcp://localhost:5555";
