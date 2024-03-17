@@ -26,7 +26,7 @@ static const char *tag = "cmdAX100";
 static char trx_node = SCH_TRX_ADDRESS;
 
 static void _com_config_help(void);
-static void _com_config_find(char *param_name, int table, param_table_t **param);
+static void _com_config_find(char *param_name, int table, const param_table_t **param);
 
 void cmd_ax100_init(void)
 {
@@ -109,7 +109,7 @@ int com_get_config(char *fmt, char *params, int nparams)
     n_args = sscanf(params, fmt, &table, &param);
     if(n_args == nparams)
     {
-        param_table_t *param_i;
+        const param_table_t *param_i;
 
         // If param is 'help' then show the available param names
         if(strcmp(param, "help") == 0)
@@ -176,7 +176,7 @@ int com_set_config(char *fmt, char *params, int nparams)
     n_args = sscanf(params, fmt, &table, &param, &value);
     if(n_args == nparams)
     {
-        param_table_t *param_i;
+        const param_table_t *param_i;
 
         // If param is 'help' then show the available param names
         if(strcmp(param, "help") == 0)
@@ -262,7 +262,7 @@ void _com_config_help(void)
  * @param param param_table_t *. The parameter type, size and index will be
  * stored here. If the parameter is not found, this pointer is set to NULL.
  */
-void _com_config_find(char *param_name, int table, param_table_t **param)
+void _com_config_find(char *param_name, int table, const param_table_t **param)
 {
     int i = 0;
     *param = NULL;
