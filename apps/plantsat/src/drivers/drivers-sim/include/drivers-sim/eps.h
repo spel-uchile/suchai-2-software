@@ -11,6 +11,7 @@
 #define SIM_EPS_ADDR_HKP 0X00
 #define SIM_EPS_ADDR_SET 0X01
 #define SIM_EPS_ADDR_HEATER 0X02
+#define SIM_EPS_ADDR_HARD_RESET 0X03
 
 typedef struct eps_hk_read{
     int vbat;
@@ -40,5 +41,11 @@ int sim_eps_set_output(uint8_t channel, uint8_t mode);
  * @return 1 Ok, -1 otherwise
  */
 int sim_eps_set_heater(uint8_t mode);
+
+/**
+ * Send the hard reset command to the EPS
+ * @return
+ */
+int sim_eps_hard_reset();
 
 #endif //SUCHAI_FLIGHT_SOFTWARE_EPS_H

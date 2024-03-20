@@ -26,3 +26,11 @@ int sim_eps_set_heater(uint8_t mode)
     int rc = iface_transaction(send, 3, (uint8_t*)&status, sizeof(int));
     return rc;
 }
+
+int sim_eps_hard_reset()
+{
+    uint8_t send[2] = {SIM_EPS_ID, SIM_EPS_ADDR_HARD_RESET};
+    int status = -1;
+    int rc = iface_transaction(send, 2, (uint8_t*)&status, sizeof(status));
+    return rc;
+}

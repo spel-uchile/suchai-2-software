@@ -63,9 +63,12 @@ int eps_node_set(char *fmt, char *params, int nparams)
 
 int eps_hard_reset(char *fmt, char *params, int nparams)
 {
-#ifdef NANOMIND
+#if defined(NANOMIND)
     if(eps_hardreset() > 0)
         return CMD_OK;
+#elif defined(SIM)
+    sim_eps_hard_reset();
+    obc_reset(NULL, NULL, 0);
 #endif
     LOGE(tag, "Unable to reset the EPS!");
     return CMD_ERROR;
