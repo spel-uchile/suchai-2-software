@@ -51,9 +51,12 @@ void initAppHook(void *params)
 {
     /** Include app commands */
     cmd_app_init();
+    cmd_cdh_init();
+
+#if SCH_GND_ADD_GS
     cmd_ax100_init();
     cmd_eps_init();
-    cmd_cdh_init();
+#endif
 
 #if SCH_GND_ADD_PAYLOADS
     cmd_mag_init();

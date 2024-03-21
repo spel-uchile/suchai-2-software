@@ -4,6 +4,7 @@ set(SCH_TX_BAUD 4800 CACHE STRING "Nanocom TX Baudrate")
 set(SCH_TX_BCN_PERIOD 600 CACHE STRING "Number of seconds between trx beacon packets")
 set(SCH_OBC_BCN_OFFSET 600 CACHE STRING "Number of seconds between obc beacon packets")
 set(SCH_GND_ADD_PAYLOADS 0 CACHE BOOL "Enable payloads commands")
+set(SCH_GND_ADD_GS 0 CACHE BOOL "Enable GomSpace commands (NANOPOWER, AX100)")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/app/system/config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/app/system/config.h)
 
@@ -53,11 +54,17 @@ set(GS_INCLUDE_PATH
 set(SOURCE_FILES
         src/system/main.c
         src/system/cmdAPP.c
-        src/system/cmdAX100.c
         src/system/cmdCDH.c
-        src/system/cmdEPS.c
         src/system/hookCommunications.c
 )
+
+if(${SCH_GND_ADD_GS})
+    list(APPEND SOURCE_FILES
+            src/system/cmdAX100.c
+            src/system/cmdEPS.c
+            ${GS_SOURCE_FILES}
+            )
+endif()
 
 if(${SCH_GND_ADD_PAYLOADS})
     list(APPEND SOURCE_FILES
@@ -66,7 +73,9 @@ if(${SCH_GND_ADD_PAYLOADS})
             )
 endif()
 
-add_executable(ground-app ${GS_SOURCE_FILES} ${SOURCE_FILES})
-target_include_directories(ground-app PRIVATE ${GS_INCLUDE_PATH})
+add_executable(ground-app ${SOURCE_FILES})
+if (${SCH_GND_ADD_GS})
+    target_include_directories(ground-app PRIVATE ${GS_INCLUDE_PATH})
+endif ()
 target_include_directories(ground-app PUBLIC include)
 target_link_libraries(ground-app PUBLIC suchai-fs-core)
