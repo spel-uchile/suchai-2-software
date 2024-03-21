@@ -24,9 +24,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/app/system/config.h.in ${CMAK
 set(SOURCE_FILES
         src/system/main.c
         src/system/cmdADCS.c
-        src/system/cmdAX100.c
         src/system/cmdEPS.c
-        src/system/cmdGSSB.c
         src/system/cmdRW.c
         src/system/cmdSensors.c
         src/system/cmdCDH.c
@@ -38,6 +36,11 @@ set(SOURCE_FILES
         src/drivers/rwdrv10987_2.c
         src/system/TRIADEKF.c
 )
+
+if(${SCH_ARCH} EQUAL "NANOMIND")
+    # Set NanoMind specific sources
+    list(APPEND SOURCE_FILES src/system/cmdAX100.c src/system/cmdGSSB.c)
+endif ()
 
 set(GS_INCLUDE_PATH
         src/drivers/suchai-drivers-bus/lib/libparam_client/src
@@ -69,8 +72,11 @@ set(GS_INCLUDE_PATH
 
 include_directories(include/app/drivers ${GS_INCLUDE_PATH})
 add_executable(suchai-app ${SOURCE_FILES})
-target_include_directories(suchai-app PUBLIC ${GS_INCLUDE_PATH})
 target_include_directories(suchai-app PUBLIC include)
+# Set NanoMind include directories
+if(${SCH_ARCH} EQUAL "NANOMIND")
+    target_include_directories(suchai-app PUBLIC ${GS_INCLUDE_PATH})
+endif ()
 target_link_libraries(suchai-app PUBLIC suchai-fs-core)
 
 add_subdirectory(src/drivers/drivers-sim)

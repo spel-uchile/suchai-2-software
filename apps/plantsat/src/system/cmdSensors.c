@@ -389,7 +389,7 @@ int sensors_get_temperatures(char *fmt, char *params, int nparams)
         return CMD_ERROR;
     }
 #elif defined(SIM)
-    eps_hk_t hk = {0};
+    eps_hk_temp_t hk = {0};
     eps_hk_read_t hk_reading;
     rc = sim_eps_get_hk(&hk_reading);
     if(rc != 0)

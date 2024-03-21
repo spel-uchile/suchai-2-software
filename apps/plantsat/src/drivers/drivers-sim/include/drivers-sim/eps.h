@@ -20,6 +20,10 @@ typedef struct eps_hk_read{
     int temp;
 } eps_hk_read_t;
 
+typedef struct eps_hk_temp{
+    int temp[6];
+} eps_hk_temp_t;
+
 /**
  * Read EPS housekeeping data such as voltage, currents, and temperature.
  * @param hk_read Pointer to store HK data.

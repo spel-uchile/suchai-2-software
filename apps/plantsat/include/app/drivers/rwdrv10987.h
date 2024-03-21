@@ -9,6 +9,7 @@
 *
 */
 
+#include <stdio.h>
 #include "suchai/i2c.h"
 #include "suchai/osDelay.h"
 

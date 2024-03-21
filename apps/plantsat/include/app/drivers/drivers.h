@@ -43,13 +43,6 @@
 #include <gs/embed/asf/drivers/spi/master.h>
 #include <gs/embed/asf/drivers/i2c/i2c.h>
 #include <gs/embed/asf/avr32/drivers/sys/avr32_reset_all_interrupt_settings.h>
-#endif
-#ifdef SIM
-#include "drivers-sim/adcs.h"
-#include "drivers-sim/cdh.h"
-#include "drivers-sim/eps.h"
-#endif
-
 // Util
 #include <gs/util/rtc.h>
 #include <gs/util/time.h>
@@ -76,5 +69,12 @@
 // GSSB
 #include <gs/gssb/gssb_all_devices.h>
 #include <gs/gssb/gssb_autodeploy.h>
+#endif // NANOMIND
+
+#ifdef SIM
+#include "drivers-sim/adcs.h"
+#include "drivers-sim/cdh.h"
+#include "drivers-sim/eps.h"
+#endif // SIM
 
 #endif //_APP_DRIVERS_H
