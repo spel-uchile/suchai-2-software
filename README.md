@@ -53,7 +53,7 @@ dependencies depending on your development environment. The following is the (no
 | zmq >= 4.2.5         | libzmq3-dev       | zeromq               |
 | pyzmq >= 18.1.1      | python3-zmq       | python-pyzmq         |
 | pkg-config >= 0.29.1 | pkg-config        | pkgconf              |
-
+| libmongoc >= 1.25    | libmongoc-dev     | mongo-c-driver       |
 
 ### Build
 
