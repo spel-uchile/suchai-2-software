@@ -30,10 +30,9 @@ int iface_open()
     zmq_setsockopt(driver.socket, ZMQ_LINGER, &zmq_linger, sizeof(zmq_linger));
     zmq_setsockopt(driver.socket, ZMQ_RCVTIMEO, &timeout_ms, sizeof(timeout_ms));
     zmq_setsockopt(driver.socket, ZMQ_SNDTIMEO, &timeout_ms, sizeof(timeout_ms));
-    const char *endpoint = "tcp://localhost:5555";
-    zmq_connect(driver.socket, endpoint);
+    zmq_connect(driver.socket, SCH_SIM_INTERFACE_URI);
     driver.open = true;
-    printf("SIM iface Driver connected to %s", endpoint);
+    printf("SIM iface Driver connected to %s", SCH_SIM_INTERFACE_URI);
 
     sem_post(&driver.sem);
     return 0;

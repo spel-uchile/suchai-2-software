@@ -10,6 +10,8 @@
 #include <stdbool.h>
 #include <semaphore.h>
 
+#include "drivers-sim/config.h"
+
 /**
  * Initializes I2C driver
  * @return 0 if success, -1 otherwise

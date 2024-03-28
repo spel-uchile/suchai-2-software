@@ -15,7 +15,8 @@ OPTIONS="-DAPP=plantsat
 -DSCH_MAX_WDT_TIMER=60
 -DSCH_MAX_GND_WDT_TIMER=5400
 -DSCH_TX_FREQ=437230000
--DSCH_TRX_PORT_APP=16"
+-DSCH_TRX_PORT_APP=16
+-DSCH_SIM_INTERFACE_URI=\"tcp://honeysat-api:5555\""
 
 rm -rf build-suchai-sim
 cmake -B build-suchai-sim -G Ninja $OPTIONS && cmake --build build-suchai-sim -j4
