@@ -16,7 +16,11 @@ OPTIONS="-DAPP=groundstation
 -DSCH_MAX_GND_WDT_TIMER=9999999
 -DSCH_STORAGE_FILE=\"suchai\"
 -DSCH_CSP_CONN_TIMEOUT=250
--DSCH_CSP_READ_TIMEOUT=50"
+-DSCH_CSP_READ_TIMEOUT=50
+-DSCH_LOG_ENABLE_MONGODB=1
+-DSCH_LOG_MONGODB_HOST=\"localhost\"
+-DSCH_LOG_MONGODB_PORT=27017
+-DSCH_LOG_MONGODB_NAME=\"suchai-log\""
 
 rm -rf build-gnd
 cmake -B build-gnd -G Ninja $OPTIONS && cmake --build build-gnd -j4

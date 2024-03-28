@@ -16,7 +16,11 @@ OPTIONS="-DAPP=plantsat
 -DSCH_MAX_GND_WDT_TIMER=5400
 -DSCH_TX_FREQ=437230000
 -DSCH_TRX_PORT_APP=16
--DSCH_SIM_INTERFACE_URI=\"tcp://honeysat-api:5555\""
+-DSCH_SIM_INTERFACE_URI=\"tcp://honeysat-api:5555\"
+-DSCH_LOG_ENABLE_MONGODB=1
+-DSCH_LOG_MONGODB_HOST=\"localhost\"
+-DSCH_LOG_MONGODB_PORT=27017
+-DSCH_LOG_MONGODB_NAME=\"suchai-log\""
 
 rm -rf build-suchai-sim
 cmake -B build-suchai-sim -G Ninja $OPTIONS && cmake --build build-suchai-sim -j4
