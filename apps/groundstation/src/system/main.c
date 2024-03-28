@@ -49,6 +49,11 @@ void my_usart_rx(uint8_t * buf, int len, void * pxTaskWoken) {
  */
 void initAppHook(void *params)
 {
+    /** Set loging system */
+#ifdef SCH_LOG_ENABLE_MONGODB
+    log_set(SCH_LOG_LEVEL, LOG_MODE_MONGO, 0, 0);
+#endif
+
     /** Include app commands */
     cmd_app_init();
     cmd_cdh_init();

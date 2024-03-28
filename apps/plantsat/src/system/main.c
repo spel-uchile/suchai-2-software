@@ -220,6 +220,11 @@ void initAppHook(void *params)
 {
     int rc;
 
+    /** Set loging system */
+#ifdef SCH_LOG_ENABLE_MONGODB
+    log_set(SCH_LOG_LEVEL, LOG_MODE_MONGO, 0, 0);
+#endif
+
     /** Include app commands */
     cmd_adcs_init();
     cmd_eps_init();
