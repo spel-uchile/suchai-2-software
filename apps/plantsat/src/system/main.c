@@ -228,11 +228,11 @@ void initAppHook(void *params)
     /** Include app commands */
     cmd_adcs_init();
     cmd_eps_init();
-    cmd_rw_init();
     cmd_sensors_init();
     cmd_cdh_init();
     cmd_cam_init();
 #ifdef NANOMIND
+    cmd_rw_init();
     cmd_ax100_init();
     cmd_gssb_init();
 #endif

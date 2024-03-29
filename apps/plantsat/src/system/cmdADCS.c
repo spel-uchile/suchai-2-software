@@ -60,12 +60,14 @@ void cmd_adcs_init(void)
     cmd_add("tle_set", tle_set, "%d %n", 2);
     cmd_add("tle_update", tle_update, "", 0);
     cmd_add("tle_prop", tle_prop, "%ld", 1);
-    cmd_add("mtt_set_duty", mtt_set_pwm_duty, "%d %d", 2);
-    cmd_add("mtt_set_freq", mtt_set_pwm_freq, "%d %f", 2);
-    cmd_add("mtt_set_pwr", mtt_set_pwm_pwr, "%d", 1);
     cmd_add("get_obc_mag", adcs_get_mag, "", 0);
     cmd_add("get_obc_omega", adcs_get_omega, "", 0);
     cmd_add("get_obc_sun_vec", get_obc_sun_vec, "", 0);
+
+#if SCH_ADCS_ENABLED
+    cmd_add("mtt_set_duty", mtt_set_pwm_duty, "%d %d", 2);
+    cmd_add("mtt_set_freq", mtt_set_pwm_freq, "%d %f", 2);
+    cmd_add("mtt_set_pwr", mtt_set_pwm_pwr, "%d", 1);
     cmd_add("start_attitude", start_attitude, "%u %u %u", 3);
     cmd_add("set_sc_inertia_matrix", set_sc_inertia_matrix, "%lf %lf %lf %lf %lf %lf", 6);
     cmd_add("set_rw_inertia_matrix", set_rw_inertia_matrix, "%lf", 1);
@@ -77,14 +79,13 @@ void cmd_adcs_init(void)
     cmd_add("set_mtq_axis", set_mtq_axis, "%f %f %f", 3);
     cmd_add("set_quat_fss", set_quat_fss, "%u %u %u %u %u", 5);
     cmd_add("set_bias_omega", set_bias_omega, "%lf %lf %lf", 3);
-#if 1
     cmd_add("adcs_point", adcs_point, "", 0);
     cmd_add("adcs_quat", adcs_get_quaternion, "", 0);
-
     cmd_add("adcs_do_control", adcs_control_torque, "%lf", 1);
     cmd_add("adcs_set_target", adcs_set_target, "%lf %lf %lf %lf %lf %lf", 6);
     cmd_add("adcs_set_to_nadir", adcs_target_nadir, "", 0);
 #endif
+
     // Matrix of calibration of FSS
     T1[0][0] = cos(cal1[3]); T1[0][1] = sin(cal1[3]);
     T1[1][0] = -sin(cal1[3]); T1[1][1] = cos(cal1[3]);
