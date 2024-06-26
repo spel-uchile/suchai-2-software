@@ -327,7 +327,7 @@ void calc_adcs_model_parameters(unsigned int elapsed_msec, vector3_t * sat_pos_i
     LOGI(tag, "Is dark?: %i", isdark[0]);
 }
 
-void eskf_predict_state(double* P, double dt)
+void eskf_predict_state(double P[6][6], double dt)
 {
     LOGD(tag, "Kalman Estimate")
     // Predict Nominal

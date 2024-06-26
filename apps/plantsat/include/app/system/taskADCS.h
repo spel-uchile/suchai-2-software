@@ -23,7 +23,7 @@
 
 void taskADCS(void *param);
 
-void eskf_predict_state(double* P, double dt);
+void eskf_predict_state(double P[6][6], double dt);
 
 void calc_sun_pos_i(double jd, vector3_t * sun_dir);
 
