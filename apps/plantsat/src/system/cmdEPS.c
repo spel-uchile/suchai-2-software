@@ -132,7 +132,12 @@ int eps_set_heater(char *fmt, char *params, int nparams)
 #if defined(NANOMIND)
         eps_heater((uint8_t) heater, (uint8_t) on_off, state);
 #elif defined(SIM)
-        sim_eps_set_heater((uint8_t)on_off);
+        int rc = sim_eps_set_heater((uint8_t)on_off);
+        if (rc == 0)
+        {
+            state[0] = on_off;
+            state[1] = on_off;
+        }
 #endif
         LOGI(tag, "Heater state is %u %u", (unsigned int)state[0], (unsigned int)state[1]);
         return CMD_OK;
