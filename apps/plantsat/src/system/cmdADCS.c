@@ -63,11 +63,12 @@ void cmd_adcs_init(void)
     cmd_add("get_obc_mag", adcs_get_mag, "", 0);
     cmd_add("get_obc_omega", adcs_get_omega, "", 0);
     cmd_add("get_obc_sun_vec", get_obc_sun_vec, "", 0);
-
-#if SCH_ADCS_ENABLED
+    // Magnetorquers commands
     cmd_add("mtt_set_duty", mtt_set_pwm_duty, "%d %d", 2);
     cmd_add("mtt_set_freq", mtt_set_pwm_freq, "%d %f", 2);
     cmd_add("mtt_set_pwr", mtt_set_pwm_pwr, "%d", 1);
+
+#if SCH_ADCS_ENABLED
     cmd_add("start_attitude", start_attitude, "%u %u %u", 3);
     cmd_add("set_sc_inertia_matrix", set_sc_inertia_matrix, "%lf %lf %lf %lf %lf %lf", 6);
     cmd_add("set_rw_inertia_matrix", set_rw_inertia_matrix, "%lf", 1);
@@ -473,6 +474,8 @@ int mtt_set_pwm_pwr(char *fmt, char *params, int nparams)
         gs_a3200_pwr_switch_enable(GS_A3200_PWR_PWM);
     else
         gs_a3200_pwr_switch_disable(GS_A3200_PWR_PWM);
+#else
+    return CMD_ERROR;
 #endif
     return CMD_OK;
 }

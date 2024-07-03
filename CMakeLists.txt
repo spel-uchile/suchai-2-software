@@ -16,6 +16,10 @@ if(NOT EXISTS suchai-flight-software)
     execute_process(COMMAND sh init.sh)
 endif()
 
+# Enable -fsanitize
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
+
 # The compiled library code is here
 set(APP simple CACHE STRING "Application name")
 message("Building for APP apps/${APP} ...")
