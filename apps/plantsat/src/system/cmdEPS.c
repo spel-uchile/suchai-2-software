@@ -65,10 +65,14 @@ int eps_hard_reset(char *fmt, char *params, int nparams)
 {
 #if defined(NANOMIND)
     if(eps_hardreset() > 0)
+    {
         return CMD_OK;
+    }
 #elif defined(SIM)
-    sim_eps_hard_reset();
-    obc_reset(NULL, NULL, 0);
+    if (sim_eps_hard_reset() == 0)
+    {
+        obc_reset(NULL, NULL, 0);  // Never returns
+    }
 #endif
     LOGE(tag, "Unable to reset the EPS!");
     return CMD_ERROR;

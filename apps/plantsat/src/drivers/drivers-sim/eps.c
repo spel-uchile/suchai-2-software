@@ -31,6 +31,7 @@ int sim_eps_hard_reset()
 {
     uint8_t send[2] = {SIM_EPS_ID, SIM_EPS_ADDR_HARD_RESET};
     int status = -1;
-    int rc = iface_transaction(send, 2, (uint8_t*)&status, sizeof(status));
+    int rc = iface_transaction(send, 2, (uint8_t*)&status, sizeof(int));
+    rc = rc == 0 && status > 0 ? 0 : -1;  // Return Ok (0) only if the EPS answered with status 1
     return rc;
 }
