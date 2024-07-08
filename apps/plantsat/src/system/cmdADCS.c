@@ -354,7 +354,7 @@ int tle_prop(char *fmt, char *params, int nparams)
 {
     double r[3];  // Sat position in ECI frame
     double v[3];  // Sat velocity in ECI frame
-    int ts=0;
+    time_t ts=0;
 
     if(params != NULL && sscanf(params, fmt, &ts) != nparams){
         return CMD_SYNTAX_ERROR;
