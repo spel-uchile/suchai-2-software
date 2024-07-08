@@ -17,8 +17,8 @@ if(NOT EXISTS suchai-flight-software)
 endif()
 
 # Enable -fsanitize
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
+#add_compile_options(-fsanitize=address)
+#add_link_options(-fsanitize=address)
 
 # The compiled library code is here
 set(APP simple CACHE STRING "Application name")
