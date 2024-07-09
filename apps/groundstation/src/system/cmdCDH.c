@@ -187,7 +187,7 @@ int tle_send_to_node(char *fmt, char *params, int nparams)
     }
 
     // Download cubesat TLE file
-    rc = system("wget https://www.celestrak.com/NORAD/elements/cubesat.txt -O /tmp/cubesat.tle");
+    rc = system("wget -O /tmp/cubesat.tle https://celestrak.org/NORAD/elements/gp.php?GROUP=active\\&FORMAT=tle");
     if(rc < 0)
     {
         LOGW(tag, "Error downloading TLE file (%d)", rc);
